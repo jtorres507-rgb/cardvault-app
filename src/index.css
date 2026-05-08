@@ -1,77 +1,3652 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@600;700;800;900&display=swap");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ==============================
+   CARDVAULT PRO GLOBAL BASE
+   ============================== */
+
 :root {
-  font-family: "Inter", ui-sans-serif, system-ui, -apple-system,
-    BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #000000;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
   color: #ffffff;
+  background: #0b0c10;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: #0b0c10;
+}
+
 body {
-  margin: 0;
-  min-width: 320px;
   min-height: 100vh;
-  background: #000000;
+  margin: 0;
+  background: #0b0c10;
   color: #ffffff;
 }
 
-* {
-  box-sizing: border-box;
+#root {
+  min-height: 100vh;
 }
 
 button,
 input,
 select,
 textarea {
-  font: inherit;
+  font-family: inherit;
 }
 
 button {
   cursor: pointer;
 }
 
-input,
-select,
-textarea {
-  color-scheme: dark;
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
-.font-vault-heading {
-  font-family: "Montserrat", "Inter", ui-sans-serif, system-ui, sans-serif;
-  letter-spacing: -0.015em;
-  font-weight: 700;
+img {
+  max-width: 100%;
+  display: block;
 }
 
-.font-vault-body {
-  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+/* ==============================
+   SCROLLBAR POLISH
+   ============================== */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
 }
 
-.cardvault-scrollbar::-webkit-scrollbar {
-  width: 8px;
+::-webkit-scrollbar-track {
+  background: #090a0d;
 }
 
-.cardvault-scrollbar::-webkit-scrollbar-track {
-  background: #09090b;
-}
-
-.cardvault-scrollbar::-webkit-scrollbar-thumb {
-  background: #2b3138;
+::-webkit-scrollbar-thumb {
+  background: rgba(245, 196, 81, 0.35);
   border-radius: 999px;
+  border: 2px solid #090a0d;
 }
 
-.cardvault-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #3a414a;
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 196, 81, 0.6);
 }
+
+/* ==============================
+   SELECTION
+   ============================== */
 
 ::selection {
   background: rgba(245, 196, 81, 0.35);
   color: #ffffff;
+}
+
+/* ==============================
+   REPORT SCREEN / PRINT SYSTEM
+   ============================== */
+
+.screen-only {
+  display: block;
+}
+
+.print-only {
+  display: none;
+}
+
+/* ==============================
+   COLLECTION REPORT BASE LAYOUT
+   ============================== */
+
+.collection-print-report {
+  width: 100%;
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #d9d9d9;
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.print-page-header {
+  display: none;
+}
+
+.print-page-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #000000;
+  color: #ffffff;
+  padding: 16px 22px;
+}
+
+.print-brand-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.print-brand-logo {
+  width: 28px !important;
+  height: 28px !important;
+  max-width: 28px !important;
+  max-height: 28px !important;
+  object-fit: contain !important;
+  display: block !important;
+  flex: 0 0 28px !important;
+}
+
+.print-brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #171717 0%, #050505 100%);
+  border: 1px solid #c79b2c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.print-brand-mark-inner {
+  color: #f4c44f;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.print-brand-title {
+  font-size: 16px;
+  font-weight: 900;
+  color: #f4c44f;
+  letter-spacing: 0.01em;
+}
+
+.print-brand-right {
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.print-report-first-page {
+  padding-top: 8px;
+}
+
+.print-report-title-block {
+  text-align: center;
+  margin: 6px 0 22px;
+}
+
+.print-report-title-block h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.1;
+  font-weight: 900;
+  color: #000000;
+}
+
+.print-report-title-block p {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: #5b6b86;
+}
+
+.print-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border: 1px solid #edc04d;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 22px;
+}
+
+.print-summary-card {
+  border-right: 1px solid #edc04d;
+  padding: 10px 12px;
+  text-align: center;
+  background: #ffffff;
+}
+
+.print-summary-card:last-child {
+  border-right: none;
+}
+
+.print-summary-label {
+  font-size: 10px;
+  font-weight: 900;
+  color: #66758f;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.print-summary-value {
+  font-size: 18px;
+  font-weight: 900;
+  color: #000000;
+}
+
+.print-section-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: #000000;
+  margin: 0 0 14px;
+}
+
+/* ==============================
+   COLLECTION REPORT TABLE
+   ============================== */
+
+.print-report-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin-top: 0;
+  font-size: 12px;
+}
+
+.print-report-table thead {
+  display: table-header-group;
+}
+
+.print-report-table th {
+  background: #000000;
+  color: #f4c44f;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: none;
+  padding: 12px 10px;
+  text-align: left;
+  border: none;
+}
+
+.print-report-table td {
+  padding: 10px 10px;
+  border-bottom: 1px solid #e4e4e4;
+  vertical-align: top;
+  color: #111111;
+  word-break: break-word;
+}
+
+.print-report-table tr {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.print-col-index {
+  width: 4%;
+  text-align: center;
+}
+
+.print-col-card {
+  width: 18%;
+}
+
+.print-col-player {
+  width: 12%;
+}
+
+.print-col-year {
+  width: 7%;
+}
+
+.print-col-brand {
+  width: 10%;
+}
+
+.print-col-grade {
+  width: 8%;
+}
+
+.print-col-purchase {
+  width: 10%;
+}
+
+.print-col-estimatedValue {
+  width: 10%;
+}
+
+.print-col-gainLoss {
+  width: 10%;
+}
+
+.print-col-location {
+  width: 11%;
+}
+
+.print-col-status {
+  width: 10%;
+}
+
+.print-col-sku {
+  width: 9%;
+}
+
+.print-col-serialNumber {
+  width: 10%;
+}
+
+.print-col-notes {
+  width: 18%;
+}
+
+.print-card-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.print-card-title {
+  font-weight: 800;
+  color: #000000;
+}
+
+.print-card-subtitle {
+  font-size: 10px;
+  color: #6b7280;
+}
+
+.print-value-positive {
+  color: #0f8a3b;
+  font-weight: 800;
+}
+
+.print-value-negative {
+  color: #c62828;
+  font-weight: 800;
+}
+
+/* ==============================
+   REPORT NOTES
+   ============================== */
+
+.print-report-notes {
+  margin-top: 20px;
+  border: 1px solid #d9dee7;
+  border-radius: 14px;
+  background: #f8fafc;
+  padding: 14px 16px;
+}
+
+.print-report-notes-title {
+  font-size: 14px;
+  font-weight: 900;
+  color: #111827;
+  margin-bottom: 6px;
+}
+.print-report-notes p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #54657d;
+}
+
+@media print {
+  @page {
+    size: letter;
+    margin: 4mm 8mm 8mm 8mm;
+  }
+
+  html,
+  body,
+  #root {
+    width: 100% !important;
+    min-height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .print-only {
+    display: block !important;
+    visibility: visible !important;
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    min-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: visible !important;
+    z-index: 999999 !important;
+  }
+
+  .print-report-shell {
+    display: block !important;
+    visibility: visible !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: none !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  .print-page {
+    display: block !important;
+    visibility: visible !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: none !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  .collection-print-report {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .print-page-header {
+    display: block !important;
+    visibility: visible !important;
+    margin-bottom: 16px !important;
+  }
+
+  .print-page-header-inner {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    background: #000000 !important;
+    color: #ffffff !important;
+    padding: 10px 20px !important;
+  }
+
+  .print-brand-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+  }
+
+  .print-brand-mark {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 9999px !important;
+    background: #111111 !important;
+    border: 1px solid #c79b2c !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .print-brand-mark-inner {
+    color: #f4c44f !important;
+    font-size: 12px !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  .print-brand-title {
+    font-size: 18px !important;
+    font-weight: 900 !important;
+    color: #f4c44f !important;
+  }
+
+  .print-brand-right {
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    color: #ffffff !important;
+  }
+
+.print-report-title-block {
+  text-align: center !important;
+  margin: 0 0 8px 0 !important;
+  padding: 0 !important;
+  }
+
+  .print-report-title-block h1 {
+    margin: 0 !important;
+    font-size: 34px !important;
+    line-height: 1.05 !important;
+    font-weight: 900 !important;
+    color: #000000 !important;
+  }
+
+  .print-report-title-block p {
+    margin: 10px 0 0 !important;
+    font-size: 16px !important;
+    color: #5b6b86 !important;
+  }
+
+  .print-summary-grid {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  width: 100% !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+  margin-bottom: 28px !important;
+}
+
+  .print-summary-card {
+  border: none !important;
+  border-right: 1px solid #edc04d !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 12px 10px !important;
+  text-align: center !important;
+  background: #ffffff !important;
+}
+
+  .print-summary-card:last-child {
+    border-right: none !important;
+  }
+
+  .print-summary-label {
+    font-size: 9px !important;
+    font-weight: 900 !important;
+    color: #66758f !important;
+    letter-spacing: 0.14em !important;
+    text-transform: uppercase !important;
+    margin-bottom: 6px !important;
+  }
+
+  .print-summary-value {
+    font-size: 20px !important;
+    font-weight: 900 !important;
+    color: #000000 !important;
+  }
+
+  .print-section-title {
+    font-size: 24px !important;
+    font-weight: 900 !important;
+    color: #000000 !important;
+    margin: 0 0 16px !important;
+  }
+
+  .print-report-table {
+    width: 100% !important;
+    max-width: none !important;
+    border-collapse: collapse !important;
+    table-layout: fixed !important;
+    font-size: 10px !important;
+  }
+
+  .print-report-table thead {
+    display: table-header-group !important;
+  }
+
+  .print-report-table th {
+    background: #000000 !important;
+    color: #f4c44f !important;
+    font-size: 9px !important;
+    font-weight: 900 !important;
+    padding: 9px 7px !important;
+    text-align: left !important;
+  }
+
+  .print-report-table td {
+    padding: 8px 7px !important;
+    border-bottom: 1px solid #e4e4e4 !important;
+    vertical-align: top !important;
+    color: #111111 !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .print-report-table tr,
+  .print-report-table td,
+  .print-report-table th {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .print-card-title {
+    font-weight: 900 !important;
+    color: #000000 !important;
+  }
+
+  .print-card-subtitle {
+    margin-top: 3px !important;
+    font-size: 8px !important;
+    color: #6b7280 !important;
+  }
+
+  .print-value-positive {
+    color: #0f8a3b !important;
+    font-weight: 900 !important;
+  }
+
+  .print-value-negative {
+    color: #c62828 !important;
+    font-weight: 900 !important;
+  }
+
+  .print-report-notes {
+    margin-top: 22px !important;
+    border: 1px solid #d9dee7 !important;
+    border-radius: 14px !important;
+    background: #f8fafc !important;
+    padding: 14px 16px !important;
+  }
+
+  .print-root,
+  .print-report-page {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  .print-report-notes-title {
+    font-size: 14px !important;
+    font-weight: 900 !important;
+    color: #111827 !important;
+    margin-bottom: 6px !important;
+  }
+
+  .print-report-notes p {
+    margin: 0 !important;
+    font-size: 12px !important;
+    line-height: 1.55 !important;
+    color: #54657d !important;
+  }
+
+  img {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+}
+
+/* ==============================
+      CARD ANALYSIS REPORT
+   ============================== */
+
+@media print {
+  .print-card-analysis-report {
+    width: 86% !important;
+    max-width: 820px !important;
+    margin: 0 auto !important;
+    transform: scale(0.94);
+    transform-origin: top center;
+  }
+
+  .print-card-analysis-report .print-page-header {
+    margin-bottom: 14px !important;
+  }
+
+  .print-card-analysis-report .print-page-header-inner {
+    padding: 10px 18px !important;
+  }
+
+  .print-card-analysis-report .print-brand-logo {
+    width: 30px !important;
+    height: 30px !important;
+    max-width: 30px !important;
+    max-height: 30px !important;
+  }
+
+  .print-card-analysis-report .print-brand-title {
+    font-size: 15px !important;
+  }
+
+  .print-card-analysis-report .print-brand-right {
+    font-size: 14px !important;
+  }
+
+  .print-card-analysis-report .print-report-title-block {
+    margin: 14px 0 16px !important;
+  }
+
+  .print-card-analysis-report .print-report-title-block h1 {
+    font-size: 26px !important;
+    line-height: 1.05 !important;
+  }
+
+  .print-card-analysis-report .print-report-title-block p {
+    font-size: 12px !important;
+    margin-top: 6px !important;
+  }
+
+  .print-card-analysis-report .print-summary-grid {
+    margin-bottom: 16px !important;
+  }
+
+  .print-card-analysis-report .print-summary-card {
+    padding: 8px 8px !important;
+  }
+
+  .print-card-analysis-report .print-summary-label {
+    font-size: 8px !important;
+    letter-spacing: 0.12em !important;
+  }
+
+  .print-card-analysis-report .print-summary-value {
+    font-size: 15px !important;
+  }
+
+  .print-card-analysis-report .rounded-3xl,
+  .print-card-analysis-report .rounded-2xl,
+  .print-card-analysis-report .rounded-xl {
+    border-radius: 12px !important;
+  }
+
+  .print-card-analysis-report .p-8 {
+    padding: 18px !important;
+  }
+
+  .print-card-analysis-report .p-6 {
+    padding: 14px !important;
+  }
+
+  .print-card-analysis-report .p-5 {
+    padding: 12px !important;
+  }
+
+  .print-card-analysis-report .p-4 {
+    padding: 10px !important;
+  }
+
+  .print-card-analysis-report .text-4xl {
+    font-size: 26px !important;
+  }
+
+  .print-card-analysis-report .text-3xl {
+    font-size: 22px !important;
+  }
+
+  .print-card-analysis-report .text-2xl {
+    font-size: 18px !important;
+  }
+
+  .print-card-analysis-report .text-xl {
+    font-size: 16px !important;
+  }
+
+  .print-card-analysis-report .text-lg {
+    font-size: 14px !important;
+  }
+
+  .print-card-analysis-report .gap-6 {
+    gap: 14px !important;
+  }
+
+  .print-card-analysis-report .gap-4 {
+    gap: 10px !important;
+  }
+
+  .print-card-analysis-report .mb-8 {
+    margin-bottom: 18px !important;
+  }
+
+  .print-card-analysis-report .mb-6 {
+    margin-bottom: 14px !important;
+  }
+
+  .print-card-analysis-report .mb-4 {
+    margin-bottom: 10px !important;
+  }
+
+  .print-card-analysis-report table th,
+  .print-card-analysis-report table td {
+    padding: 7px 6px !important;
+    font-size: 10px !important;
+  }
+}
+
+/* ==============================
+   COMPACT CARD ANALYSIS REPORT
+   ============================== */
+
+.card-analysis-print-report {
+  width: 100%;
+  background: #ffffff;
+  color: #000000;
+  border-radius: 10px;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+.analysis-print-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #000000;
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 4px;
+}
+
+.analysis-print-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.analysis-print-logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.analysis-print-brand-text {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+}
+
+.analysis-print-brand-text strong {
+  color: #f4c44f;
+}
+
+.analysis-print-report-name {
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.analysis-print-title-block {
+  text-align: center;
+  margin: 12px 0 12px;
+}
+
+.analysis-print-title-block h1 {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.1;
+  font-weight: 900;
+}
+
+.analysis-print-title-block p {
+  margin: 5px 0 0;
+  font-size: 13px;
+  color: #18375f;
+}
+
+.analysis-print-metric-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border: 1px solid #d7a92d;
+  margin-bottom: 10px;
+}
+
+.analysis-print-metric-row div {
+  border-right: 1px solid #d7a92d;
+  text-align: center;
+  padding: 7px 6px;
+}
+
+.analysis-print-metric-row div:last-child {
+  border-right: none;
+}
+
+.analysis-print-metric-row p {
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  font-size: 9px;
+  font-weight: 900;
+  color: #f4c44f;
+  background: #000000;
+  padding: 4px 2px;
+}
+
+.analysis-print-metric-row strong {
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.analysis-profit {
+  color: #0f8a3b !important;
+}
+
+.analysis-print-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 8px;
+}
+
+.analysis-print-panel {
+  border: 1px solid #cfd6df;
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.92) !important;
+}
+
+.analysis-print-panel h2 {
+  margin: 0;
+  background: #000000;
+  color: #f4c44f;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 6px 9px;
+}
+
+.analysis-detail-grid {
+  display: grid;
+  grid-template-columns: 95px 1fr;
+  gap: 5px 8px;
+  padding: 9px;
+  font-size: 11px;
+}
+
+.analysis-detail-grid span {
+  font-weight: 800;
+  color: #111827;
+}
+
+.analysis-detail-grid strong {
+  font-weight: 600;
+  color: #111827;
+}
+
+.analysis-image-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 9px;
+}
+
+.analysis-image-grid p {
+  margin: 0 0 5px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.analysis-image-grid img {
+  width: 100%;
+  max-height: 190px;
+  object-fit: contain;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  background: #ffffff;
+}
+
+.analysis-image-placeholder {
+  height: 190px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.55) !important;
+}
+
+.analysis-notes-list {
+  margin: 0;
+  padding: 9px 14px 9px 25px;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.analysis-grade-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+  padding: 9px;
+}
+
+.analysis-grade-grid div,
+.analysis-comp-grid div,
+.analysis-sale-table div {
+  border: 1px solid #d7a92d;
+  border-radius: 5px;
+  padding: 6px;
+  text-align: center;
+}
+
+.analysis-grade-grid span,
+.analysis-comp-grid span,
+.analysis-sale-table span {
+  display: block;
+  font-size: 9px;
+  font-weight: 900;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.analysis-grade-grid strong,
+.analysis-comp-grid strong,
+.analysis-sale-table strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.analysis-comp-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+  padding: 9px;
+}
+
+.analysis-sale-table {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  padding: 9px;
+}
+
+.analysis-decision-text {
+  margin: 0;
+  padding: 10px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.analysis-report-notes {
+  margin-top: 8px;
+}
+
+@media print {
+  .card-analysis-print-report {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 auto !important;
+    transform: scale(0.92) !important;
+    transform-origin: top center !important;
+  }
+
+  .analysis-print-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #000000;
+  border-radius: 6px;
+  padding: 10px 16px;
+  margin-bottom: 14px;
+}
+
+  .analysis-print-logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+}
+
+  .analysis-print-brand-text {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  line-height: 1;
+}
+
+  .analysis-print-title-block h1 {
+    font-size: 24px !important;
+  }
+
+  .analysis-print-metric-row strong {
+    font-size: 14px !important;
+  }
+
+  .analysis-print-grid {
+    gap: 7px !important;
+  }
+
+  .analysis-print-panel h2 {
+    font-size: 12px !important;
+    padding: 5px 8px !important;
+  }
+
+  .analysis-detail-grid {
+    font-size: 10px !important;
+    padding: 7px !important;
+  }
+
+  .analysis-image-grid img,
+  .analysis-image-placeholder {
+    max-height: 165px !important;
+    height: 165px !important;
+  }
+
+  .analysis-notes-list {
+    font-size: 10px !important;
+  }
+}
+
+.analysis-print-brand-text strong {
+  color: #f4c44f;
+}
+
+.analysis-print-report-name {
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.analysis-print-body {
+  position: relative;
+}
+
+.analysis-print-content {
+  position: relative;
+  z-index: 1;
+}
+
+.analysis-report-watermark {
+  position: absolute;
+  top: 56%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 520px;
+  max-width: 72%;
+  height: auto;
+  object-fit: contain;
+  opacity: 0.045;
+  pointer-events: none;
+  z-index: 0;
+}
+/* =========================================================
+   CARDVAULT PRO — GRADING FORMS REPORT DESIGN
+   Printable Grading Submission Prep Sheets
+   Companies: PSA, BGS / Beckett, SGC, CGC Cards, TAG
+   ========================================================= */
+
+.grading-form-page {
+  position: relative;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #ffffff;
+  color: #111827;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.grading-form-watermark {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.grading-form-watermark img {
+  width: 58%;
+  max-width: 720px;
+  opacity: 0.035;
+  filter: grayscale(1);
+}
+
+.grading-form-content {
+  position: relative;
+  z-index: 1;
+}
+
+.grading-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 24px;
+  border-radius: 14px 14px 0 0;
+  border-bottom: 4px solid #d6a900;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(214, 169, 0, 0.16), transparent 34%),
+    linear-gradient(135deg, #020617 0%, #050505 55%, #18130a 100%);
+  color: #ffffff;
+}
+
+.grading-form-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.grading-form-logo {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+
+.grading-form-brand-name {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.grading-form-brand-name span {
+  color: #f4c430;
+}
+
+.grading-form-kicker {
+  margin: 8px 0 0;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #d6a900;
+}
+
+.grading-form-company-badge {
+  min-width: 150px;
+  padding: 12px 18px;
+  border: 1px solid rgba(244, 196, 48, 0.72);
+  border-radius: 999px;
+  background: rgba(244, 196, 48, 0.12);
+  color: #f4c430;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.grading-form-title-block {
+  padding: 22px 12px 16px;
+  text-align: center;
+}
+
+.grading-form-title-block h1 {
+  margin: 0;
+  font-size: 42px;
+  font-weight: 950;
+  line-height: 1.05;
+  letter-spacing: 0.05em;
+  color: #050505;
+}
+
+.grading-form-title-block p {
+  margin: 9px 0 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.grading-form-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.grading-form-kpi {
+  min-height: 96px;
+  padding: 14px 10px;
+  border: 1px solid rgba(180, 126, 0, 0.55);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+  text-align: center;
+}
+
+.grading-form-kpi p {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.grading-form-kpi h2 {
+  margin: 0;
+  font-size: 23px;
+  font-weight: 950;
+  line-height: 1.05;
+  color: #050505;
+}
+
+.grading-form-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.grading-form-card,
+.grading-form-table-card {
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.22);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+}
+
+.grading-form-card-title {
+  padding: 10px 14px;
+  border-bottom: 2px solid #d6a900;
+  background: #050505;
+  color: #f4c430;
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.grading-form-fields {
+  padding: 14px 16px;
+}
+
+.grading-form-fields p {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #111827;
+}
+
+.grading-form-fields p:last-child {
+  margin-bottom: 0;
+}
+
+.grading-form-table-card {
+  margin-bottom: 14px;
+}
+
+.grading-form-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 11px;
+  color: #111827;
+}
+
+.grading-form-table th {
+  padding: 8px 6px;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  background: #111111;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.grading-form-table th:nth-child(1) {
+  width: 34px;
+}
+
+.grading-form-table th:nth-child(2) {
+  width: 110px;
+}
+
+.grading-form-table th:nth-child(3) {
+  width: 175px;
+}
+
+.grading-form-table th:nth-child(4) {
+  width: 85px;
+}
+
+.grading-form-table th:nth-child(5) {
+  width: 92px;
+}
+
+.grading-form-table th:nth-child(6) {
+  width: 105px;
+}
+
+.grading-form-table th:nth-child(7) {
+  width: 54px;
+}
+
+.grading-form-table td {
+  padding: 8px 6px;
+  border-right: 1px solid #d1d5db;
+  border-bottom: 1px solid #d1d5db;
+  background: rgba(255, 255, 255, 0.96);
+  font-weight: 700;
+  text-align: center;
+  vertical-align: top;
+}
+
+.grading-form-table td:nth-child(2),
+.grading-form-table td:nth-child(3),
+.grading-form-table td:nth-child(8) {
+  text-align: left;
+}
+
+.grading-form-table td strong {
+  display: block;
+  margin-bottom: 3px;
+  color: #050505;
+  font-weight: 950;
+}
+
+.grading-form-table td span {
+  display: block;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.grading-form-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.grading-form-checklist {
+  margin: 0;
+  padding: 14px 18px 14px 22px;
+  list-style: none;
+}
+
+.grading-form-checklist li {
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: #111827;
+}
+
+.grading-form-checklist li:last-child {
+  margin-bottom: 0;
+}
+
+.grading-form-reminder {
+  margin: 0;
+  padding: 14px 16px 0;
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.45;
+  color: #111827;
+}
+
+.grading-form-signature-box {
+  padding: 14px 16px;
+}
+
+.grading-form-signature-box p {
+  margin: 0 0 11px;
+  font-size: 13px;
+  font-weight: 850;
+  color: #111827;
+}
+
+.grading-form-signature-box p:last-child {
+  margin-bottom: 0;
+}
+
+.grading-form-footer {
+  padding: 12px 16px;
+  border: 1px solid rgba(214, 169, 0, 0.55);
+  border-radius: 10px;
+  background: rgba(244, 196, 48, 0.1);
+  color: #111827;
+  font-size: 11px;
+  font-weight: 850;
+  line-height: 1.45;
+  text-align: center;
+}
+
+/* =========================================================
+   CARDVAULT PRO — GRADING FORMS
+   ========================================================= */
+
+@media print {
+  .grading-form-page {
+    width: 7.65in !important;
+    max-width: 7.65in !important;
+    min-width: 7.65in !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+    overflow: visible !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+  }
+
+  .grading-form-watermark {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    pointer-events: none !important;
+  }
+
+  .grading-form-watermark img {
+    width: 58% !important;
+    max-width: 620px !important;
+    opacity: 0.03 !important;
+  }
+
+  .grading-form-content {
+    position: relative !important;
+    z-index: 1 !important;
+    width: 100% !important;
+  }
+
+  .grading-form-header {
+    padding: 8px 12px !important;
+    border-radius: 0 !important;
+    border-bottom: 2px solid #d6a900 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .grading-form-logo {
+    width: 42px !important;
+    height: 42px !important;
+  }
+
+  .grading-form-brand {
+    gap: 10px !important;
+  }
+
+  .grading-form-brand-name {
+    font-size: 19px !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  .grading-form-kicker {
+    margin-top: 4px !important;
+    font-size: 6.8px !important;
+    letter-spacing: 0.22em !important;
+  }
+
+  .grading-form-company-badge {
+    min-width: 94px !important;
+    padding: 5px 8px !important;
+    border-radius: 999px !important;
+    font-size: 9px !important;
+  }
+
+  .grading-form-title-block {
+    padding: 8px 4px 8px !important;
+  }
+
+  .grading-form-title-block h1 {
+    font-size: 25px !important;
+    letter-spacing: 0.04em !important;
+  }
+
+  .grading-form-title-block p {
+    margin-top: 4px !important;
+    font-size: 8px !important;
+  }
+
+  .grading-form-kpi-row {
+    gap: 6px !important;
+    margin-bottom: 8px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+  }
+
+  .grading-form-kpi {
+    min-height: 58px !important;
+    padding: 6px 4px !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .grading-form-kpi p {
+    margin-bottom: 4px !important;
+    font-size: 6.5px !important;
+  }
+
+  .grading-form-kpi h2 {
+    font-size: 11px !important;
+  }
+
+  .grading-form-info-grid {
+    gap: 7px !important;
+    margin-bottom: 7px !important;
+  }
+
+  .grading-form-card,
+  .grading-form-table-card {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+  }
+
+  .grading-form-card-title {
+    padding: 5px 8px !important;
+    border-bottom: 1.5px solid #d6a900 !important;
+    font-size: 7.8px !important;
+    letter-spacing: 0.1em !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .grading-form-fields {
+    padding: 7px 8px !important;
+  }
+
+  .grading-form-fields p {
+    margin-bottom: 5px !important;
+    font-size: 7.5px !important;
+  }
+
+  .grading-form-table-card {
+    margin-bottom: 7px !important;
+  }
+
+  .grading-form-table {
+    font-size: 6.5px !important;
+  }
+
+  .grading-form-table th {
+    padding: 4px 3px !important;
+    font-size: 6px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .grading-form-table th:nth-child(1) {
+    width: 24px !important;
+  }
+
+  .grading-form-table th:nth-child(2) {
+    width: 72px !important;
+  }
+
+  .grading-form-table th:nth-child(3) {
+    width: 118px !important;
+  }
+
+  .grading-form-table th:nth-child(4) {
+    width: 58px !important;
+  }
+
+  .grading-form-table th:nth-child(5) {
+    width: 64px !important;
+  }
+
+  .grading-form-table th:nth-child(6) {
+    width: 72px !important;
+  }
+
+  .grading-form-table th:nth-child(7) {
+    width: 36px !important;
+  }
+
+  .grading-form-table td {
+    padding: 4px 3px !important;
+    font-size: 6.3px !important;
+  }
+
+  .grading-form-table td strong {
+    margin-bottom: 2px !important;
+  }
+
+  .grading-form-table td span {
+    font-size: 5.8px !important;
+  }
+
+  .grading-form-bottom-grid {
+    gap: 7px !important;
+    margin-bottom: 7px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+  }
+
+  .grading-form-checklist {
+    padding: 7px 8px 7px 10px !important;
+  }
+
+  .grading-form-checklist li {
+    margin-bottom: 4px !important;
+    font-size: 7px !important;
+    line-height: 1.25 !important;
+  }
+
+  .grading-form-reminder {
+    padding: 7px 8px 0 !important;
+    font-size: 7.2px !important;
+    line-height: 1.3 !important;
+  }
+
+  .grading-form-signature-box {
+    padding: 7px 8px !important;
+  }
+
+  .grading-form-signature-box p {
+    margin-bottom: 5px !important;
+    font-size: 7.2px !important;
+  }
+
+  .grading-form-footer {
+    padding: 7px 9px !important;
+    border-radius: 0 !important;
+    font-size: 6.8px !important;
+    line-height: 1.3 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+  }
+}
+/* =========================================================
+   CARDVAULT PRO — MEMORABILIA REPORT PREVIEW
+   Option B Premium Form Layout
+   ========================================================= */
+
+.memorabilia-report-page {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px;
+  background: #ffffff;
+  color: #111827;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+}
+
+.memorabilia-report-watermark {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.memorabilia-report-watermark img {
+  width: 62%;
+  max-width: 720px;
+  opacity: 0.055;
+  object-fit: contain;
+  filter: grayscale(100%);
+}
+
+.memorabilia-report-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Header */
+
+.memorabilia-report-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #030303 0%, #151515 55%, #2a2110 100%);
+  color: #ffffff;
+  border: 1px solid rgba(212, 175, 55, 0.55);
+  border-radius: 16px;
+}
+
+.memorabilia-report-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.memorabilia-report-logo-box {
+  width: 74px;
+  height: 74px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.memorabilia-report-logo {
+  width: 68px;
+  height: 68px;
+  object-fit: contain;
+  display: block;
+}
+
+.memorabilia-report-brand-name {
+  margin: 0;
+  font-size: 25px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+}
+
+.memorabilia-report-brand-name span {
+  color: #d4af37;
+}
+
+.memorabilia-report-type {
+  padding: 9px 16px;
+  border: 1px solid rgba(212, 175, 55, 0.75);
+  border-radius: 999px;
+  background: rgba(212, 175, 55, 0.12);
+  color: #f8e7a1;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Title */
+
+.memorabilia-report-title-block {
+  padding: 20px 8px 16px;
+  text-align: center;
+}
+
+.memorabilia-report-title-block h1 {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.15;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.memorabilia-report-title-block p {
+  margin: 6px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* KPI Strip */
+
+.memorabilia-report-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.memorabilia-report-kpi {
+  padding: 13px 10px;
+  background: linear-gradient(180deg, #111827 0%, #020617 100%);
+  border: 1px solid rgba(212, 175, 55, 0.65);
+  border-radius: 14px;
+  text-align: center;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.memorabilia-report-kpi p {
+  margin: 0 0 6px;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #d4af37;
+}
+
+.memorabilia-report-kpi h2 {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.15;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+/* Shared Layout */
+
+.memorabilia-report-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.memorabilia-report-main-grid {
+  grid-template-columns: 1fr 1.05fr;
+  margin-bottom: 14px;
+}
+
+.memorabilia-report-secondary-grid {
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 14px;
+}
+
+.memorabilia-report-bottom-grid {
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 14px;
+}
+
+.memorabilia-report-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #cbd5e1;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.memorabilia-report-card-title {
+  padding: 9px 12px;
+  background: linear-gradient(135deg, #050505 0%, #111827 100%);
+  color: #f8e7a1;
+  border-bottom: 2px solid #d4af37;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Profile Fields */
+
+.memorabilia-report-field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  padding: 12px;
+}
+
+.memorabilia-report-field-grid div {
+  min-height: 36px;
+  padding: 7px 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.memorabilia-report-field-grid div:nth-child(odd) {
+  border-right: 1px solid #e5e7eb;
+}
+
+.memorabilia-report-field-grid strong {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.memorabilia-report-field-grid span {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  color: #111827;
+}
+
+/* Image Inserts */
+
+.memorabilia-report-image-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 12px;
+}
+
+.memorabilia-report-image-slot {
+  min-height: 230px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #9ca3af;
+  border-radius: 13px;
+  background:
+    linear-gradient(135deg, rgba(248, 250, 252, 0.95), rgba(241, 245, 249, 0.95)),
+    repeating-linear-gradient(
+      45deg,
+      rgba(212, 175, 55, 0.05) 0,
+      rgba(212, 175, 55, 0.05) 6px,
+      transparent 6px,
+      transparent 12px
+    );
+  text-align: center;
+  overflow: hidden;
+}
+
+.memorabilia-report-image-slot p {
+  margin: 0 0 8px;
+  padding: 4px 8px;
+  background: #111827;
+  color: #f8e7a1;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.memorabilia-report-image-slot span {
+  max-width: 90%;
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.memorabilia-report-image-slot img {
+  width: 100%;
+  height: 100%;
+  max-height: 210px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+/* Authentication */
+
+.memorabilia-report-auth-card {
+  margin-bottom: 14px;
+}
+
+.memorabilia-report-auth-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  padding: 12px;
+}
+
+.memorabilia-report-auth-grid div {
+  min-height: 38px;
+  padding: 8px;
+  border-right: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.memorabilia-report-auth-grid div:nth-child(3n) {
+  border-right: none;
+}
+
+.memorabilia-report-auth-grid strong {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.memorabilia-report-auth-grid span {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  color: #111827;
+}
+
+.memorabilia-report-auth-comments {
+  margin: 0 12px 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border: 1px solid #d1d5db;
+  border-left: 5px solid #d4af37;
+  border-radius: 12px;
+}
+
+.memorabilia-report-auth-comments strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #111827;
+}
+
+.memorabilia-report-auth-comments p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #374151;
+}
+
+/* Condition / Evaluation */
+
+.memorabilia-report-score-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  padding: 12px;
+}
+
+.memorabilia-report-score-grid div {
+  padding: 10px;
+  background: #f8fafc;
+  border: 1px solid #d1d5db;
+  border-radius: 11px;
+}
+
+.memorabilia-report-score-grid p {
+  margin: 0 0 4px;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.memorabilia-report-score-grid strong {
+  display: block;
+  font-size: 13px;
+  color: #111827;
+}
+
+/* Market Valuation */
+
+.memorabilia-report-market-list {
+  padding: 12px;
+}
+
+.memorabilia-report-market-list div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.memorabilia-report-market-list div:last-child {
+  border-bottom: none;
+}
+
+.memorabilia-report-market-list span {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.memorabilia-report-market-list strong {
+  font-size: 13px;
+  font-weight: 900;
+  color: #111827;
+}
+
+/* Decision */
+
+.memorabilia-report-decision-card {
+  margin-bottom: 14px;
+  border-color: rgba(212, 175, 55, 0.75);
+}
+
+.memorabilia-report-decision-card p {
+  margin: 0;
+  padding: 14px;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(255, 255, 255, 0.95));
+  font-size: 13px;
+  line-height: 1.55;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+/* Notes */
+
+.memorabilia-report-notes {
+  margin: 0;
+  padding: 14px 18px 14px 28px;
+}
+
+.memorabilia-report-notes li {
+  margin-bottom: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #374151;
+}
+
+.memorabilia-report-notes li:last-child {
+  margin-bottom: 0;
+}
+
+/* Notary */
+
+.memorabilia-report-notary-card {
+  min-height: 245px;
+}
+
+.memorabilia-report-notary-lines {
+  padding: 12px 14px 8px;
+}
+
+.memorabilia-report-notary-lines p {
+  margin: 0 0 9px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.memorabilia-report-seal-box {
+  height: 72px;
+  margin: 0 14px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #9ca3af;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Footer */
+
+.memorabilia-report-footer {
+  padding-top: 10px;
+  border-top: 1px solid #d1d5db;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #6b7280;
+  letter-spacing: 0.04em;
+}
+
+/* =========================================================
+   CARDVAULT PRO — MEMORABILIA REPORT PRINT CSS
+   Cleaned May 2026
+   ========================================================= */
+
+@media print {
+  .report-preview-output,
+  .report-preview-output * {
+    visibility: visible !important;
+  }
+
+  .report-preview-output {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+  }
+
+  .memorabilia-report-page {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+
+  .memorabilia-report-content {
+    position: relative !important;
+    z-index: 1 !important;
+    width: 100% !important;
+  }
+
+  .memorabilia-report-watermark {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .memorabilia-report-watermark img {
+    width: 62% !important;
+    max-width: 680px !important;
+    opacity: 0.04 !important;
+  }
+
+  .memorabilia-report-header {
+    position: relative !important;
+    display: flex !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: 100% !important;
+    z-index: 2 !important;
+    padding: 10px 14px !important;
+    border-radius: 0 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .memorabilia-report-logo-box {
+    width: 58px !important;
+    height: 58px !important;
+  }
+
+  .memorabilia-report-logo {
+    width: 54px !important;
+    height: 54px !important;
+  }
+
+  .memorabilia-report-brand-name {
+    font-size: 21px !important;
+  }
+
+  .memorabilia-report-type {
+    padding: 7px 12px !important;
+    font-size: 10px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .memorabilia-report-title-block {
+    padding: 12px 4px 10px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+  }
+
+  .memorabilia-report-title-block h1 {
+    font-size: 24px !important;
+  }
+
+  .memorabilia-report-title-block p {
+    font-size: 9px !important;
+  }
+
+  .memorabilia-report-kpi-strip {
+    gap: 6px !important;
+    margin-bottom: 10px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+  }
+
+  .memorabilia-report-kpi {
+    padding: 8px 6px !important;
+    border-radius: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .memorabilia-report-kpi p {
+    font-size: 7.5px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .memorabilia-report-kpi h2 {
+    font-size: 11px !important;
+  }
+
+  .memorabilia-report-grid {
+    gap: 8px !important;
+  }
+
+  .memorabilia-report-main-grid {
+    grid-template-columns: 0.95fr 1.05fr !important;
+    margin-bottom: 8px !important;
+  }
+
+  .memorabilia-report-secondary-grid,
+  .memorabilia-report-bottom-grid {
+    grid-template-columns: 1fr 1fr !important;
+    margin-bottom: 8px !important;
+  }
+
+  .memorabilia-report-card {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: rgba(255, 255, 255, 0.94) !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+  }
+
+  .memorabilia-report-card-title {
+    padding: 6px 8px !important;
+    font-size: 8px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .memorabilia-report-field-grid {
+    padding: 7px !important;
+  }
+
+  .memorabilia-report-field-grid div {
+    min-height: 27px !important;
+    padding: 4px 5px !important;
+  }
+
+  .memorabilia-report-field-grid strong {
+    font-size: 7px !important;
+  }
+
+  .memorabilia-report-field-grid span {
+    font-size: 8.5px !important;
+  }
+
+  .memorabilia-report-image-grid {
+    gap: 6px !important;
+    padding: 7px !important;
+  }
+
+  .memorabilia-report-image-slot {
+    min-height: 150px !important;
+    border-radius: 0 !important;
+  }
+
+  .memorabilia-report-image-slot p {
+    font-size: 7px !important;
+    margin-bottom: 5px !important;
+  }
+
+  .memorabilia-report-image-slot span {
+    font-size: 8px !important;
+  }
+
+  .memorabilia-report-image-slot img {
+    max-height: 140px !important;
+    border-radius: 0 !important;
+  }
+
+  .memorabilia-report-auth-card {
+    margin-bottom: 8px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+  }
+
+  .memorabilia-report-auth-grid {
+    padding: 7px !important;
+  }
+
+  .memorabilia-report-auth-grid div {
+    min-height: 28px !important;
+    padding: 5px !important;
+  }
+
+  .memorabilia-report-auth-grid strong {
+    font-size: 7px !important;
+  }
+
+  .memorabilia-report-auth-grid span {
+    font-size: 8.5px !important;
+  }
+
+  .memorabilia-report-auth-comments {
+    margin: 0 7px 7px !important;
+    padding: 8px !important;
+    border-radius: 0 !important;
+  }
+
+  .memorabilia-report-auth-comments strong {
+    font-size: 7.5px !important;
+  }
+
+  .memorabilia-report-auth-comments p {
+    font-size: 8.5px !important;
+    line-height: 1.35 !important;
+  }
+
+  .memorabilia-report-score-grid {
+    gap: 6px !important;
+    padding: 7px !important;
+  }
+
+  .memorabilia-report-score-grid div {
+    padding: 6px !important;
+    border-radius: 0 !important;
+  }
+
+  .memorabilia-report-score-grid p {
+    font-size: 7px !important;
+  }
+
+  .memorabilia-report-score-grid strong {
+    font-size: 9px !important;
+  }
+
+  .memorabilia-report-market-list {
+    padding: 7px !important;
+  }
+
+  .memorabilia-report-market-list div {
+    padding: 5px 0 !important;
+  }
+
+  .memorabilia-report-market-list span {
+    font-size: 7px !important;
+  }
+
+  .memorabilia-report-market-list strong {
+    font-size: 9px !important;
+  }
+
+  .memorabilia-report-decision-card {
+    margin-bottom: 8px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+  }
+
+  .memorabilia-report-decision-card p {
+    padding: 8px !important;
+    font-size: 8.5px !important;
+    line-height: 1.35 !important;
+  }
+
+  .memorabilia-report-notes {
+    padding: 8px 12px 8px 20px !important;
+  }
+
+  .memorabilia-report-notes li {
+    margin-bottom: 5px !important;
+    font-size: 8.5px !important;
+    line-height: 1.3 !important;
+  }
+
+  .memorabilia-report-notary-card {
+    min-height: 165px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+  }
+
+  .memorabilia-report-notary-lines {
+    padding: 8px 9px 4px !important;
+  }
+
+  .memorabilia-report-notary-lines p {
+    margin-bottom: 6px !important;
+    font-size: 8.5px !important;
+  }
+
+  .memorabilia-report-seal-box {
+    height: 48px !important;
+    margin: 0 9px 9px !important;
+    border-radius: 0 !important;
+    font-size: 7px !important;
+  }
+
+  .memorabilia-report-footer {
+    padding-top: 6px !important;
+    font-size: 7px !important;
+  }
+}
+
+/* =========================================================
+   MEMORABILIA REPORT FORM — CLEAN PRINT OUTPUT
+   ========================================================= */
+
+.screen-only {
+  display: block;
+}
+
+.print-only {
+  display: none;
+}
+
+@page {
+  size: letter;
+  margin: 0.2in;
+}
+
+@media print {
+  html,
+  body,
+  #root {
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: visible !important;
+  }
+
+  .screen-only {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  .clean-print-report-output,
+  .clean-print-report-output * {
+    visibility: visible !important;
+  }
+
+  .clean-print-report-output {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    border: none !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    z-index: 999999 !important;
+  }
+
+  .memorabilia-report-page {
+    width: 7.45in !important;
+    max-width: 7.45in !important;
+    min-width: 7.45in !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    overflow: visible !important;
+    color: #111827 !important;
+    page-break-after: avoid !important;
+    break-after: avoid-page !important;
+  }
+
+  .memorabilia-report-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  .memorabilia-report-watermark {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .memorabilia-report-watermark img {
+    width: 58% !important;
+    max-width: 620px !important;
+    opacity: 0.035 !important;
+  }
+
+  .memorabilia-report-header {
+    width: 100% !important;
+    display: flex !important;
+    position: relative !important;
+    padding: 8px 12px !important;
+    border-radius: 0 !important;
+    margin-bottom: 7px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .memorabilia-report-logo-box {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .memorabilia-report-logo {
+    width: 42px !important;
+    height: 42px !important;
+  }
+
+  .memorabilia-report-brand-name {
+    font-size: 18px !important;
+    letter-spacing: 0.06em !important;
+  }
+
+  .memorabilia-report-type {
+    padding: 5px 10px !important;
+    font-size: 8px !important;
+  }
+
+  .memorabilia-report-title-block {
+    padding: 7px 4px !important;
+  }
+
+  .memorabilia-report-title-block h1 {
+    font-size: 22px !important;
+    line-height: 1.05 !important;
+  }
+
+  .memorabilia-report-title-block p {
+    margin-top: 4px !important;
+    font-size: 8px !important;
+  }
+
+  .memorabilia-report-kpi-strip {
+    gap: 6px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .memorabilia-report-kpi {
+    padding: 7px 6px !important;
+    border-radius: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .memorabilia-report-kpi p {
+    font-size: 7px !important;
+    margin-bottom: 3px !important;
+  }
+
+  .memorabilia-report-kpi h2 {
+    font-size: 10px !important;
+  }
+
+  .memorabilia-report-grid {
+    gap: 7px !important;
+  }
+
+  .memorabilia-report-main-grid {
+    grid-template-columns: 0.95fr 1.05fr !important;
+    margin-bottom: 7px !important;
+  }
+
+  .memorabilia-report-secondary-grid {
+    grid-template-columns: 1fr 1fr !important;
+    margin-bottom: 7px !important;
+  }
+
+  .memorabilia-report-card {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+  }
+
+  .memorabilia-report-card-title {
+    padding: 5px 7px !important;
+    font-size: 7.5px !important;
+    letter-spacing: 0.12em !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .memorabilia-report-field-grid {
+    padding: 6px !important;
+  }
+
+  .memorabilia-report-field-grid div {
+    min-height: 23px !important;
+    padding: 3px 4px !important;
+  }
+
+  .memorabilia-report-field-grid strong {
+    font-size: 6.2px !important;
+  }
+
+  .memorabilia-report-field-grid span {
+    font-size: 7.8px !important;
+  }
+
+  .memorabilia-report-image-grid {
+    gap: 5px !important;
+    padding: 6px !important;
+  }
+
+  .memorabilia-report-image-slot {
+    min-height: 130px !important;
+    border-radius: 0 !important;
+  }
+
+  .memorabilia-report-image-slot p {
+    font-size: 6px !important;
+    margin-bottom: 4px !important;
+    padding: 3px 6px !important;
+  }
+
+  .memorabilia-report-image-slot span {
+    font-size: 7px !important;
+  }
+
+  .memorabilia-report-image-slot img {
+    max-height: 125px !important;
+    border-radius: 0 !important;
+  }
+
+  .memorabilia-report-auth-card {
+    margin-bottom: 7px !important;
+  }
+
+  .memorabilia-report-auth-grid {
+    padding: 6px !important;
+  }
+
+  .memorabilia-report-auth-grid div {
+    min-height: 23px !important;
+    padding: 4px !important;
+  }
+
+  .memorabilia-report-auth-grid strong {
+    font-size: 6.2px !important;
+  }
+
+  .memorabilia-report-auth-grid span {
+    font-size: 7.8px !important;
+  }
+
+  .memorabilia-report-auth-comments {
+    margin: 0 6px 6px !important;
+    padding: 6px !important;
+    border-radius: 0 !important;
+  }
+
+  .memorabilia-report-auth-comments strong {
+    font-size: 7px !important;
+  }
+
+  .memorabilia-report-auth-comments p {
+    font-size: 8px !important;
+    line-height: 1.35 !important;
+  }
+
+  .memorabilia-report-score-grid {
+    gap: 5px !important;
+    padding: 6px !important;
+  }
+
+  .memorabilia-report-score-grid div {
+    padding: 5px !important;
+    border-radius: 0 !important;
+  }
+
+  .memorabilia-report-score-grid p {
+    font-size: 6.2px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .memorabilia-report-score-grid strong {
+    font-size: 8px !important;
+  }
+
+  .memorabilia-report-market-list {
+    padding: 6px !important;
+  }
+
+  .memorabilia-report-market-list div {
+    padding: 4px 0 !important;
+  }
+
+  .memorabilia-report-market-list span {
+    font-size: 6.2px !important;
+  }
+
+  .memorabilia-report-market-list strong {
+    font-size: 8px !important;
+  }
+
+  .memorabilia-report-decision-card {
+    margin-bottom: 7px !important;
+  }
+
+  .memorabilia-report-decision-card p {
+    padding: 8px !important;
+    font-size: 8px !important;
+    line-height: 1.35 !important;
+  }
+
+  .memorabilia-report-footer {
+    padding-top: 7px !important;
+    font-size: 7px !important;
+    page-break-after: avoid !important;
+    break-after: avoid-page !important;
+  }
+}
+
+/* =========================================================
+   CARDVAULT PRO — SALES REPORT 
+   ========================================================= */
+
+.sales-report-page {
+  position: relative;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 18px;
+  background: #ffffff;
+  color: #111827;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.sales-report-watermark {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.sales-report-watermark img {
+  width: 58%;
+  max-width: 720px;
+  opacity: 0.035;
+  filter: grayscale(1);
+}
+
+.sales-report-content {
+  position: relative;
+  z-index: 1;
+}
+
+.sales-report-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 24px;
+  border-radius: 12px 12px 0 0;
+  border-bottom: 4px solid #d6a900;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(214, 169, 0, 0.16), transparent 34%),
+    linear-gradient(135deg, #020617 0%, #050505 55%, #18130a 100%);
+  color: #ffffff;
+}
+
+.sales-report-brand {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.sales-report-logo {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+
+.sales-report-brand p {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.sales-report-brand span {
+  color: #f4c430;
+}
+
+.sales-report-type {
+  font-size: 24px;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.sales-report-title-block {
+  padding: 22px 12px 16px;
+  text-align: center;
+}
+
+.sales-report-title-block h1 {
+  margin: 0;
+  font-size: 54px;
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  color: #050505;
+}
+
+.sales-report-title-block p {
+  margin: 10px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.sales-report-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr) 2.1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.sales-report-kpi,
+.sales-report-chart-card {
+  border: 1px solid rgba(180, 126, 0, 0.55);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+}
+
+.sales-report-kpi {
+  display: flex;
+  min-height: 140px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 10px;
+  text-align: center;
+}
+
+.sales-report-kpi p {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #111827;
+}
+
+.sales-report-kpi span {
+  display: block;
+  margin: 13px 0 10px;
+  font-size: 35px;
+  font-weight: 950;
+  line-height: 1;
+  color: #b98200;
+}
+
+.sales-report-kpi h2 {
+  margin: 0;
+  font-size: 25px;
+  font-weight: 950;
+  line-height: 1;
+  color: #050505;
+}
+
+.sales-report-chart-card {
+  min-height: 140px;
+  padding: 10px 14px 12px;
+}
+
+.sales-report-chart-card > p {
+  margin: 0 0 8px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.sales-report-bar-chart {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 12px;
+  height: 96px;
+}
+
+.sales-report-chart-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.sales-report-bars {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  gap: 28px;
+  border-left: 1px solid #d1d5db;
+  border-bottom: 1px solid #d1d5db;
+  background:
+    linear-gradient(to top, rgba(148, 163, 184, 0.2) 1px, transparent 1px);
+  background-size: 100% 20%;
+}
+
+.sales-report-bar-group {
+  display: flex;
+  height: 100%;
+  min-width: 72px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: end;
+  gap: 3px;
+}
+
+.sales-report-bar-group strong {
+  font-size: 10px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.sales-report-bar-group span {
+  font-size: 10px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.sales-report-bar {
+  width: 38px;
+  min-height: 18px;
+  border-radius: 4px 4px 0 0;
+}
+
+.sales-report-bar-revenue {
+  background: #050505;
+}
+
+.sales-report-bar-profit {
+  background: #c99700;
+}
+
+.sales-report-body-grid {
+  display: grid;
+  grid-template-columns: 175px 1fr;
+  gap: 12px;
+}
+
+.sales-report-side-panel {
+  display: grid;
+  gap: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 50% 10%, rgba(214, 169, 0, 0.16), transparent 36%),
+    linear-gradient(180deg, #020617 0%, #050505 100%);
+  color: #ffffff;
+}
+
+.sales-report-side-panel > div {
+  display: flex;
+  min-height: 210px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 12px;
+  border-bottom: 1px solid rgba(214, 169, 0, 0.36);
+  text-align: center;
+}
+
+.sales-report-side-panel > div:last-child {
+  border-bottom: none;
+}
+
+.sales-report-side-panel span {
+  display: flex;
+  width: 78px;
+  height: 78px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  border: 2px solid #d6a900;
+  border-radius: 999px;
+  color: #d6a900;
+  font-size: 36px;
+  font-weight: 950;
+}
+
+.sales-report-side-panel p {
+  margin: 0;
+  color: #f4c430;
+  font-size: 15px;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sales-report-side-panel h2 {
+  margin: 14px 0 4px;
+  color: #ffffff;
+  font-size: 32px;
+  font-weight: 950;
+}
+
+.sales-report-side-panel small {
+  color: #d1d5db;
+  font-size: 15px;
+}
+
+.sales-report-tables {
+  display: grid;
+  gap: 12px;
+}
+
+.sales-report-table-card {
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.22);
+  background: #ffffff;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+}
+
+.sales-report-section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 2px solid #d6a900;
+  background: #050505;
+  color: #f4c430;
+  font-size: 17px;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sales-report-section-title span {
+  color: #d6a900;
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.sales-report-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 10.5px;
+  color: #111827;
+}
+
+.sales-report-table th {
+  padding: 8px 6px;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  background: #111111;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.sales-report-table th:first-child {
+  width: 130px;
+  text-align: left;
+}
+
+.sales-report-table th:last-child {
+  width: 74px;
+}
+
+.sales-report-table td {
+  padding: 7px 6px;
+  border-right: 1px solid #d1d5db;
+  border-bottom: 1px solid #d1d5db;
+  background: rgba(255, 255, 255, 0.95);
+  font-weight: 700;
+  text-align: center;
+}
+
+.sales-report-table td:first-child {
+  text-align: left;
+}
+
+.sales-report-row-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.sales-report-row-label span {
+  color: #050505;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.sales-report-total-cell {
+  font-weight: 950 !important;
+  color: #050505;
+}
+
+.sales-report-total-row td {
+  border-color: rgba(214, 169, 0, 0.38);
+  background: #050505 !important;
+  color: #f4c430 !important;
+  font-weight: 950 !important;
+  text-transform: uppercase;
+}
+
+.sales-report-footer {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 18px;
+  margin-top: 18px;
+  padding: 18px 22px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.sales-report-footer-note,
+.sales-report-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.sales-report-footer-brand {
+  padding-left: 22px;
+  border-left: 1px solid #d1d5db;
+}
+
+.sales-report-footer-note > span,
+.sales-report-footer-brand > span {
+  display: flex;
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #c99700;
+  border-radius: 999px;
+  color: #b98200;
+  font-size: 26px;
+}
+
+.sales-report-footer h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 950;
+  color: #111827;
+}
+
+.sales-report-footer p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #334155;
+}
+
+/* =========================================================
+   CARDVAULT PRO — SALES REPORT PRINT CSS
+   Keeps the Sales Report tight, printable, and one-page style.
+   ========================================================= */
+
+@media print {
+  .sales-report-page {
+    width: 7.65in !important;
+    max-width: 7.65in !important;
+    min-width: 7.65in !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+    overflow: visible !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+  }
+
+  .sales-report-watermark {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .sales-report-watermark img {
+    width: 58% !important;
+    max-width: 620px !important;
+    opacity: 0.03 !important;
+  }
+
+  .sales-report-content {
+    position: relative !important;
+    z-index: 1 !important;
+    width: 100% !important;
+  }
+
+  .sales-report-header {
+    padding: 8px 12px !important;
+    border-radius: 0 !important;
+    border-bottom: 2px solid #d6a900 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .sales-report-logo {
+    width: 42px !important;
+    height: 42px !important;
+  }
+
+  .sales-report-brand {
+    gap: 10px !important;
+  }
+
+  .sales-report-brand p {
+    font-size: 20px !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  .sales-report-type {
+    font-size: 14px !important;
+  }
+
+  .sales-report-title-block {
+    padding: 8px 4px 8px !important;
+  }
+
+  .sales-report-title-block h1 {
+    font-size: 30px !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  .sales-report-title-block p {
+    margin-top: 4px !important;
+    font-size: 10px !important;
+  }
+
+  .sales-report-kpi-row {
+    grid-template-columns: repeat(5, 1fr) 1.85fr !important;
+    gap: 6px !important;
+    margin-bottom: 8px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+  }
+
+  .sales-report-kpi,
+  .sales-report-chart-card {
+    min-height: 78px !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .sales-report-kpi {
+    padding: 6px 4px !important;
+  }
+
+  .sales-report-kpi p {
+    font-size: 6.5px !important;
+  }
+
+  .sales-report-kpi span {
+    margin: 5px 0 4px !important;
+    font-size: 18px !important;
+  }
+
+  .sales-report-kpi h2 {
+    font-size: 11px !important;
+  }
+
+  .sales-report-chart-card {
+    padding: 5px 7px !important;
+  }
+
+  .sales-report-chart-card > p {
+    margin-bottom: 4px !important;
+    font-size: 8px !important;
+  }
+
+  .sales-report-bar-chart {
+    grid-template-columns: 30px 1fr !important;
+    gap: 6px !important;
+    height: 54px !important;
+  }
+
+  .sales-report-chart-axis {
+    font-size: 6px !important;
+  }
+
+  .sales-report-bars {
+    gap: 16px !important;
+  }
+
+  .sales-report-bar-group {
+    min-width: 44px !important;
+  }
+
+  .sales-report-bar-group strong,
+  .sales-report-bar-group span {
+    font-size: 6px !important;
+  }
+
+  .sales-report-bar {
+    width: 24px !important;
+  }
+
+  .sales-report-body-grid {
+    grid-template-columns: 1.03in 1fr !important;
+    gap: 7px !important;
+  }
+
+  .sales-report-side-panel {
+    border-radius: 0 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .sales-report-side-panel > div {
+    min-height: 118px !important;
+    padding: 8px 6px !important;
+  }
+
+  .sales-report-side-panel span {
+    width: 42px !important;
+    height: 42px !important;
+    margin-bottom: 8px !important;
+    font-size: 20px !important;
+  }
+
+  .sales-report-side-panel p {
+    font-size: 7.5px !important;
+  }
+
+  .sales-report-side-panel h2 {
+    margin: 7px 0 2px !important;
+    font-size: 16px !important;
+  }
+
+  .sales-report-side-panel small {
+    font-size: 7px !important;
+  }
+
+  .sales-report-tables {
+    gap: 7px !important;
+  }
+
+  .sales-report-table-card {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+  }
+
+  .sales-report-section-title {
+    padding: 5px 8px !important;
+    border-bottom: 1.5px solid #d6a900 !important;
+    font-size: 8.5px !important;
+    letter-spacing: 0.08em !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .sales-report-section-title span {
+    font-size: 10px !important;
+  }
+
+  .sales-report-table {
+    font-size: 5.8px !important;
+  }
+
+  .sales-report-table th {
+    padding: 4px 3px !important;
+    font-size: 5.8px !important;
+  }
+
+  .sales-report-table th:first-child {
+    width: 80px !important;
+  }
+
+  .sales-report-table th:last-child {
+    width: 45px !important;
+  }
+
+  .sales-report-table td {
+    padding: 4px 3px !important;
+    font-size: 5.8px !important;
+  }
+
+  .sales-report-row-label {
+    gap: 4px !important;
+  }
+
+  .sales-report-row-label span {
+    font-size: 7px !important;
+  }
+
+  .sales-report-footer {
+    grid-template-columns: 1.35fr 1fr !important;
+    gap: 8px !important;
+    margin-top: 8px !important;
+    padding: 8px 10px !important;
+    border-radius: 0 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+  }
+
+  .sales-report-footer-note,
+  .sales-report-footer-brand {
+    gap: 8px !important;
+  }
+
+  .sales-report-footer-brand {
+    padding-left: 10px !important;
+  }
+
+  .sales-report-footer-note > span,
+  .sales-report-footer-brand > span {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 15px !important;
+  }
+
+  .sales-report-footer h3 {
+    margin-bottom: 3px !important;
+    font-size: 8.5px !important;
+  }
+
+  .sales-report-footer p {
+    font-size: 7px !important;
+    line-height: 1.25 !important;
+  }
 }
