@@ -80,6 +80,25 @@ type CardRecord = {
   receiptImage?: string;
 };
 
+type SaleRecord = {
+  id: number;
+  cardId: number;
+  cardName: string;
+  player: string;
+  platform: string;
+  saleDate: string;
+  salePrice: number;
+  fees: number;
+  shippingCost: number;
+  taxes: number;
+  netProceeds: number;
+  purchasePrice: number;
+  profitLoss: number;
+  roi: number;
+  buyerSource: string;
+  notes: string;
+};
+
 type AddCardForm = {
   player: string;
   card: string;
@@ -475,6 +494,25 @@ const emptyForm: AddCardForm = {
 
 function App() {
   const [activeScreen, setActiveScreen] = useState<Screen>("Dashboard");
+  const [sales, setSales] = useState<SaleRecord[]>(() => {
+  const savedSales = localStorage.getItem("cardvault-sales");
+
+  if (!savedSales) {
+    return [];
+  }
+
+  try {
+    const parsedSales = JSON.parse(savedSales);
+
+    if (!Array.isArray(parsedSales)) {
+      return [];
+    }
+
+    return parsedSales as SaleRecord[];
+  } catch {
+    return [];
+  }
+});
 
   const [cards, setCards] = useState<CardRecord[]>(() => {
     const savedCards = localStorage.getItem("cardvault-cards");
@@ -499,9 +537,11 @@ function App() {
   });
 
   const [memorabilia] = useState<MemorabiliaRecord[]>(initialMemorabilia);
+
   const [selectedCardId, setSelectedCardId] = useState<number>(
     initialCards[0].id
   );
+
   const [pendingDeleteCardId, setPendingDeleteCardId] = useState<number | null>(
     null
   );
@@ -660,6 +700,7 @@ function App() {
 
         <main className="relative flex-1 overflow-hidden bg-[#0b0c10]">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(95,24,18,0.14),transparent_40%)]" />
+
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.04]">
             <img
               src="/cardgemz-main-logo.png"
@@ -733,11 +774,15 @@ function App() {
             )}
 
             {activeScreen === "Reports" && (
-              <Reports cards={cards} defaultReport={defaultReport} />
+              <Reports
+                cards={cards}
+                sales={sales}
+                defaultReport={defaultReport}
+              />
             )}
 
             {activeScreen === "Sales Tracker" && (
-              <SalesTracker cards={cards} />
+              <SalesTracker cards={cards} sales={sales} setSales={setSales} />
             )}
 
             {activeScreen === "Settings" && (
@@ -2348,11 +2393,13 @@ function GradingFormsReportPreview({
 
 function SalesReportPreview({
   cards,
+  sales,
   selectedYear = "2026",
   selectedQuarter = "All Quarters",
   selectedMonth = "All Months",
 }: {
   cards: CardRecord[];
+  sales: SaleRecord[];
   selectedYear?: string;
   selectedQuarter?: string;
   selectedMonth?: string;
@@ -2396,69 +2443,6 @@ function SalesReportPreview({
       ? `${selectedQuarter} ${selectedYear}`
       : `Full Year ${selectedYear}`;
 
-  const salesChannels = [
-    {
-      name: "eBay Sales",
-      icon: "◼",
-      revenue: [
-        12430, 11250, 13120, 13890, 14640, 13890, 15220, 14330, 13880,
-        15110, 14220, 15660,
-      ],
-      margin: [
-        24.0, 23.8, 24.2, 24.6, 25.1, 24.3, 25.5, 24.9, 24.4, 25.3,
-        24.8, 25.6,
-      ],
-    },
-    {
-      name: "Card Show Sales",
-      icon: "▣",
-      revenue: [
-        6210, 5480, 6250, 6780, 6920, 6310, 6980, 6410, 6720, 7200,
-        6640, 7050,
-      ],
-      margin: [
-        31.2, 31.8, 32.0, 32.5, 31.9, 32.1, 32.4, 32.3, 32.0, 32.6,
-        32.2, 32.7,
-      ],
-    },
-    {
-      name: "Whatnot Sales",
-      icon: "●",
-      revenue: [
-        16540, 14980, 16710, 18240, 19830, 18190, 21220, 20110, 18760,
-        20990, 19540, 21460,
-      ],
-      margin: [
-        27.6, 27.2, 27.8, 27.9, 28.4, 27.6, 28.5, 28.2, 27.9, 28.6,
-        28.1, 28.7,
-      ],
-    },
-    {
-      name: "Direct Sales",
-      icon: "◆",
-      revenue: [
-        3780, 3650, 3920, 4310, 4560, 4180, 4750, 4430, 4220, 4680,
-        4320, 4820,
-      ],
-      margin: [
-        34.1, 34.3, 34.6, 34.5, 34.8, 34.7, 35.1, 34.9, 35.0, 35.2,
-        35.0, 35.3,
-      ],
-    },
-    {
-      name: "Break Sales",
-      icon: "▲",
-      revenue: [
-        7850, 7120, 7950, 8520, 9480, 8230, 9670, 8610, 8230, 9190,
-        8380, 9620,
-      ],
-      margin: [
-        22.7, 22.5, 22.9, 23.1, 23.4, 22.9, 23.5, 23.2, 23.0, 23.6,
-        23.3, 23.7,
-      ],
-    },
-  ];
-
   const monthIndexes = visibleMonths
     .map((month) => months.indexOf(month))
     .filter((index) => index >= 0);
@@ -2473,45 +2457,163 @@ function SalesReportPreview({
 
   const formatPercent = (value: number) => `${value.toFixed(1)}%`;
 
+  const getSaleDate = (saleDate: string) => {
+    const date = new Date(`${saleDate}T00:00:00`);
+    return Number.isNaN(date.getTime()) ? null : date;
+  };
+
+  const getSaleMonthIndex = (saleDate: string) => {
+    const date = getSaleDate(saleDate);
+    return date ? date.getMonth() : -1;
+  };
+
+  const getSaleYear = (saleDate: string) => {
+    const date = getSaleDate(saleDate);
+    return date ? String(date.getFullYear()) : "";
+  };
+
+  const normalizePlatformName = (platform: string) => {
+    const cleanPlatform = platform.trim();
+
+    if (!cleanPlatform) return "Other Sales";
+
+    const lower = cleanPlatform.toLowerCase();
+
+    if (lower.includes("ebay")) return "eBay Sales";
+    if (lower.includes("whatnot")) return "Whatnot Sales";
+    if (lower.includes("show")) return "Card Show Sales";
+    if (lower.includes("direct")) return "Direct Sales";
+    if (lower.includes("break")) return "Break Sales";
+
+    return `${cleanPlatform} Sales`;
+  };
+
+  const getChannelIcon = (channelName: string) => {
+    if (channelName.includes("eBay")) return "◼";
+    if (channelName.includes("Card Show")) return "▣";
+    if (channelName.includes("Whatnot")) return "●";
+    if (channelName.includes("Direct")) return "◆";
+    if (channelName.includes("Break")) return "▲";
+    return "◇";
+  };
+
+  const salesForSelectedYear = sales.filter(
+    (sale) => getSaleYear(sale.saleDate) === selectedYear
+  );
+
+  const filteredSales = salesForSelectedYear.filter((sale) => {
+    const monthIndex = getSaleMonthIndex(sale.saleDate);
+    return monthIndexes.includes(monthIndex);
+  });
+
+  const baseChannelNames = [
+    "eBay Sales",
+    "Card Show Sales",
+    "Whatnot Sales",
+    "Direct Sales",
+    "Break Sales",
+  ];
+
+  const dynamicChannelNames = Array.from(
+    new Set(
+      salesForSelectedYear.map((sale) => normalizePlatformName(sale.platform))
+    )
+  );
+
+  const channelNames = Array.from(
+    new Set([...baseChannelNames, ...dynamicChannelNames])
+  );
+
+  const salesChannels = channelNames.map((channelName) => {
+    const revenue = months.map((_, monthIndex) =>
+      salesForSelectedYear
+        .filter(
+          (sale) =>
+            normalizePlatformName(sale.platform) === channelName &&
+            getSaleMonthIndex(sale.saleDate) === monthIndex
+        )
+        .reduce((sum, sale) => sum + sale.salePrice, 0)
+    );
+
+    const grossProfit = months.map((_, monthIndex) =>
+      salesForSelectedYear
+        .filter(
+          (sale) =>
+            normalizePlatformName(sale.platform) === channelName &&
+            getSaleMonthIndex(sale.saleDate) === monthIndex
+        )
+        .reduce((sum, sale) => sum + sale.profitLoss, 0)
+    );
+
+    const margin = months.map((_, monthIndex) => {
+      const monthlyRevenue = revenue[monthIndex] || 0;
+      const monthlyProfit = grossProfit[monthIndex] || 0;
+
+      return monthlyRevenue > 0 ? (monthlyProfit / monthlyRevenue) * 100 : 0;
+    });
+
+    return {
+      name: channelName,
+      icon: getChannelIcon(channelName),
+      revenue,
+      grossProfit,
+      margin,
+    };
+  });
+
   const sumByVisibleMonths = (values: number[]) =>
     monthIndexes.reduce((sum, index) => sum + (values[index] || 0), 0);
 
   const averageByVisibleMonths = (values: number[]) => {
-    if (monthIndexes.length === 0) return 0;
+    const activeValues = monthIndexes
+      .map((index) => values[index] || 0)
+      .filter((value) => value > 0);
+
+    if (activeValues.length === 0) return 0;
 
     return (
-      monthIndexes.reduce((sum, index) => sum + (values[index] || 0), 0) /
-      monthIndexes.length
+      activeValues.reduce((sum, value) => sum + value, 0) / activeValues.length
     );
   };
 
-  const getGrossProfitValues = (revenue: number[], margin: number[]) => {
-    return revenue.map((value, index) =>
-      Math.round(value * ((margin[index] || 0) / 100))
-    );
-  };
-
-  const grossProfitByChannel = salesChannels.map((channel) =>
-    getGrossProfitValues(channel.revenue, channel.margin)
-  );
-
-  const totalRevenue = salesChannels.reduce(
-    (sum, channel) => sum + sumByVisibleMonths(channel.revenue),
+  const totalRevenue = filteredSales.reduce(
+    (sum, sale) => sum + sale.salePrice,
     0
   );
 
-  const totalGrossProfit = grossProfitByChannel.reduce(
-    (sum, values) => sum + sumByVisibleMonths(values),
+  const totalGrossProfit = filteredSales.reduce(
+    (sum, sale) => sum + sale.profitLoss,
     0
   );
 
-  const totalUnitsSold = Math.max(1, Math.round(totalRevenue / 74));
-  const totalFees = Math.round(totalRevenue * 0.057);
-  const netProceeds = totalRevenue - totalFees;
+  const totalUnitsSold = filteredSales.length;
+
+  const totalFees = filteredSales.reduce((sum, sale) => sum + sale.fees, 0);
+
+  const totalShipping = filteredSales.reduce(
+    (sum, sale) => sum + sale.shippingCost,
+    0
+  );
+
+  const totalTaxes = filteredSales.reduce((sum, sale) => sum + sale.taxes, 0);
+
+  const totalCosts = totalFees + totalShipping + totalTaxes;
+
+  const netProceeds = filteredSales.reduce(
+    (sum, sale) => sum + sale.netProceeds,
+    0
+  );
+
   const averageMargin =
     totalRevenue > 0 ? (totalGrossProfit / totalRevenue) * 100 : 0;
 
-  const revenueGrowth = 18.6;
+  const priorPeriodRevenue = 0;
+
+  const revenueGrowth =
+    priorPeriodRevenue > 0
+      ? ((totalRevenue - priorPeriodRevenue) / priorPeriodRevenue) * 100
+      : 0;
+
   const vaultCardsTracked = cards.length;
 
   const renderMonthHeaders = (finalColumnLabel: string) => (
@@ -2613,14 +2715,10 @@ function SalesReportPreview({
                 0
               );
 
-              const monthlyProfit = salesChannels.reduce((sum, channel) => {
-                const profitValues = getGrossProfitValues(
-                  channel.revenue,
-                  channel.margin
-                );
-
-                return sum + profitValues[monthIndex];
-              }, 0);
+              const monthlyProfit = salesChannels.reduce(
+                (sum, channel) => sum + channel.grossProfit[monthIndex],
+                0
+              );
 
               const monthlyMargin =
                 monthlyRevenue > 0 ? (monthlyProfit / monthlyRevenue) * 100 : 0;
@@ -2647,34 +2745,30 @@ function SalesReportPreview({
         </thead>
 
         <tbody>
-          {salesChannels.map((channel, channelIndex) => {
-            const profitValues = grossProfitByChannel[channelIndex];
+          {salesChannels.map((channel) => (
+            <tr key={channel.name}>
+              <td className="sales-report-row-label">
+                <span>{channel.icon}</span>
+                {channel.name}
+              </td>
 
-            return (
-              <tr key={channel.name}>
-                <td className="sales-report-row-label">
-                  <span>{channel.icon}</span>
-                  {channel.name}
+              {monthIndexes.map((monthIndex) => (
+                <td key={monthIndex}>
+                  {formatCurrency(channel.grossProfit[monthIndex])}
                 </td>
+              ))}
 
-                {monthIndexes.map((monthIndex) => (
-                  <td key={monthIndex}>
-                    {formatCurrency(profitValues[monthIndex])}
-                  </td>
-                ))}
-
-                <td className="sales-report-total-cell">
-                  {formatCurrency(sumByVisibleMonths(profitValues))}
-                </td>
-              </tr>
-            );
-          })}
+              <td className="sales-report-total-cell">
+                {formatCurrency(sumByVisibleMonths(channel.grossProfit))}
+              </td>
+            </tr>
+          ))}
 
           <tr className="sales-report-total-row">
             <td>Total Gross Profit</td>
             {monthIndexes.map((monthIndex) => {
-              const monthlyProfit = grossProfitByChannel.reduce(
-                (sum, values) => sum + values[monthIndex],
+              const monthlyProfit = salesChannels.reduce(
+                (sum, channel) => sum + channel.grossProfit[monthIndex],
                 0
               );
 
@@ -2714,6 +2808,19 @@ function SalesReportPreview({
           <h1>Sales Report</h1>
           <p>Sales Performance Summary | {reportPeriod}</p>
         </section>
+
+        {filteredSales.length === 0 && (
+          <section className="sales-report-table-card">
+            <div className="sales-report-section-title">
+              <span>◇</span>
+              No Sales Recorded
+            </div>
+            <p>
+              No closed sales are recorded for {reportPeriod}. Add sales through
+              the Sales Tracker to populate this report.
+            </p>
+          </section>
+        )}
 
         <section className="sales-report-kpi-row">
           <div className="sales-report-kpi">
@@ -2764,10 +2871,14 @@ function SalesReportPreview({
                   <div
                     className="sales-report-bar sales-report-bar-revenue"
                     style={{
-                      height: `${Math.min(
-                        100,
-                        Math.max(18, (totalRevenue / 100000) * 100)
-                      )}%`,
+                      height: `${
+                        totalRevenue > 0
+                          ? Math.min(
+                              100,
+                              Math.max(18, (totalRevenue / 100000) * 100)
+                            )
+                          : 18
+                      }%`,
                     }}
                   />
                   <span>Revenue</span>
@@ -2778,10 +2889,14 @@ function SalesReportPreview({
                   <div
                     className="sales-report-bar sales-report-bar-profit"
                     style={{
-                      height: `${Math.min(
-                        100,
-                        Math.max(18, (totalGrossProfit / 100000) * 100)
-                      )}%`,
+                      height: `${
+                        totalGrossProfit > 0
+                          ? Math.min(
+                              100,
+                              Math.max(18, (totalGrossProfit / 100000) * 100)
+                            )
+                          : 18
+                      }%`,
                     }}
                   />
                   <span>Gross Profit</span>
@@ -2796,7 +2911,7 @@ function SalesReportPreview({
             <div>
               <span>↗</span>
               <p>Revenue Growth</p>
-              <h2>+{revenueGrowth}%</h2>
+              <h2>{revenueGrowth >= 0 ? "+" : ""}{formatPercent(revenueGrowth)}</h2>
               <small>vs prior period</small>
             </div>
 
@@ -2809,9 +2924,9 @@ function SalesReportPreview({
 
             <div>
               <span>$</span>
-              <p>Gross Profit</p>
-              <h2>{formatCurrency(totalGrossProfit)}</h2>
-              <small>{reportPeriod}</small>
+              <p>Total Costs</p>
+              <h2>{formatCurrency(totalCosts)}</h2>
+              <small>fees, shipping, taxes</small>
             </div>
           </aside>
 
@@ -2828,9 +2943,9 @@ function SalesReportPreview({
             <div>
               <h3>Report Notes</h3>
               <p>
-                Figures are based on closed sales, platform fees, estimated cost
-                basis, and reconciled sales activity for {reportPeriod}. Vault
-                cards referenced: {vaultCardsTracked}.
+                Figures are based on closed sales, platform fees, shipping
+                costs, taxes, cost basis, and reconciled sales activity for{" "}
+                {reportPeriod}. Vault cards referenced: {vaultCardsTracked}.
               </p>
             </div>
           </div>
@@ -2850,9 +2965,11 @@ function SalesReportPreview({
 
 function Reports({
   cards,
+  sales,
   defaultReport = "myCollection",
 }: {
   cards: CardRecord[];
+  sales: SaleRecord[];
   defaultReport?:
     | "cardAnalysis"
     | "myCollection"
@@ -3085,16 +3202,17 @@ function Reports({
       return <MemorabiliaReportPreview memorabiliaItems={[]} />;
     }
 
-    if (activeReport === "sales") {
-      return (
-        <SalesReportPreview
-          cards={filteredCards}
-          selectedYear={selectedSalesYear}
-          selectedQuarter={selectedSalesQuarter}
-          selectedMonth={selectedSalesMonth}
-        />
-      );
-    }
+if (activeReport === "sales") {
+  return (
+    <SalesReportPreview
+       cards={cards}
+       sales={sales}
+       selectedYear={selectedSalesYear}
+       selectedQuarter={selectedSalesQuarter}
+       selectedMonth={selectedSalesMonth}
+      />
+    );
+  }
 
     return null;
   };
@@ -5636,7 +5754,15 @@ function GradingCenter({ cards }: { cards: CardRecord[] }) {
   );
 }
 
-function SalesTracker({ cards }: { cards: CardRecord[] }) {
+function SalesTracker({
+  cards,
+  sales,
+  setSales,
+}: {
+  cards: CardRecord[];
+  sales: SaleRecord[];
+  setSales: React.Dispatch<React.SetStateAction<SaleRecord[]>>;
+}) {
   const [selectedCardId, setSelectedCardId] = useState<number>(
     cards[0]?.id ?? 1
   );
@@ -5644,95 +5770,112 @@ function SalesTracker({ cards }: { cards: CardRecord[] }) {
   const selectedCard =
     cards.find((card) => card.id === selectedCardId) ?? cards[0];
 
+  const [saleStatus, setSaleStatus] = useState("Sold");
+  const [platform, setPlatform] = useState("eBay");
+  const [saleDate, setSaleDate] = useState("");
+  const [salePrice, setSalePrice] = useState("");
+  const [fees, setFees] = useState("");
+  const [shippingCost, setShippingCost] = useState("");
+  const [taxes, setTaxes] = useState("");
+  const [buyerSource, setBuyerSource] = useState("");
+  const [notes, setNotes] = useState("");
+
+  const soldCards = sales.length;
   const listedCards = cards.filter((card) => card.status === "For Sale");
-  const soldCards = cards.filter((card) => card.status === "Sold");
 
-  const salesRows = cards.map((card) => {
-    const isForSale = card.status === "For Sale";
-    const isSold = card.status === "Sold";
-    const suggestedSalePrice = card.estimatedValue * 1.05;
-    const platformFee = suggestedSalePrice * 0.1325;
-    const shippingCost = 6.5;
-    const netProceeds = suggestedSalePrice - platformFee - shippingCost;
-    const netProfit = netProceeds - card.purchasePrice;
-    const saleRoi =
-      card.purchasePrice > 0 ? (netProfit / card.purchasePrice) * 100 : 0;
+  const salePriceNumber = Number(salePrice) || 0;
+  const feesNumber = Number(fees) || 0;
+  const shippingCostNumber = Number(shippingCost) || 0;
+  const taxesNumber = Number(taxes) || 0;
+  const purchasePriceNumber = selectedCard?.purchasePrice ?? 0;
 
-    return {
-      ...card,
-      saleStatus: isSold ? "Sold" : isForSale ? "Listed" : "Not Listed",
-      suggestedSalePrice,
-      platformFee,
-      shippingCost,
-      netProceeds,
-      netProfit,
-      saleRoi,
-    };
-  });
+  const netProceeds =
+    salePriceNumber - feesNumber - shippingCostNumber - taxesNumber;
+
+  const profitLoss = netProceeds - purchasePriceNumber;
+
+  const roi =
+    purchasePriceNumber > 0 ? (profitLoss / purchasePriceNumber) * 100 : 0;
+
+  const totalRevenue = sales.reduce((sum, sale) => sum + sale.salePrice, 0);
+
+  const totalNetProceeds = sales.reduce(
+    (sum, sale) => sum + sale.netProceeds,
+    0
+  );
+
+  const totalProfit = sales.reduce((sum, sale) => sum + sale.profitLoss, 0);
 
   const listedValue = listedCards.reduce(
     (sum, card) => sum + card.estimatedValue,
     0
   );
 
-  const projectedGrossSales = salesRows.reduce(
-    (sum, row) =>
-      row.saleStatus === "Listed" || row.saleStatus === "Sold"
-        ? sum + row.suggestedSalePrice
-        : sum,
-    0
-  );
+  const handleRecordSale = () => {
+    if (!selectedCard) return;
 
-  const projectedNetProceeds = salesRows.reduce(
-    (sum, row) =>
-      row.saleStatus === "Listed" || row.saleStatus === "Sold"
-        ? sum + row.netProceeds
-        : sum,
-    0
-  );
+    if (!saleDate || salePriceNumber <= 0) {
+      alert("Please enter a sale date and sale price before saving.");
+      return;
+    }
 
-  const projectedProfit = salesRows.reduce(
-    (sum, row) =>
-      row.saleStatus === "Listed" || row.saleStatus === "Sold"
-        ? sum + row.netProfit
-        : sum,
-    0
-  );
+    const newSale: SaleRecord = {
+      id: Date.now(),
+      cardId: selectedCard.id,
+      cardName: selectedCard.card,
+      player: selectedCard.player,
+      platform,
+      saleDate,
+      salePrice: salePriceNumber,
+      fees: feesNumber,
+      shippingCost: shippingCostNumber,
+      taxes: taxesNumber,
+      netProceeds,
+      purchasePrice: purchasePriceNumber,
+      profitLoss,
+      roi,
+      buyerSource,
+      notes,
+    };
 
-  const selectedSuggestedSalePrice = selectedCard
-    ? selectedCard.estimatedValue * 1.05
-    : 0;
-  const selectedPlatformFees = selectedSuggestedSalePrice * 0.1325;
-  const selectedShippingCost = 6.5;
-  const selectedNetProceeds =
-    selectedSuggestedSalePrice - selectedPlatformFees - selectedShippingCost;
-  const selectedProfit = selectedCard
-    ? selectedNetProceeds - selectedCard.purchasePrice
-    : 0;
-  const selectedRoi =
-    selectedCard && selectedCard.purchasePrice > 0
-      ? (selectedProfit / selectedCard.purchasePrice) * 100
-      : 0;
+    setSales((currentSales) => [newSale, ...currentSales]);
+
+    setSaleStatus("Sold");
+    setPlatform("eBay");
+    setSaleDate("");
+    setSalePrice("");
+    setFees("");
+    setShippingCost("");
+    setTaxes("");
+    setBuyerSource("");
+    setNotes("");
+  };
+
+  const handleDeleteSale = (saleId: number) => {
+    setSales((currentSales) =>
+      currentSales.filter((sale) => sale.id !== saleId)
+    );
+  };
 
   return (
     <>
       <PageHero
         title="Sales Tracker"
-        subtitle="Track listed cards, sold cards, platform fees, net proceeds, projected profit, and ROI."
+        subtitle="Track listed cards, sold cards, platform fees, net proceeds, real profit, and ROI."
         actions={
           <>
             <HeroButton variant="black">Export Sales Report</HeroButton>
             <HeroButton variant="gold">Record Sale</HeroButton>
           </>
-         }
-        />
+        }
+      />
 
       <div className="mb-6 grid grid-cols-5 gap-5">
         <MiniStat label="Listed Cards" value={String(listedCards.length)} />
-        <MiniStat label="Sold Cards" value={String(soldCards.length)} />
+        <MiniStat label="Recorded Sales" value={String(soldCards)} />
         <MiniStat label="Listed Value" value={money(listedValue)} />
-        <MiniStat label="Projected Net" value={money(projectedNetProceeds)} />
-        <MiniStat label="Projected Profit" value={money(projectedProfit)} />
+        <MiniStat label="Net Proceeds" value={money(totalNetProceeds)} />
+        <MiniStat label="Real Profit" value={money(totalProfit)} />
       </div>
 
       <div className="mb-6 grid grid-cols-12 gap-6">
@@ -5770,8 +5913,14 @@ function SalesTracker({ cards }: { cards: CardRecord[] }) {
               </p>
 
               <div className="mt-4 grid grid-cols-2 gap-3">
-                <MiniDarkStat label="Purchase" value={money(selectedCard.purchasePrice)} />
-                <MiniDarkStat label="Est. Value" value={money(selectedCard.estimatedValue)} />
+                <MiniDarkStat
+                  label="Purchase"
+                  value={money(selectedCard.purchasePrice)}
+                />
+                <MiniDarkStat
+                  label="Est. Value"
+                  value={money(selectedCard.estimatedValue)}
+                />
               </div>
             </div>
           )}
@@ -5779,69 +5928,101 @@ function SalesTracker({ cards }: { cards: CardRecord[] }) {
 
         <Panel className="col-span-8">
           <h2 className="mb-5 text-sm font-bold uppercase tracking-widest text-vaultGold">
-            Sale Planner
+            Record Sale
           </h2>
 
           <div className="grid grid-cols-4 gap-4">
             <Select
               label="Sale Status"
-              value={
-                selectedCard?.status === "Sold"
-                  ? "Sold"
-                  : selectedCard?.status === "For Sale"
-                  ? "Listed"
-                  : "Not Listed"
-              }
-              onChange={() => null}
-              options={["Not Listed", "Listed", "Sold", "Traded", "Removed"]}
+              value={saleStatus}
+              onChange={setSaleStatus}
+              options={["Sold", "Listed", "Pending", "Traded", "Removed"]}
             />
+
             <Input
               label="Platform / Show"
-              value=""
-              onChange={() => null}
+              value={platform}
+              onChange={setPlatform}
               placeholder="eBay, Whatnot, Show..."
             />
-            <Input
-              label="Target Sale Price"
-              value={money(selectedSuggestedSalePrice)}
-              onChange={() => null}
-              placeholder="$0.00"
-            />
+
             <Input
               label="Sale Date"
-              value=""
-              onChange={() => null}
-              placeholder="Select date"
+              value={saleDate}
+              onChange={setSaleDate}
+              placeholder="YYYY-MM-DD"
+            />
+
+            <Input
+              label="Sale Price"
+              value={salePrice}
+              onChange={setSalePrice}
+              placeholder="0.00"
+            />
+          </div>
+
+          <div className="mt-5 grid grid-cols-4 gap-4">
+            <Input
+              label="Fees"
+              value={fees}
+              onChange={setFees}
+              placeholder="0.00"
+            />
+
+            <Input
+              label="Shipping Cost"
+              value={shippingCost}
+              onChange={setShippingCost}
+              placeholder="0.00"
+            />
+
+            <Input
+              label="Taxes"
+              value={taxes}
+              onChange={setTaxes}
+              placeholder="0.00"
+            />
+
+            <Input
+              label="Buyer / Source"
+              value={buyerSource}
+              onChange={setBuyerSource}
+              placeholder="Buyer, dealer, show..."
             />
           </div>
 
           <div className="mt-5 grid grid-cols-3 gap-4">
             <MiniDarkStat
-              label="Projected Profit"
-              value={money(selectedProfit)}
-              positive={selectedProfit >= 0}
+              label="Net Proceeds"
+              value={money(netProceeds)}
+              positive={netProceeds >= 0}
+            />
+            <MiniDarkStat
+              label="Profit / Loss"
+              value={money(profitLoss)}
+              positive={profitLoss >= 0}
             />
             <MiniDarkStat
               label="ROI"
-              value={`${selectedRoi.toFixed(1)}%`}
-              positive={selectedRoi >= 0}
-            />
-            <MiniDarkStat
-              label="Break-Even Sale"
-              value={
-                selectedCard
-                  ? money((selectedCard.purchasePrice + selectedShippingCost) / 0.8675)
-                  : "$0"
-              }
+              value={`${roi.toFixed(1)}%`}
+              positive={roi >= 0}
             />
           </div>
 
           <Textarea
             label="Sale Notes"
-            value=""
-            onChange={() => null}
-            placeholder="Add notes about buyer, platform, negotiation, fees, shipping, margin, or whether this card should remain in the personal collection..."
+            value={notes}
+            onChange={setNotes}
+            placeholder="Add notes about buyer, platform, negotiation, shipping, margin, or whether this card should remain in the personal collection..."
           />
+
+          <button
+            type="button"
+            onClick={handleRecordSale}
+            className="mt-5 rounded-xl border border-vaultGold bg-vaultGold px-5 py-3 text-sm font-black uppercase tracking-widest text-black shadow-lg shadow-vaultGold/20 transition hover:bg-goldHover"
+          >
+            Save Sale Record
+          </button>
         </Panel>
       </div>
 
@@ -5849,55 +6030,89 @@ function SalesTracker({ cards }: { cards: CardRecord[] }) {
         <Panel className="col-span-8">
           <div className="mb-5 flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-bold">Sales Pipeline</h2>
+              <h2 className="text-lg font-bold">Recorded Sales</h2>
               <p className="mt-1 text-sm text-zinc-400">
-                Track cards by sale status, projected proceeds, profit, and ROI.
+                Real closed sales by platform, sale date, proceeds, profit, and
+                ROI.
               </p>
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-xl border border-steelBorder">
-            <table className="w-full border-collapse text-left text-sm">
-              <thead className="bg-black text-xs uppercase tracking-widest text-vaultGold">
-                <tr>
-                  <th className="px-4 py-4">Card</th>
-                  <th className="px-4 py-4">Player</th>
-                  <th className="px-4 py-4">Status</th>
-                  <th className="px-4 py-4">Purchase</th>
-                  <th className="px-4 py-4">Est. Value</th>
-                  <th className="px-4 py-4">Sale Target</th>
-                  <th className="px-4 py-4">Net Profit</th>
-                  <th className="px-4 py-4">ROI</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {salesRows.map((row) => (
-                  <tr
-                    key={row.id}
-                    className="border-t border-steelBorder bg-graphite900/60"
-                  >
-                    <td className="px-4 py-4 font-bold">{row.card}</td>
-                    <td className="px-4 py-4 text-zinc-300">{row.player}</td>
-                    <td className="px-4 py-4 text-vaultGold">
-                      {row.saleStatus}
-                    </td>
-                    <td className="px-4 py-4">{money(row.purchasePrice)}</td>
-                    <td className="px-4 py-4 text-profitGreen">
-                      {money(row.estimatedValue)}
-                    </td>
-                    <td className="px-4 py-4 text-vaultGold">
-                      {money(row.suggestedSalePrice)}
-                    </td>
-                    <td className="px-4 py-4 text-profitGreen">
-                      {money(row.netProfit)}
-                    </td>
-                    <td className="px-4 py-4">{row.saleRoi.toFixed(1)}%</td>
+          {sales.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-steelBorder bg-black/30 p-8 text-center">
+              <p className="text-lg font-bold text-vaultGold">
+                No sales recorded yet.
+              </p>
+              <p className="mt-2 text-sm text-zinc-400">
+                Use the Record Sale form above to add your first real sale.
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-xl border border-steelBorder">
+              <table className="w-full border-collapse text-left text-sm">
+                <thead className="bg-black text-xs uppercase tracking-widest text-vaultGold">
+                  <tr>
+                    <th className="px-4 py-4">Date</th>
+                    <th className="px-4 py-4">Card</th>
+                    <th className="px-4 py-4">Player</th>
+                    <th className="px-4 py-4">Platform</th>
+                    <th className="px-4 py-4">Sale Price</th>
+                    <th className="px-4 py-4">Net</th>
+                    <th className="px-4 py-4">Profit</th>
+                    <th className="px-4 py-4">ROI</th>
+                    <th className="px-4 py-4">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+
+                <tbody>
+                  {sales.map((sale) => (
+                    <tr
+                      key={sale.id}
+                      className="border-t border-steelBorder bg-graphite900/60"
+                    >
+                      <td className="px-4 py-4 text-zinc-300">
+                        {sale.saleDate}
+                      </td>
+                      <td className="px-4 py-4 font-bold">{sale.cardName}</td>
+                      <td className="px-4 py-4 text-zinc-300">
+                        {sale.player}
+                      </td>
+                      <td className="px-4 py-4 text-vaultGold">
+                        {sale.platform}
+                      </td>
+                      <td className="px-4 py-4">
+                        {money(sale.salePrice)}
+                      </td>
+                      <td className="px-4 py-4 text-profitGreen">
+                        {money(sale.netProceeds)}
+                      </td>
+                      <td
+                        className={`px-4 py-4 ${
+                          sale.profitLoss >= 0
+                            ? "text-profitGreen"
+                            : "text-red-400"
+                        }`}
+                      >
+                        {money(sale.profitLoss)}
+                      </td>
+                      <td className="px-4 py-4">
+                        {sale.roi.toFixed(1)}%
+                      </td>
+                      <td className="px-4 py-4">
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteSale(sale.id)}
+                          className="rounded-lg border border-red-500/50 px-3 py-2 text-xs font-bold uppercase tracking-widest text-red-300 transition hover:bg-red-500/10"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </Panel>
 
         <Panel className="col-span-4">
@@ -5905,18 +6120,19 @@ function SalesTracker({ cards }: { cards: CardRecord[] }) {
 
           <div className="mt-5 space-y-4">
             <MiniDarkStat
-              label="Projected Gross Sales"
-              value={money(projectedGrossSales)}
+              label="Total Revenue"
+              value={money(totalRevenue)}
+              positive={totalRevenue >= 0}
             />
             <MiniDarkStat
-              label="Projected Net Proceeds"
-              value={money(projectedNetProceeds)}
-              positive
+              label="Total Net Proceeds"
+              value={money(totalNetProceeds)}
+              positive={totalNetProceeds >= 0}
             />
             <MiniDarkStat
-              label="Projected Profit"
-              value={money(projectedProfit)}
-              positive={projectedProfit >= 0}
+              label="Total Profit"
+              value={money(totalProfit)}
+              positive={totalProfit >= 0}
             />
           </div>
         </Panel>
