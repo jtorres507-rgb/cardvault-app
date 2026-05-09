@@ -1,28 +1,47 @@
 import { useEffect, useMemo, useState } from "react";
 import {
+  ArrowLeft,
+  Award,
+  BadgeCheck,
   BarChart3,
   Bell,
+  Box,
+  Boxes,
   Camera,
   CheckCircle2,
+  Crown,
+  DollarSign,
+  Download,
+  Edit3,
   Eye,
   FileText,
+  Gem,
+  Grid3X3,
   Home,
   ImagePlus,
+  Layers,
+  List,
+  MoreHorizontal,
+  NotebookText,
+  Plus,
   PlusCircle,
   Search,
   Settings,
+  Shield,
   ShieldCheck,
   ShoppingCart,
+  Star,
+  Trash2,
   TrendingUp,
   Upload,
+  User,
   UserCircle,
-  Boxes,
-  Award,
 } from "lucide-react";
 
 type Screen =
   | "Dashboard"
   | "My Collection"
+  | "All Cards"
   | "Memorabilia"
   | "Add Card"
   | "Card Detail"
@@ -735,6 +754,18 @@ function App() {
               />
             )}
 
+          {activeScreen === "All Cards" && (
+            <AllCards
+              cards={cards}
+              openCardDetail={openCardDetail}
+              setActiveScreen={setActiveScreen}
+              openCollectionReport={() => {
+              setDefaultReport("myCollection");
+              setActiveScreen("Reports");
+              }}
+             />
+            )}
+
             {activeScreen === "Memorabilia" && (
               <MemorabiliaPage memorabilia={memorabilia} />
             )}
@@ -782,7 +813,7 @@ function App() {
             )}
 
             {activeScreen === "Sales Tracker" && (
-              <SalesTracker cards={cards} sales={sales} setSales={setSales} />
+              <SalesTracker cards={cards} setCards={setCards} sales={sales} setSales={setSales} />
             )}
 
             {activeScreen === "Settings" && (
@@ -1111,6 +1142,178 @@ function Dashboard({
   );
 }
 
+function CollectionStatStrip({
+  cards,
+}: {
+  cards: CardRecord[];
+}) {
+  const totalValue = cards.reduce((sum, card) => sum + card.estimatedValue, 0);
+  const rawCards = cards.filter((card) => card.grade === "Raw").length;
+  const gradedCards = cards.length - rawCards;
+  const totalSets = new Set(cards.map((card) => card.set || card.brand)).size;
+
+  return (
+    <div className="grid w-full grid-cols-5 overflow-hidden rounded-2xl border border-vaultGold/30 bg-black/55 shadow-[0_0_35px_rgba(245,196,81,0.12)] backdrop-blur">
+      <VaultStat icon={<Layers size={30} />} label="Total Cards" value={String(cards.length)} sub="+38 this month" />
+      <VaultStat icon={<DollarSign size={30} />} label="Collection Value" value={money(totalValue)} sub="+9.21%" positive />
+      <VaultStat icon={<Shield size={30} />} label="Graded" value={String(gradedCards)} sub="+49.2%" positive />
+      <VaultStat icon={<Box size={30} />} label="Raw" value={String(rawCards)} sub="+50.8%" positive />
+      <VaultStat icon={<Layers size={30} />} label="Sets" value={String(totalSets)} sub="Tracked sets" />
+    </div>
+  );
+}
+
+function VaultStat({
+  icon,
+  label,
+  value,
+  sub,
+  positive = false,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  sub?: string;
+  positive?: boolean;
+}) {
+  return (
+    <div className="flex items-center gap-4 border-r border-vaultGold/20 px-6 py-5 last:border-r-0">
+      <div className="text-vaultGold">{icon}</div>
+
+      <div>
+        <p className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-400">
+          {label}
+        </p>
+
+        <p className="mt-1 text-2xl font-black text-white">{value}</p>
+
+        {sub && (
+          <p className={positive ? "mt-1 text-xs font-bold text-profitGreen" : "mt-1 text-xs font-bold text-zinc-500"}>
+            {positive ? "↗ " : ""}
+            {sub}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function CollectionCardTile({
+  card,
+  openCardDetail,
+  compact = false,
+}: {
+  card: CardRecord;
+  openCardDetail: (cardId: number) => void;
+  compact?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => openCardDetail(card.id)}
+      className="group overflow-hidden rounded-xl border border-vaultGold/35 bg-black/60 text-left shadow-[0_0_24px_rgba(0,0,0,0.6)] transition hover:-translate-y-1 hover:border-vaultGold hover:shadow-[0_0_28px_rgba(245,196,81,0.25)]"
+    >
+      <div className={`relative overflow-hidden bg-graphite900 ${compact ? "aspect-[4/3]" : "aspect-[3/3.6]"}`}>
+        {card.frontImage ? (
+          <img
+            src={card.frontImage}
+            alt={`${card.player} ${card.card}`}
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-black via-graphite900 to-black">
+            <div className="text-center">
+              <Crown className="mx-auto h-12 w-12 text-vaultGold/70" />
+              <p className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-vaultGold">
+                CARDGEMZ
+              </p>
+            </div>
+          </div>
+        )}
+
+        <div className="absolute left-3 top-3 rounded-lg bg-black/80 px-2 py-1 text-lg font-black text-white">
+          {card.grade === "Raw" ? "RAW" : card.grade.replace("PSA ", "")}
+        </div>
+
+        <div className="absolute right-3 top-3 rounded-md border border-vaultGold/40 bg-black/75 px-2 py-1 text-[10px] font-black uppercase text-vaultGold">
+          Lineup
+        </div>
+
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/85 to-transparent p-3">
+          <p className="text-[11px] font-bold uppercase text-zinc-400">
+            {card.year} {card.brand}
+          </p>
+
+          <h3 className="mt-1 text-lg font-black uppercase tracking-wide text-white">
+            {card.player}
+          </h3>
+
+          <p className="text-xs uppercase text-zinc-400">{card.card}</p>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between px-3 py-3">
+        <span className="rounded-lg border border-steelBorder bg-black/60 px-2 py-1 text-xs font-black text-white">
+          {card.grade}
+        </span>
+
+        <span className="text-sm font-black text-profitGreen">
+          {money(card.estimatedValue)}
+        </span>
+      </div>
+    </button>
+  );
+}
+
+function VaultCollectionHero({
+  cards,
+  title,
+  subtitle,
+  actions,
+}: {
+  cards: CardRecord[];
+  title: string;
+  subtitle: string;
+  actions: React.ReactNode;
+}) {
+  return (
+    <section className="relative mb-6 overflow-hidden rounded-3xl border border-vaultGold/25 bg-black px-8 py-8 shadow-[0_0_50px_rgba(0,0,0,0.75)]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(245,196,81,0.24),transparent_28%),radial-gradient(circle_at_82%_26%,rgba(245,196,81,0.12),transparent_30%),linear-gradient(90deg,rgba(0,0,0,0.2),rgba(0,0,0,0.95))]" />
+      <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_80%_40%,rgba(255,255,255,0.09),transparent_36%)]" />
+
+      <div className="relative grid items-center gap-8 xl:grid-cols-[260px_1fr_340px]">
+        <div className="flex justify-center xl:justify-start">
+          <div className="relative h-48 w-48">
+            <img
+              src="/cardgemz-main-logo.png"
+              alt="CARDGEMZ"
+              className="h-full w-full object-contain drop-shadow-[0_0_34px_rgba(245,196,81,0.38)]"
+            />
+          </div>
+        </div>
+
+        <div>
+          <h1 className="font-vault-heading text-6xl font-black tracking-[-0.04em] text-white">
+            {title}
+          </h1>
+
+          <p className="mt-4 max-w-2xl text-sm font-medium leading-6 text-zinc-300">
+            {subtitle}
+          </p>
+
+          <div className="mt-6 flex flex-wrap gap-4">{actions}</div>
+        </div>
+
+        <div className="hidden xl:block" />
+      </div>
+
+      <div className="relative mx-auto mt-6 max-w-5xl">
+        <CollectionStatStrip cards={cards} />
+      </div>
+    </section>
+  );
+}
+
 function MyCollection({
   cards,
   openCardDetail,
@@ -1122,13 +1325,92 @@ function MyCollection({
   setActiveScreen: (screen: Screen) => void;
   openCollectionReport: () => void;
 }) {
-  const rawCards = cards.filter((card) => card.grade === "Raw").length;
-  const gradedCards = cards.length - rawCards;
-  const forSaleCards = cards.filter((card) => card.status === "For Sale").length;
-  const gradeCandidates = cards.filter(
-    (card) => card.status === "Grade Candidate"
-  ).length;
+  const topCards = [...cards]
+    .sort((a, b) => b.estimatedValue - a.estimatedValue)
+    .slice(0, 5);
 
+  if (cards.length === 0) {
+    return (
+      <EmptyVaultState
+        title="No Cards in Your Vault"
+        message="Start building your collection by adding your first card to CardVault Pro."
+        actionLabel="Add First Card"
+        onAction={() => setActiveScreen("Add Card")}
+      />
+    );
+  }
+
+  return (
+    <>
+      <VaultCollectionHero
+        cards={cards}
+        title="My Collection"
+        subtitle="Track your full card inventory, market value, grading status, storage, and collection decisions — all in one place."
+        actions={
+          <>
+            <button
+              type="button"
+              onClick={() => setActiveScreen("Add Card")}
+              className="inline-flex items-center gap-2 rounded-xl border border-vaultGold/70 bg-black/60 px-7 py-3 text-sm font-black text-vaultGold shadow-vault transition hover:bg-vaultGold hover:text-black"
+            >
+              <Plus size={18} />
+              Add Card
+            </button>
+
+            <button
+              type="button"
+              onClick={openCollectionReport}
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-[#fff3a0] via-vaultGold to-[#9b6a10] px-7 py-3 text-sm font-black text-black shadow-vault transition hover:scale-[1.02]"
+            >
+              <Download size={18} />
+              Export Collection
+            </button>
+          </>
+        }
+      />
+
+      <Panel className="border-vaultGold/25 bg-black/50">
+        <div className="mb-5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Crown className="h-5 w-5 text-vaultGold" />
+            <h2 className="text-2xl font-black">Top Cards</h2>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setActiveScreen("All Cards")}
+            className="text-sm font-black text-vaultGold hover:text-white"
+          >
+            View All →
+          </button>
+        </div>
+
+        <div className="grid grid-cols-5 gap-6">
+          {topCards.map((card) => (
+            <CollectionCardTile
+              key={card.id}
+              card={card}
+              openCardDetail={openCardDetail}
+              compact
+            />
+          ))}
+        </div>
+      </Panel>
+    </>
+  );
+}
+
+function AllCards({
+  cards,
+  openCardDetail,
+  setActiveScreen,
+  openCollectionReport,
+}: {
+  cards: CardRecord[];
+  openCardDetail: (cardId: number) => void;
+  setActiveScreen: (screen: Screen) => void;
+  openCollectionReport: () => void;
+}) {
   const [searchTerm, setSearchTerm] = useState("");
   const [collectionFilter, setCollectionFilter] = useState<
     "All" | "Raw" | "Graded" | "For Sale" | "Grade Candidate"
@@ -1164,171 +1446,131 @@ function MyCollection({
 
   return (
     <>
-      <PageHero
-        title="My Collection"
-        subtitle="Track your full card inventory, market value, grading status, storage, and collection decisions."
-        actions={
-          <>
-            <HeroButton variant="black" onClick={openCollectionReport}>
-              Export Collection
-            </HeroButton>
+      <section className="relative mb-6 overflow-hidden rounded-3xl border border-vaultGold/25 bg-black px-8 py-7">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_20%,rgba(245,196,81,0.18),transparent_30%),linear-gradient(90deg,rgba(0,0,0,0.15),rgba(0,0,0,0.95))]" />
 
-            <HeroButton variant="gold" onClick={() => setActiveScreen("Add Card")}>
-              Add Card
-            </HeroButton>
-          </>
-        }
-      />
+        <div className="relative flex items-start justify-between gap-6">
+          <div>
+            <button
+              type="button"
+              onClick={() => setActiveScreen("My Collection")}
+              className="mb-4 inline-flex items-center gap-2 text-sm font-black text-vaultGold hover:text-white"
+            >
+              <ArrowLeft size={16} />
+              Back to My Collection
+            </button>
 
-      {cards.length === 0 && (
-        <EmptyVaultState
-          title="No Cards in Your Vault"
-          message="Start building your collection by adding your first card to CardVault Pro."
-          actionLabel="Add First Card"
-          onAction={() => setActiveScreen("Add Card")}
-        />
-      )}
+            <h1 className="font-vault-heading text-5xl font-black tracking-[-0.04em] text-white">
+              All Cards
+            </h1>
 
-      {cards.length > 0 && (
-        <>
-          <div className="mb-6 grid grid-cols-5 gap-5">
-            <MiniStat label="Total Cards" value={String(cards.length)} />
-            <MiniStat label="Raw Cards" value={String(rawCards)} />
-            <MiniStat label="Graded Cards" value={String(gradedCards)} />
-            <MiniStat label="For Sale" value={String(forSaleCards)} />
-            <MiniStat label="Grade Candidates" value={String(gradeCandidates)} />
+            <p className="mt-2 text-sm text-zinc-400">
+              My Collection › All Cards
+            </p>
+
+            <p className="mt-4 text-sm font-bold text-zinc-300">
+              {cards.length.toLocaleString()} cards in your collection
+            </p>
           </div>
 
-          <Panel>
-            <div className="mb-5 flex items-center gap-4">
-              <div className="flex flex-1 items-center gap-3 rounded-xl border border-steelBorder bg-black/40 px-4 py-3">
-                <Search size={18} className="text-zinc-500" />
+          <div className="flex flex-wrap justify-end gap-3">
+            <button
+              type="button"
+              onClick={openCollectionReport}
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-[#fff3a0] via-vaultGold to-[#9b6a10] px-5 py-3 text-sm font-black text-black shadow-vault"
+            >
+              <Download size={17} />
+              Export Collection
+            </button>
 
-                <input
-                  value={searchTerm}
-                  onChange={(event) => setSearchTerm(event.target.value)}
-                  className="w-full bg-transparent text-sm outline-none placeholder:text-zinc-500"
-                  placeholder="Search inventory..."
-                />
-              </div>
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 rounded-xl border border-steelBorder bg-black/50 px-5 py-3 text-sm font-black text-zinc-200"
+            >
+              Print Report
+            </button>
 
-              <div className="flex flex-wrap gap-2">
-                {(["All", "Raw", "Graded", "For Sale", "Grade Candidate"] as const).map(
-                  (filter) => (
-                    <button
-                      key={filter}
-                      onClick={() => setCollectionFilter(filter)}
-                      className={`rounded-xl border px-4 py-3 text-xs font-black transition ${
-                        collectionFilter === filter
-                          ? "border-vaultGold bg-vaultGold text-black shadow-vault"
-                          : "border-steelBorder bg-black/40 text-zinc-300 hover:border-vaultGold/50 hover:text-vaultGold"
-                      }`}
-                    >
-                      {filter}
-                    </button>
-                  )
-                )}
-              </div>
-            </div>
+            <button
+              type="button"
+              onClick={() => setActiveScreen("Add Card")}
+              className="inline-flex items-center gap-2 rounded-xl border border-vaultGold/60 bg-black/50 px-5 py-3 text-sm font-black text-vaultGold hover:bg-vaultGold hover:text-black"
+            >
+              <Plus size={17} />
+              Add Card
+            </button>
+          </div>
+        </div>
 
-            <div className="mb-4 flex items-center justify-between rounded-xl border border-steelBorder bg-black/30 px-4 py-3 text-xs font-bold text-zinc-400">
-              <span>
-                Showing <span className="text-vaultGold">{filteredCards.length}</span> of{" "}
-                <span className="text-white">{cards.length}</span> cards
-              </span>
+        <div className="relative mx-auto mt-6 max-w-5xl">
+          <CollectionStatStrip cards={cards} />
+        </div>
+      </section>
 
-              <div className="flex items-center gap-3">
-                <span>
-                  Filter: <span className="text-vaultGold">{collectionFilter}</span>
-                  {searchTerm && (
-                    <>
-                      {" "}
-                      | Search: <span className="text-vaultGold">{searchTerm}</span>
-                    </>
-                  )}
-                </span>
+      <Panel className="border-vaultGold/20 bg-black/50">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex min-w-[320px] flex-1 items-center gap-3 rounded-xl border border-steelBorder bg-black/50 px-4 py-3">
+            <Search size={18} className="text-zinc-500" />
 
+            <input
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              className="w-full bg-transparent text-sm text-white outline-none placeholder:text-zinc-500"
+              placeholder="Search in collection..."
+            />
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {(["All", "Raw", "Graded", "For Sale", "Grade Candidate"] as const).map(
+              (filter) => (
                 <button
-                  onClick={() => {
-                    setSearchTerm("");
-                    setCollectionFilter("All");
-                  }}
-                  className="rounded-lg border border-steelBorder bg-black/40 px-3 py-2 text-xs font-black text-zinc-300 hover:border-vaultGold/50 hover:text-vaultGold"
+                  key={filter}
+                  onClick={() => setCollectionFilter(filter)}
+                  className={`rounded-xl border px-4 py-3 text-xs font-black transition ${
+                    collectionFilter === filter
+                      ? "border-vaultGold bg-vaultGold text-black shadow-vault"
+                      : "border-steelBorder bg-black/40 text-zinc-300 hover:border-vaultGold/50 hover:text-vaultGold"
+                  }`}
                 >
-                  Clear Search / Reset Filters
+                  {filter}
                 </button>
-              </div>
-            </div>
+              )
+            )}
 
-            <div className="overflow-hidden rounded-xl border border-steelBorder">
-              <table className="w-full border-collapse text-left text-sm">
-                <thead className="bg-black text-xs uppercase tracking-widest text-vaultGold">
-                  <tr>
-                    <th className="px-4 py-4">Card</th>
-                    <th className="px-4 py-4">Player</th>
-                    <th className="px-4 py-4">Year</th>
-                    <th className="px-4 py-4">Brand</th>
-                    <th className="px-4 py-4">Grade</th>
-                    <th className="px-4 py-4">Purchase</th>
-                    <th className="px-4 py-4">Est. Value</th>
-                    <th className="px-4 py-4">Status</th>
-                    <th className="px-4 py-4">Actions</th>
-                  </tr>
-                </thead>
+            <button className="rounded-xl border border-vaultGold/40 bg-black/50 p-3 text-vaultGold">
+              <Grid3X3 size={16} />
+            </button>
 
-                <tbody>
-                  {filteredCards.length === 0 ? (
-                    <tr>
-                      <td colSpan={9} className="px-4 py-10 text-center text-zinc-400">
-                        No cards match your search.
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredCards.map((card) => (
-                      <tr
-                        key={card.id}
-                        className="border-t border-steelBorder bg-graphite900/60"
-                      >
-                        <td className="px-4 py-4 font-bold">{card.card}</td>
-                        <td className="px-4 py-4 text-zinc-300">{card.player}</td>
-                        <td className="px-4 py-4 text-zinc-400">{card.year}</td>
-                        <td className="px-4 py-4 text-zinc-400">{card.brand}</td>
+            <button className="rounded-xl border border-steelBorder bg-black/50 p-3 text-zinc-300">
+              <List size={16} />
+            </button>
+          </div>
+        </div>
 
-                        <td className="px-4 py-4">
-                          <span className="rounded-lg border border-steelBorder bg-black/40 px-2 py-1 text-xs font-bold">
-                            {card.grade}
-                          </span>
-                        </td>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6 2xl:grid-cols-8">
+          {filteredCards.map((card) => (
+            <CollectionCardTile
+              key={card.id}
+              card={card}
+              openCardDetail={openCardDetail}
+            />
+          ))}
+        </div>
 
-                        <td className="px-4 py-4">{money(card.purchasePrice)}</td>
+        <div className="mt-6 flex items-center justify-between border-t border-steelBorder pt-4 text-sm text-zinc-400">
+          <p>
+            Showing 1–{Math.min(filteredCards.length, 24)} of{" "}
+            {filteredCards.length.toLocaleString()} cards
+          </p>
 
-                        <td className="px-4 py-4 font-black text-profitGreen">
-                          {money(card.estimatedValue)}
-                        </td>
-
-                        <td className="px-4 py-4">
-                          <span className="rounded-lg border border-vaultGold/30 bg-vaultGold/10 px-2 py-1 text-xs font-bold text-vaultGold">
-                            {card.status}
-                          </span>
-                        </td>
-
-                        <td className="px-4 py-4">
-                          <button
-                            onClick={() => openCardDetail(card.id)}
-                            className="rounded-lg border border-steelBorder bg-black/40 p-2 text-zinc-300 hover:text-vaultGold"
-                          >
-                            <Eye size={16} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </Panel>
-        </>
-      )}
+          <div className="flex items-center gap-2">
+            <button className="rounded-lg border border-steelBorder px-3 py-2 text-white">‹</button>
+            <button className="rounded-lg border border-vaultGold bg-vaultGold px-3 py-2 font-black text-black">1</button>
+            <button className="rounded-lg border border-steelBorder px-3 py-2 text-white">2</button>
+            <button className="rounded-lg border border-steelBorder px-3 py-2 text-white">3</button>
+            <button className="rounded-lg border border-steelBorder px-3 py-2 text-white">›</button>
+          </div>
+        </div>
+      </Panel>
     </>
   );
 }
@@ -4791,10 +5033,15 @@ function CardDetail({
   card: CardRecord;
   deleteCard: (cardId: number) => void;
   updateCard: (updatedCard: CardRecord) => void;
-  setActiveScreen: (screen: Screen) => void;}) {
+  setActiveScreen: (screen: Screen) => void;
+}) {
   const [isEditing, setIsEditing] = useState(false);
   const [editCard, setEditCard] = useState<CardRecord>(card);
   const [saveMessage, setSaveMessage] = useState("");
+
+  useEffect(() => {
+    setEditCard(card);
+  }, [card]);
 
   function updateEditField<K extends keyof CardRecord>(
     field: K,
@@ -4807,390 +5054,386 @@ function CardDetail({
   }
 
   function saveEditedCard() {
-  const recalculatedGainLoss = editCard.estimatedValue - editCard.totalCostBasis;
-  const recalculatedRoi =
-    editCard.totalCostBasis > 0
-      ? (recalculatedGainLoss / editCard.totalCostBasis) * 100
-      : 0;
+    const recalculatedGainLoss =
+      editCard.estimatedValue - editCard.totalCostBasis;
 
-  updateCard({
-    ...editCard,
-    gainLoss: recalculatedGainLoss,
-    roi: recalculatedRoi,
-  });
+    const recalculatedRoi =
+      editCard.totalCostBasis > 0
+        ? (recalculatedGainLoss / editCard.totalCostBasis) * 100
+        : 0;
 
-  setIsEditing(false);
-  setSaveMessage("Card updated successfully.");
+    updateCard({
+      ...editCard,
+      gainLoss: recalculatedGainLoss,
+      roi: recalculatedRoi,
+    });
 
-  window.setTimeout(() => {
-    setSaveMessage("");
-  }, 2500);
-}
+    setIsEditing(false);
+    setSaveMessage("Card updated successfully.");
 
-return (
-  <>
- <PageHero
-  title="Card Detail"
-  subtitle={`${card.player} — ${card.card}`}
-  actions={
-    <>
-      <HeroButton variant="black" onClick={() => setActiveScreen("My Collection")}>
-        Back to Collection
-      </HeroButton>
+    window.setTimeout(() => {
+      setSaveMessage("");
+    }, 2500);
+  }
 
-      {isEditing ? (
-        <>
-          <HeroButton variant="gold" onClick={saveEditedCard}>
-            Save Changes
-          </HeroButton>
+  const displayCard = isEditing ? editCard : card;
 
-          <HeroButton
-            variant="black"
-            onClick={() => {
-              setEditCard(card);
-              setIsEditing(false);
-            }}
+  const isRookieCard =
+    displayCard.card.toLowerCase().includes("rookie") ||
+    displayCard.year === "2023" ||
+    displayCard.year === "2017";
+
+  return (
+    <section className="relative overflow-hidden rounded-3xl border border-vaultGold/25 bg-black p-6 shadow-[0_0_60px_rgba(0,0,0,0.75)]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(245,196,81,0.16),transparent_30%),radial-gradient(circle_at_70%_16%,rgba(245,196,81,0.08),transparent_28%),linear-gradient(135deg,rgba(0,0,0,0.25),rgba(0,0,0,0.95))]" />
+
+      <div className="relative mb-6 flex flex-wrap items-center justify-between gap-5">
+        <div>
+          <h1 className="font-vault-heading text-5xl font-black tracking-[-0.04em] text-white">
+            Card Detail
+          </h1>
+
+          <p className="mt-2 text-lg text-zinc-300">
+            {displayCard.player} — {displayCard.card}
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => setActiveScreen("My Collection")}
+            className="inline-flex items-center gap-2 rounded-xl border border-vaultGold/40 bg-black/60 px-6 py-3 text-sm font-black text-white transition hover:border-vaultGold hover:text-vaultGold"
           >
-            Cancel Edit
-          </HeroButton>
-        </>
-      ) : (
-        <HeroButton variant="black" onClick={() => setIsEditing(true)}>
-          Edit Card
-        </HeroButton>
+            <ArrowLeft size={17} />
+            Back to Collection
+          </button>
+
+          {isEditing ? (
+            <>
+              <button
+                type="button"
+                onClick={saveEditedCard}
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-[#fff3a0] via-vaultGold to-[#9b6a10] px-6 py-3 text-sm font-black text-black shadow-vault"
+              >
+                <BadgeCheck size={17} />
+                Save Changes
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setEditCard(card);
+                  setIsEditing(false);
+                }}
+                className="inline-flex items-center gap-2 rounded-xl border border-steelBorder bg-black/60 px-6 py-3 text-sm font-black text-zinc-300 hover:text-white"
+              >
+                Cancel
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-[#fff3a0] via-vaultGold to-[#9b6a10] px-6 py-3 text-sm font-black text-black shadow-vault"
+            >
+              <Edit3 size={17} />
+              Edit Card
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={() => deleteCard(card.id)}
+            className="inline-flex items-center gap-2 rounded-xl border border-red-500/60 bg-red-950/20 px-6 py-3 text-sm font-black text-red-400 hover:bg-red-500 hover:text-white"
+          >
+            <Trash2 size={17} />
+            Delete Card
+          </button>
+        </div>
+      </div>
+
+      {saveMessage && (
+        <div className="relative mb-6 rounded-2xl border border-profitGreen/30 bg-profitGreen/10 px-5 py-4 text-sm font-bold text-profitGreen shadow-vault">
+          {saveMessage}
+        </div>
       )}
 
-      <HeroButton variant="gold" onClick={() => deleteCard(card.id)}>
-        Delete Card
-      </HeroButton>
-    </>
-  }
-/>
-
-{saveMessage && (
-  <div className="mb-6 rounded-2xl border border-profitGreen/30 bg-profitGreen/10 px-5 py-4 text-sm font-bold text-profitGreen shadow-vault">
-    {saveMessage}
-  </div>
-)}
-
-  <Panel className="col-span-3">
-          <h2 className="mb-4 text-sm font-bold uppercase tracking-widest text-vaultGold">
-            Card Images
-          </h2>
-
-          <CardImagePreview image={card.frontImage} label="Front Image" large />
-
-          <div className="mt-4">
-            <CardImagePreview image={card.backImage} label="Back Image" />
-          </div>
-
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <CardImagePreview image={card.slabImage} label="Slab" />
-            <CardImagePreview image={card.receiptImage} label="Receipt" />
-          </div>
-
-          <div className="mt-6 border-t border-steelBorder pt-5">
-            <h2 className="mb-4 text-sm font-bold uppercase tracking-widest text-vaultGold">
-              Condition Review
-            </h2>
-
-            <div className="grid grid-cols-2 gap-3">
-              <ScoreBox label="Corners" value="Review" />
-              <ScoreBox label="Centering" value="Review" />
-              <ScoreBox label="Edges" value="Review" />
-              <ScoreBox label="Surface" value="Review" />
-            </div>
-
-            <div className="mt-4 rounded-xl border border-vaultGold/30 bg-vaultGold/10 p-3">
-              <p className="text-xs font-bold uppercase tracking-widest text-zinc-400">
-                Overall Condition
-              </p>
-              <p className="mt-1 text-xl font-extrabold text-vaultGold">
-                Pending Inspection
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-6 border-t border-steelBorder pt-5">
-            <h2 className="mb-4 text-sm font-bold uppercase tracking-widest text-vaultGold">
-              Card Analysis
-            </h2>
-
-            <div className="space-y-3 text-sm leading-6 text-zinc-300">
-              <CheckItem text="Initial card record created." />
-              <CheckItem text="Card analysis notes available for review." />
-              <CheckItem text={card.notes || "Add personal analysis notes."} />
-            </div>
-          </div>
-        </Panel>
-
-        <div className="col-span-9 space-y-6">
-          <div className="grid grid-cols-4 gap-5">
-            <KpiCard
-              label="Estimated Value"
-              value={money(card.estimatedValue)}
-              sub="Market value"
-              color="text-profitGreen"
+      <div className="relative grid gap-6 xl:grid-cols-[1.45fr_1fr]">
+        <section className="rounded-3xl border border-vaultGold/35 bg-black/55 p-6 shadow-[0_0_55px_rgba(245,196,81,0.16)]">
+          <div className="grid gap-5 md:grid-cols-2">
+            <CardVaultImagePanel
+              label="Front"
+              image={displayCard.frontImage}
+              placeholder={`${displayCard.player} Front`}
             />
-            <KpiCard
-              label="Purchase Price"
-              value={money(card.purchasePrice)}
-              sub={card.purchaseDate}
-              color="text-dataCyan"
-            />
-            <KpiCard
-              label="Net Gain / Loss"
-              value={money(card.gainLoss)}
-              sub={`${card.roi.toFixed(1)}% ROI`}
-              color="text-profitGreen"
-            />
-            <KpiCard
-              label="Market Trend"
-              value="Manual Review"
-              sub="Comp refresh pending"
-              color="text-vaultGold"
+
+            <CardVaultImagePanel
+              label="Back"
+              image={displayCard.backImage}
+              placeholder={`${displayCard.player} Back`}
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-5">
+          <div className="mt-6 grid grid-cols-1 overflow-hidden rounded-2xl border border-vaultGold/25 bg-black/65 md:grid-cols-3">
+            <DetailBadge
+              icon={
+                <Gem className="h-12 w-12 text-vaultGold drop-shadow-[0_0_18px_rgba(245,196,81,0.55)]" />
+              }
+              title="Super Rare"
+              subtitle="Condition"
+            />
 
-      <DetailSection title="Card Profile">{isEditing ? (
-        <div className="space-y-3">
-          <EditDetailField
-            label="Player"
-            value={editCard.player}
-            onChange={(value) => updateEditField("player", value)}
-          />
+            <DetailBadge
+              icon={<RookieCardEmblem />}
+              title={isRookieCard ? "Rookie Card" : "Base Card"}
+              subtitle="Rookie Indicator"
+            />
 
-          <EditDetailField
-            label="Card"
-            value={editCard.card}
-            onChange={(value) => updateEditField("card", value)}
-          />
-
-          <EditDetailField
-            label="Team"
-            value={editCard.team}
-            onChange={(value) => updateEditField("team", value)}
-          />
-
-          <EditDetailField
-           label="Sport"
-           value={editCard.sport}
-           onChange={(value) => updateEditField("sport", value)}
-          />
-
-          <EditDetailField
-            label="Year"
-            value={editCard.year}
-            onChange={(value) => updateEditField("year", value)}
-          />
-
-         <EditDetailField
-           label="Brand"
-           value={editCard.brand}
-           onChange={(value) => updateEditField("brand", value)}
-         />
-
-          <EditDetailField
-            label="Serial Number"
-            value={editCard.serialNumber}
-            onChange={(value) => updateEditField("serialNumber", value)}
-          />
-
-          <EditDetailField
-            label="SKU"
-            value={editCard.sku}
-            onChange={(value) => updateEditField("sku", value)}
-          />
-
-          <EditDetailField
-            label="Storage"
-            value={editCard.storageLocation}
-            onChange={(value) => updateEditField("storageLocation", value)}
-          />
-       </div>
-    ) : (
-   <>
-      <DetailLine label="Player" value={card.player} />
-      <DetailLine label="Card" value={card.card} />
-      <DetailLine label="Team" value={card.team} />
-      <DetailLine label="Sport" value={card.sport} />
-      <DetailLine label="Year" value={card.year} />
-      <DetailLine label="Brand" value={card.brand} />
-      <DetailLine label="Serial Number" value={card.serialNumber} />
-      <DetailLine label="SKU" value={card.sku} />
-      <DetailLine label="Storage" value={card.storageLocation} />
-    </>
-  )}
-</DetailSection>
-
-            <DetailSection title="Purchase Snapshot">
-  {isEditing ? (
-    <div className="space-y-3">
-      <EditDetailField
-        label="Purchase Date"
-        value={editCard.purchaseDate}
-        onChange={(value) => updateEditField("purchaseDate", value)}
-      />
-
-      <EditNumberField
-        label="Purchase Price"
-        value={editCard.purchasePrice}
-        onChange={(value) => updateEditField("purchasePrice", value)}
-      />
-
-      <EditDetailField
-        label="Source"
-        value={editCard.source}
-        onChange={(value) => updateEditField("source", value)}
-      />
-
-      <EditDetailField
-        label="Location"
-        value={editCard.storageLocation}
-        onChange={(value) => updateEditField("storageLocation", value)}
-      />
-
-      <EditNumberField
-        label="Total Cost Basis"
-        value={editCard.totalCostBasis}
-        onChange={(value) => updateEditField("totalCostBasis", value)}
-      />
-
-      <EditNumberField
-        label="Estimated Value"
-        value={editCard.estimatedValue}
-        onChange={(value) => {
-          const updatedGainLoss = value - editCard.totalCostBasis;
-          const updatedRoi =
-            editCard.totalCostBasis > 0
-              ? (updatedGainLoss / editCard.totalCostBasis) * 100
-              : 0;
-
-          setEditCard((currentCard) => ({
-            ...currentCard,
-            estimatedValue: value,
-            gainLoss: updatedGainLoss,
-            roi: updatedRoi,
-          }));
-        }}
-      />
-    </div>
-  ) : (
-    <>
-      <DetailLine label="Purchase Date" value={card.purchaseDate} />
-      <DetailLine label="Purchase Price" value={money(card.purchasePrice)} />
-      <DetailLine label="Source" value={card.source} />
-      <DetailLine label="Location" value={card.storageLocation} />
-      <DetailLine label="Total Cost Basis" value={money(card.totalCostBasis)} />
-      <DetailLine
-        label="Current Gain"
-        value={money(card.gainLoss)}
-        valueClass={card.gainLoss >= 0 ? "text-profitGreen" : "text-red-400"}
-      />
-    </>
-  )}
-</DetailSection>
-
-            <DetailSection title="Market Comp Information">
-  {isEditing ? (
-    <div className="space-y-3">
-      <EditNumberField
-        label="Last Sale"
-        value={editCard.lastSale}
-        onChange={(value) => updateEditField("lastSale", value)}
-      />
-
-      <EditNumberField
-        label="30-Day Average"
-        value={editCard.averageComp}
-        onChange={(value) => updateEditField("averageComp", value)}
-      />
-
-      <EditNumberField
-        label="High Comp"
-        value={editCard.highComp}
-        onChange={(value) => updateEditField("highComp", value)}
-      />
-
-      <EditNumberField
-        label="Low Comp"
-        value={editCard.lowComp}
-        onChange={(value) => updateEditField("lowComp", value)}
-      />
-
-      <EditDetailField
-        label="Comp Confidence"
-        value={editCard.compConfidence}
-        onChange={(value) => updateEditField("compConfidence", value)}
-      />
-    </div>
-  ) : (
-    <>
-      <DetailLine label="Last Sale" value={money(card.lastSale)} />
-      <DetailLine label="30-Day Average" value={money(card.averageComp)} />
-      <DetailLine label="High Comp" value={money(card.highComp)} />
-      <DetailLine label="Low Comp" value={money(card.lowComp)} />
-      <DetailLine
-        label="Comp Confidence"
-        value={card.compConfidence}
-        valueClass="text-vaultGold"
-      />
-    </>
-  )}
-</DetailSection>
-
-            <DetailSection title="Grading Strategy">
-              <DetailLine label="Preferred Grader" value={card.grader} />
-              <DetailLine label="Grading Status" value="Planning" />
-              <DetailLine label="Expected Grade" value="Review Needed" />
-              <DetailLine label="Actual Grade" value={card.grade} />
-              <DetailLine label="Cert Number" value="Pending" />
-              <button className="mt-4 w-full rounded-xl border border-vaultGold/40 px-4 py-3 text-sm font-bold text-vaultGold">
-                View Grading Tracker
-              </button>
-            </DetailSection>
-
-            <DetailSection title="Market Prediction">
-              <DetailLine label="Low Estimate" value={money(card.lowComp * 1.05)} />
-              <DetailLine label="Mid Estimate" value={money(card.estimatedValue)} />
-              <DetailLine label="High Estimate" value={money(card.highComp * 1.05)} />
-              <DetailLine label="Premium Grade Estimate" value={money(card.estimatedValue * 1.55)} />
-              <DetailLine label="30-Day Trend" value="Pending" valueClass="text-vaultGold" />
-            </DetailSection>
-
-            <DetailSection title="Personal Collection Decision">
-              <DetailLine
-                label="PC Candidate"
-                value={card.status === "Personal Collection" ? "Yes" : "Review"}
-                valueClass="text-profitGreen"
-              />
-              <DetailLine label="Recommendation" value="Hold / Review" />
-              <DetailLine label="Target Sale Price" value={money(card.estimatedValue * 1.15)} />
-              <DetailLine
-                label="Projected Profit"
-                value={money(card.gainLoss)}
-                valueClass={card.gainLoss >= 0 ? "text-profitGreen" : "text-red-400"}
-              />
-              <div className="mt-4 rounded-xl border border-steelBorder bg-black/40 p-3 text-sm leading-6 text-zinc-300">
-                {card.notes}
+            <button
+              type="button"
+              onClick={() => setActiveScreen("Sales Tracker")}
+              className="flex items-center gap-4 border-t border-vaultGold/20 p-5 text-left transition hover:bg-vaultGold/10 md:border-l md:border-t-0"
+            >
+              <div className="flex h-14 w-14 items-center justify-center rounded-full border border-vaultGold bg-black text-vaultGold shadow-[0_0_25px_rgba(245,196,81,0.35)]">
+                <DollarSign className="h-8 w-8" />
               </div>
-            </DetailSection>
 
-            <DetailSection title="Sale Information">
-              <DetailLine label="Sale Date" value="TBD" />
-              <DetailLine label="Platform / Show" value="TBD" />
-              <DetailLine label="Invoice Number" value="TBD" />
-              <DetailLine label="Sale Price" value="TBD" />
-              <DetailLine label="Net Proceeds" value="TBD" />
-              <button className="mt-4 w-full rounded-xl border border-vaultGold/40 px-4 py-3 text-sm font-bold text-vaultGold">
-                Record Sale
-              </button>
-            </DetailSection>
+              <div>
+                <p className="text-lg font-black uppercase text-white">
+                  Sell Card
+                </p>
+                <p className="text-xs font-bold uppercase tracking-wide text-zinc-400">
+                  List this card
+                </p>
+              </div>
+            </button>
           </div>
+        </section>
+
+        <aside className="space-y-4">
+          <DetailPanel title="Card Profile" icon={<User size={20} />}>
+            <DetailGrid
+              items={[
+                ["Player", displayCard.player],
+                ["Brand", displayCard.brand],
+                ["Card", displayCard.card],
+                ["Serial Number", displayCard.serialNumber || "N/A"],
+                ["Team", displayCard.team],
+                ["SKU", displayCard.sku || "N/A"],
+                ["Sport", displayCard.sport],
+                ["Storage", displayCard.storageLocation || "N/A"],
+                ["Year", displayCard.year],
+              ]}
+            />
+          </DetailPanel>
+
+          <DetailPanel title="Grading Strategy" icon={<BarChart3 size={20} />}>
+            <DetailGrid
+              items={[
+                [
+                  "Preferred Grade",
+                  displayCard.grader === "PSA"
+                    ? "PSA 10"
+                    : `${displayCard.grader} Review`,
+                ],
+                [
+                  "Grading Status",
+                  displayCard.grade === "Raw" ? "Planning" : "Graded",
+                ],
+                [
+                  "Expected Grade",
+                  displayCard.grade === "Raw"
+                    ? "Review Needed"
+                    : displayCard.grade,
+                ],
+                ["Actual Grade", displayCard.grade],
+              ]}
+            />
+
+            <button
+              type="button"
+              onClick={() => setActiveScreen("Grading Center")}
+              className="mt-4 w-full rounded-xl border border-vaultGold/50 bg-black/50 px-4 py-3 text-sm font-black text-vaultGold hover:bg-vaultGold hover:text-black"
+            >
+              View Grading Tracker
+            </button>
+          </DetailPanel>
+
+          <DetailPanel title="Sale Information" icon={<DollarSign size={20} />}>
+            <DetailGrid
+              items={[
+                [
+                  "Target Sale Price",
+                  money(displayCard.highComp || displayCard.estimatedValue),
+                ],
+                ["Market Value", money(displayCard.estimatedValue)],
+                [
+                  "Platform / Show",
+                  displayCard.status === "For Sale" ? displayCard.source : "TBD",
+                ],
+                ["Date Added", displayCard.purchaseDate || "TBD"],
+              ]}
+            />
+          </DetailPanel>
+
+          <DetailPanel
+            title="Purchase Information"
+            icon={<ShoppingCart size={20} />}
+          >
+            <DetailGrid
+              items={[
+                [
+                  "Purchase Price",
+                  money(displayCard.totalCostBasis || displayCard.purchasePrice),
+                ],
+                ["Source", displayCard.source || "TBD"],
+                ["Purchase Date", displayCard.purchaseDate || "TBD"],
+                ["Seller", displayCard.seller || "TBD"],
+              ]}
+            />
+          </DetailPanel>
+
+          <DetailPanel title="Storage Information" icon={<Box size={20} />}>
+            <DetailGrid
+              items={[
+                ["Storage Location", displayCard.storageLocation || "Vault A-01"],
+                ["Storage Type", "Magnetic Case"],
+                ["Added To Storage", displayCard.purchaseDate || "TBD"],
+                ["Condition", "Stored Securely"],
+              ]}
+            />
+          </DetailPanel>
+
+          <DetailPanel title="Notes" icon={<NotebookText size={20} />}>
+            {isEditing ? (
+              <textarea
+                value={editCard.notes}
+                onChange={(event) =>
+                  updateEditField("notes", event.target.value)
+                }
+                className="min-h-[110px] w-full rounded-xl border border-steelBorder bg-black/60 p-3 text-sm text-white outline-none focus:border-vaultGold"
+              />
+            ) : (
+              <p className="text-sm leading-6 text-zinc-300">
+                {displayCard.notes || "No notes added yet."}
+              </p>
+            )}
+          </DetailPanel>
+        </aside>
+      </div>
+    </section>
+  );
+}
+
+function CardVaultImagePanel({
+  label,
+  image,
+  placeholder,
+}: {
+  label: string;
+  image?: string;
+  placeholder: string;
+}) {
+  return (
+    <div>
+      <p className="mb-3 text-center text-xs font-black uppercase tracking-[0.22em] text-vaultGold">
+        {label}
+      </p>
+
+      <div className="overflow-hidden rounded-xl border border-vaultGold/35 bg-black shadow-[0_0_32px_rgba(245,196,81,0.16)]">
+        {image ? (
+          <img
+            src={image}
+            alt={placeholder}
+            className="aspect-[3/4] w-full object-cover"
+          />
+        ) : (
+          <div className="flex aspect-[3/4] w-full items-center justify-center bg-gradient-to-br from-graphite900 via-black to-graphite900">
+            <div className="text-center">
+              <Crown className="mx-auto h-16 w-16 text-vaultGold/70" />
+              <p className="mt-3 text-xs font-black uppercase tracking-[0.22em] text-vaultGold">
+                {placeholder}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DetailBadge({
+  icon,
+  title,
+  subtitle,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+}) {
+  return (
+    <div className="flex items-center gap-4 border-t border-vaultGold/20 p-5 first:border-t-0 md:border-l md:border-t-0 md:first:border-l-0">
+      {icon}
+
+      <div>
+        <p className="text-lg font-black uppercase text-white">{title}</p>
+        <p className="text-xs font-bold uppercase tracking-wide text-zinc-400">
+          {subtitle}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function RookieCardEmblem() {
+  return (
+    <div className="flex h-14 w-14 items-center justify-center text-vaultGold">
+      <div className="relative flex h-12 w-12 items-center justify-center">
+        <Shield className="absolute h-12 w-12 fill-vaultGold/10 text-vaultGold drop-shadow-[0_0_18px_rgba(245,196,81,0.45)]" />
+        <span className="relative text-sm font-black">RC</span>
+      </div>
+    </div>
+  );
+}
+
+function DetailPanel({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="rounded-2xl border border-vaultGold/25 bg-black/60 p-5 shadow-[0_0_24px_rgba(0,0,0,0.6)]">
+      <div className="mb-4 flex items-center gap-3 text-vaultGold">
+        {icon}
+        <h3 className="text-sm font-black uppercase tracking-wide">{title}</h3>
+      </div>
+
+      {children}
+    </section>
+  );
+}
+
+function DetailGrid({
+  items,
+}: {
+  items: [string, string | number | React.ReactNode][];
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
+      {items.map(([label, value]) => (
+        <div
+          key={label}
+          className="flex items-center justify-between gap-4 border-b border-white/5 pb-2"
+        >
+          <span className="text-zinc-400">{label}</span>
+          <span className="text-right font-bold text-white">{value}</span>
         </div>
-    </>
+      ))}
+    </div>
   );
 }
 
@@ -5756,10 +5999,12 @@ function GradingCenter({ cards }: { cards: CardRecord[] }) {
 
 function SalesTracker({
   cards,
+  setCards,
   sales,
   setSales,
 }: {
   cards: CardRecord[];
+  setCards: React.Dispatch<React.SetStateAction<CardRecord[]>>;
   sales: SaleRecord[];
   setSales: React.Dispatch<React.SetStateAction<SaleRecord[]>>;
 }) {
@@ -5770,6 +6015,8 @@ function SalesTracker({
   const selectedCard =
     cards.find((card) => card.id === selectedCardId) ?? cards[0];
 
+  const [editingSaleId, setEditingSaleId] = useState<number | null>(null);
+
   const [saleStatus, setSaleStatus] = useState("Sold");
   const [platform, setPlatform] = useState("eBay");
   const [saleDate, setSaleDate] = useState("");
@@ -5779,6 +6026,7 @@ function SalesTracker({
   const [taxes, setTaxes] = useState("");
   const [buyerSource, setBuyerSource] = useState("");
   const [notes, setNotes] = useState("");
+  const [platformFilter, setPlatformFilter] = useState("All Platforms");
 
   const soldCards = sales.length;
   const listedCards = cards.filter((card) => card.status === "For Sale");
@@ -5806,10 +6054,96 @@ function SalesTracker({
 
   const totalProfit = sales.reduce((sum, sale) => sum + sale.profitLoss, 0);
 
+  const averageProfit = sales.length > 0 ? totalProfit / sales.length : 0;
+
+  const bestSale =
+    sales.length > 0
+      ? sales.reduce((best, sale) =>
+          sale.profitLoss > best.profitLoss ? sale : best
+        )
+      : null;
+
+  const highestRoiSale =
+    sales.length > 0
+      ? sales.reduce((best, sale) => (sale.roi > best.roi ? sale : best))
+      : null;
+
+  const platformBreakdown = sales.reduce(
+    (platforms, sale) => {
+      const existingPlatform = platforms[sale.platform] ?? {
+        revenue: 0,
+        profit: 0,
+        count: 0,
+      };
+
+      return {
+        ...platforms,
+        [sale.platform]: {
+          revenue: existingPlatform.revenue + sale.salePrice,
+          profit: existingPlatform.profit + sale.profitLoss,
+          count: existingPlatform.count + 1,
+        },
+      };
+    },
+    {} as Record<
+      string,
+      {
+        revenue: number;
+        profit: number;
+        count: number;
+      }
+    >
+  );
+
+  const topPlatform =
+    Object.entries(platformBreakdown).length > 0
+      ? Object.entries(platformBreakdown).sort(
+          ([, platformA], [, platformB]) => platformB.profit - platformA.profit
+        )[0]
+      : null;
+
+  const platformOptions = [
+    "All Platforms",
+    ...Array.from(new Set(sales.map((sale) => sale.platform))),
+  ];
+
+  const filteredSales =
+    platformFilter === "All Platforms"
+      ? sales
+      : sales.filter((sale) => sale.platform === platformFilter);
+
+  const filteredRevenue = filteredSales.reduce(
+    (sum, sale) => sum + sale.salePrice,
+    0
+  );
+
+  const filteredProfit = filteredSales.reduce(
+    (sum, sale) => sum + sale.profitLoss,
+    0
+  );
+
+  const filteredNetProceeds = filteredSales.reduce(
+    (sum, sale) => sum + sale.netProceeds,
+    0
+  );
+
   const listedValue = listedCards.reduce(
     (sum, card) => sum + card.estimatedValue,
     0
   );
+
+  const resetSaleForm = () => {
+    setEditingSaleId(null);
+    setSaleStatus("Sold");
+    setPlatform("eBay");
+    setSaleDate("");
+    setSalePrice("");
+    setFees("");
+    setShippingCost("");
+    setTaxes("");
+    setBuyerSource("");
+    setNotes("");
+  };
 
   const handleRecordSale = () => {
     if (!selectedCard) return;
@@ -5819,8 +6153,8 @@ function SalesTracker({
       return;
     }
 
-    const newSale: SaleRecord = {
-      id: Date.now(),
+    const updatedSale: SaleRecord = {
+      id: editingSaleId ?? Date.now(),
       cardId: selectedCard.id,
       cardName: selectedCard.card,
       player: selectedCard.player,
@@ -5838,23 +6172,78 @@ function SalesTracker({
       notes,
     };
 
-    setSales((currentSales) => [newSale, ...currentSales]);
+    if (editingSaleId) {
+      setSales((currentSales) =>
+        currentSales.map((sale) =>
+          sale.id === editingSaleId ? updatedSale : sale
+        )
+      );
+    } else {
+      setSales((currentSales) => [updatedSale, ...currentSales]);
+    }
 
+    setCards((currentCards) =>
+      currentCards.map((card) =>
+        card.id === selectedCard.id
+          ? {
+              ...card,
+              status: "Sold",
+            }
+          : card
+      )
+    );
+
+    resetSaleForm();
+  };
+
+  const handleEditSale = (sale: SaleRecord) => {
+    setEditingSaleId(sale.id);
+    setSelectedCardId(sale.cardId);
     setSaleStatus("Sold");
-    setPlatform("eBay");
-    setSaleDate("");
-    setSalePrice("");
-    setFees("");
-    setShippingCost("");
-    setTaxes("");
-    setBuyerSource("");
-    setNotes("");
+    setPlatform(sale.platform);
+    setSaleDate(sale.saleDate);
+    setSalePrice(String(sale.salePrice));
+    setFees(String(sale.fees));
+    setShippingCost(String(sale.shippingCost));
+    setTaxes(String(sale.taxes));
+    setBuyerSource(sale.buyerSource);
+    setNotes(sale.notes);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   const handleDeleteSale = (saleId: number) => {
+    const saleToDelete = sales.find((sale) => sale.id === saleId);
+
     setSales((currentSales) =>
       currentSales.filter((sale) => sale.id !== saleId)
     );
+
+    if (saleToDelete) {
+      const stillHasSale = sales.some(
+        (sale) => sale.cardId === saleToDelete.cardId && sale.id !== saleId
+      );
+
+      if (!stillHasSale) {
+        setCards((currentCards) =>
+          currentCards.map((card) =>
+            card.id === saleToDelete.cardId
+              ? {
+                  ...card,
+                  status: "For Sale",
+                }
+              : card
+          )
+        );
+      }
+    }
+
+    if (editingSaleId === saleId) {
+      resetSaleForm();
+    }
   };
 
   return (
@@ -5865,7 +6254,9 @@ function SalesTracker({
         actions={
           <>
             <HeroButton variant="black">Export Sales Report</HeroButton>
-            <HeroButton variant="gold">Record Sale</HeroButton>
+            <HeroButton variant="gold">
+              {editingSaleId ? "Updating Sale" : "Record Sale"}
+            </HeroButton>
           </>
         }
       />
@@ -5878,11 +6269,136 @@ function SalesTracker({
         <MiniStat label="Real Profit" value={money(totalProfit)} />
       </div>
 
+      <Panel className="mb-6">
+        <div className="mb-5 flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-black text-vaultGold">
+              Connected Selling Platforms
+            </h2>
+            <p className="mt-1 text-sm text-zinc-400">
+              Future-ready sales hub for tracking eBay, Whatnot, breaks, card
+              shows, and direct buyer sales in one command center.
+            </p>
+          </div>
+
+          <div className="rounded-full border border-vaultGold/40 bg-vaultGold/10 px-4 py-2 text-xs font-black uppercase tracking-widest text-vaultGold">
+            Sales Hub Beta
+          </div>
+        </div>
+
+        <div className="grid grid-cols-5 gap-4">
+          <div className="rounded-2xl border border-steelBorder bg-black/40 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-black text-white">eBay</p>
+              <span className="rounded-full border border-vaultGold/40 bg-vaultGold/10 px-2 py-1 text-[10px] font-black uppercase tracking-widest text-vaultGold">
+                OAuth
+              </span>
+            </div>
+            <p className="mt-2 text-xs text-zinc-400">
+              Secure seller account connection planned. No password storage.
+            </p>
+            <button
+              type="button"
+              className="mt-4 w-full rounded-lg border border-steelBorder px-3 py-2 text-xs font-black uppercase tracking-widest text-zinc-400 transition hover:border-vaultGold hover:text-vaultGold"
+            >
+              Connect Soon
+            </button>
+          </div>
+
+          <div className="rounded-2xl border border-steelBorder bg-black/40 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-black text-white">Whatnot</p>
+              <span className="rounded-full border border-zinc-600 bg-zinc-900 px-2 py-1 text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                Import Beta
+              </span>
+            </div>
+            <p className="mt-2 text-xs text-zinc-400">
+              Track live-selling performance and future sales imports.
+            </p>
+            <button
+              type="button"
+              className="mt-4 w-full rounded-lg border border-steelBorder px-3 py-2 text-xs font-black uppercase tracking-widest text-zinc-400 transition hover:border-vaultGold hover:text-vaultGold"
+            >
+              Upload Soon
+            </button>
+          </div>
+
+          <div className="rounded-2xl border border-steelBorder bg-black/40 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-black text-white">Breaks</p>
+              <span className="rounded-full border border-profitGreen/40 bg-profitGreen/10 px-2 py-1 text-[10px] font-black uppercase tracking-widest text-profitGreen">
+                Manual
+              </span>
+            </div>
+            <p className="mt-2 text-xs text-zinc-400">
+              Track break session sales, lots, claims, and group sales.
+            </p>
+            <button
+              type="button"
+              onClick={() => setPlatform("Break Session")}
+              className="mt-4 w-full rounded-lg border border-steelBorder px-3 py-2 text-xs font-black uppercase tracking-widest text-zinc-400 transition hover:border-vaultGold hover:text-vaultGold"
+            >
+              Use Platform
+            </button>
+          </div>
+
+          <div className="rounded-2xl border border-steelBorder bg-black/40 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-black text-white">Card Show</p>
+              <span className="rounded-full border border-profitGreen/40 bg-profitGreen/10 px-2 py-1 text-[10px] font-black uppercase tracking-widest text-profitGreen">
+                Manual
+              </span>
+            </div>
+            <p className="mt-2 text-xs text-zinc-400">
+              Record in-person show sales, trades, and negotiation results.
+            </p>
+            <button
+              type="button"
+              onClick={() => setPlatform("Card Show")}
+              className="mt-4 w-full rounded-lg border border-steelBorder px-3 py-2 text-xs font-black uppercase tracking-widest text-zinc-400 transition hover:border-vaultGold hover:text-vaultGold"
+            >
+              Use Platform
+            </button>
+          </div>
+
+          <div className="rounded-2xl border border-steelBorder bg-black/40 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-black text-white">Direct Buyer</p>
+              <span className="rounded-full border border-profitGreen/40 bg-profitGreen/10 px-2 py-1 text-[10px] font-black uppercase tracking-widest text-profitGreen">
+                Manual
+              </span>
+            </div>
+            <p className="mt-2 text-xs text-zinc-400">
+              Track private buyer, dealer, Instagram, and local sales.
+            </p>
+            <button
+              type="button"
+              onClick={() => setPlatform("Direct Buyer")}
+              className="mt-4 w-full rounded-lg border border-steelBorder px-3 py-2 text-xs font-black uppercase tracking-widest text-zinc-400 transition hover:border-vaultGold hover:text-vaultGold"
+            >
+              Use Platform
+            </button>
+          </div>
+        </div>
+      </Panel>
+
       <div className="mb-6 grid grid-cols-12 gap-6">
         <Panel className="col-span-4">
           <h2 className="mb-5 text-sm font-bold uppercase tracking-widest text-vaultGold">
             Select Card
           </h2>
+
+          {editingSaleId && (
+            <div className="mb-5 rounded-xl border border-vaultGold bg-vaultGold/10 p-4">
+              <p className="text-xs font-black uppercase tracking-widest text-vaultGold">
+                Edit Mode Active
+              </p>
+              <p className="mt-2 text-sm text-zinc-300">
+                You are updating an existing sale record. Save changes or cancel
+                edit mode.
+              </p>
+            </div>
+          )}
 
           <label className="block">
             <span className="mb-2 block text-xs font-bold text-zinc-300">
@@ -5909,7 +6425,15 @@ function SalesTracker({
               <h3 className="mt-2 text-lg font-bold">{selectedCard.card}</h3>
               <p className="mt-1 text-sm text-zinc-400">
                 {selectedCard.player} • {selectedCard.grade} •{" "}
-                {selectedCard.status}
+                <span
+                  className={
+                    selectedCard.status === "Sold"
+                      ? "font-bold text-vaultGold"
+                      : "text-zinc-400"
+                  }
+                >
+                  {selectedCard.status}
+                </span>
               </p>
 
               <div className="mt-4 grid grid-cols-2 gap-3">
@@ -5927,9 +6451,28 @@ function SalesTracker({
         </Panel>
 
         <Panel className="col-span-8">
-          <h2 className="mb-5 text-sm font-bold uppercase tracking-widest text-vaultGold">
-            Record Sale
-          </h2>
+          <div className="mb-5 flex items-center justify-between">
+            <div>
+              <h2 className="text-sm font-bold uppercase tracking-widest text-vaultGold">
+                {editingSaleId ? "Edit Sale Record" : "Record Sale"}
+              </h2>
+              <p className="mt-1 text-sm text-zinc-400">
+                {editingSaleId
+                  ? "Update the sale details below and save your changes."
+                  : "Add a closed sale and automatically move the card to sold status."}
+              </p>
+            </div>
+
+            {editingSaleId && (
+              <button
+                type="button"
+                onClick={resetSaleForm}
+                className="rounded-lg border border-steelBorder px-4 py-2 text-xs font-black uppercase tracking-widest text-zinc-300 transition hover:border-vaultGold hover:text-vaultGold"
+              >
+                Cancel Edit
+              </button>
+            )}
+          </div>
 
           <div className="grid grid-cols-4 gap-4">
             <Select
@@ -6021,14 +6564,14 @@ function SalesTracker({
             onClick={handleRecordSale}
             className="mt-5 rounded-xl border border-vaultGold bg-vaultGold px-5 py-3 text-sm font-black uppercase tracking-widest text-black shadow-lg shadow-vaultGold/20 transition hover:bg-goldHover"
           >
-            Save Sale Record
+            {editingSaleId ? "Update Sale Record" : "Save Sale Record"}
           </button>
         </Panel>
       </div>
 
       <div className="grid grid-cols-12 gap-6">
         <Panel className="col-span-8">
-          <div className="mb-5 flex items-center justify-between">
+          <div className="mb-5 flex items-center justify-between gap-4">
             <div>
               <h2 className="text-lg font-bold">Recorded Sales</h2>
               <p className="mt-1 text-sm text-zinc-400">
@@ -6036,9 +6579,48 @@ function SalesTracker({
                 ROI.
               </p>
             </div>
+
+            <div className="min-w-[220px]">
+              <label className="block">
+                <span className="mb-2 block text-xs font-black uppercase tracking-widest text-zinc-500">
+                  Filter Platform
+                </span>
+                <select
+                  value={platformFilter}
+                  onChange={(event) => setPlatformFilter(event.target.value)}
+                  className="w-full rounded-lg border border-steelBorder bg-black/40 px-3 py-3 text-sm font-bold text-white outline-none focus:border-vaultGold"
+                >
+                  {platformOptions.map((platformName) => (
+                    <option key={platformName} value={platformName}>
+                      {platformName}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
           </div>
 
-          {sales.length === 0 ? (
+          {sales.length > 0 && (
+            <div className="mb-5 grid grid-cols-3 gap-4">
+              <MiniDarkStat
+                label={`${platformFilter} Revenue`}
+                value={money(filteredRevenue)}
+                positive={filteredRevenue >= 0}
+              />
+              <MiniDarkStat
+                label={`${platformFilter} Net`}
+                value={money(filteredNetProceeds)}
+                positive={filteredNetProceeds >= 0}
+              />
+              <MiniDarkStat
+                label={`${platformFilter} Profit`}
+                value={money(filteredProfit)}
+                positive={filteredProfit >= 0}
+              />
+            </div>
+          )}
+
+          {filteredSales.length === 0 ? (
             <div className="rounded-xl border border-dashed border-steelBorder bg-black/30 p-8 text-center">
               <p className="text-lg font-bold text-vaultGold">
                 No sales recorded yet.
@@ -6065,7 +6647,7 @@ function SalesTracker({
                 </thead>
 
                 <tbody>
-                  {sales.map((sale) => (
+                  {filteredSales.map((sale) => (
                     <tr
                       key={sale.id}
                       className="border-t border-steelBorder bg-graphite900/60"
@@ -6080,9 +6662,7 @@ function SalesTracker({
                       <td className="px-4 py-4 text-vaultGold">
                         {sale.platform}
                       </td>
-                      <td className="px-4 py-4">
-                        {money(sale.salePrice)}
-                      </td>
+                      <td className="px-4 py-4">{money(sale.salePrice)}</td>
                       <td className="px-4 py-4 text-profitGreen">
                         {money(sale.netProceeds)}
                       </td>
@@ -6095,17 +6675,25 @@ function SalesTracker({
                       >
                         {money(sale.profitLoss)}
                       </td>
+                      <td className="px-4 py-4">{sale.roi.toFixed(1)}%</td>
                       <td className="px-4 py-4">
-                        {sale.roi.toFixed(1)}%
-                      </td>
-                      <td className="px-4 py-4">
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteSale(sale.id)}
-                          className="rounded-lg border border-red-500/50 px-3 py-2 text-xs font-bold uppercase tracking-widest text-red-300 transition hover:bg-red-500/10"
-                        >
-                          Delete
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleEditSale(sale)}
+                            className="rounded-lg border border-vaultGold/70 px-3 py-2 text-xs font-bold uppercase tracking-widest text-vaultGold transition hover:bg-vaultGold/10"
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteSale(sale.id)}
+                            className="rounded-lg border border-red-500/50 px-3 py-2 text-xs font-bold uppercase tracking-widest text-red-300 transition hover:bg-red-500/10"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -6134,6 +6722,126 @@ function SalesTracker({
               value={money(totalProfit)}
               positive={totalProfit >= 0}
             />
+            <MiniDarkStat
+              label="Average Profit"
+              value={money(averageProfit)}
+              positive={averageProfit >= 0}
+            />
+
+            {bestSale && (
+              <div className="rounded-xl border border-steelBorder bg-black/40 p-4">
+                <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
+                  Best Sale
+                </p>
+                <p className="mt-2 text-sm font-bold text-white">
+                  {bestSale.player}
+                </p>
+                <p className="text-xs text-zinc-400">{bestSale.cardName}</p>
+                <p className="mt-2 text-lg font-black text-profitGreen">
+                  {money(bestSale.profitLoss)}
+                </p>
+              </div>
+            )}
+
+            {highestRoiSale && (
+              <div className="rounded-xl border border-steelBorder bg-black/40 p-4">
+                <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
+                  Highest ROI
+                </p>
+                <p className="mt-2 text-sm font-bold text-white">
+                  {highestRoiSale.player}
+                </p>
+                <p className="text-xs text-zinc-400">
+                  {highestRoiSale.cardName}
+                </p>
+                <p className="mt-2 text-lg font-black text-vaultGold">
+                  {highestRoiSale.roi.toFixed(1)}%
+                </p>
+              </div>
+            )}
+
+            {topPlatform && (
+              <div className="rounded-xl border border-vaultGold/40 bg-vaultGold/10 p-4">
+                <p className="text-xs font-black uppercase tracking-widest text-vaultGold">
+                  Best Platform
+                </p>
+                <p className="mt-2 text-lg font-black text-white">
+                  {topPlatform[0]}
+                </p>
+                <p className="mt-1 text-xs text-zinc-400">
+                  {topPlatform[1].count} sale
+                  {topPlatform[1].count === 1 ? "" : "s"} •{" "}
+                  {money(topPlatform[1].revenue)} revenue
+                </p>
+                <p
+                  className={`mt-2 text-lg font-black ${
+                    topPlatform[1].profit >= 0
+                      ? "text-profitGreen"
+                      : "text-red-400"
+                  }`}
+                >
+                  {money(topPlatform[1].profit)} profit
+                </p>
+              </div>
+            )}
+
+            {Object.entries(platformBreakdown).length > 0 && (
+              <div className="rounded-xl border border-steelBorder bg-black/40 p-4">
+                <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
+                  Platform Breakdown
+                </p>
+
+                <div className="mt-4 space-y-3">
+                  {Object.entries(platformBreakdown)
+                    .sort(
+                      ([, platformA], [, platformB]) =>
+                        platformB.profit - platformA.profit
+                    )
+                    .map(([platformName, platformStats]) => (
+                      <div
+                        key={platformName}
+                        className="rounded-lg border border-steelBorder bg-graphite900/70 p-3"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-sm font-black text-white">
+                            {platformName}
+                          </p>
+                          <p className="text-xs font-bold text-vaultGold">
+                            {platformStats.count} sale
+                            {platformStats.count === 1 ? "" : "s"}
+                          </p>
+                        </div>
+
+                        <div className="mt-2 grid grid-cols-2 gap-2">
+                          <div>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                              Revenue
+                            </p>
+                            <p className="text-sm font-bold text-zinc-200">
+                              {money(platformStats.revenue)}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                              Profit
+                            </p>
+                            <p
+                              className={`text-sm font-bold ${
+                                platformStats.profit >= 0
+                                  ? "text-profitGreen"
+                                  : "text-red-400"
+                              }`}
+                            >
+                              {money(platformStats.profit)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
           </div>
         </Panel>
       </div>
