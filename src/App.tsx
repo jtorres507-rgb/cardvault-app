@@ -6054,6 +6054,51 @@ function SalesTracker({
 
   const totalProfit = sales.reduce((sum, sale) => sum + sale.profitLoss, 0);
 
+  const totalFees = sales.reduce((sum, sale) => sum + sale.fees, 0);
+
+  const totalShippingCosts = sales.reduce(
+    (sum, sale) => sum + sale.shippingCost,
+    0
+  );
+
+  const totalTaxes = sales.reduce((sum, sale) => sum + sale.taxes, 0);
+
+  const totalSellingCosts = totalFees + totalShippingCosts + totalTaxes;
+
+  const sellingCostRate =
+    totalRevenue > 0 ? (totalSellingCosts / totalRevenue) * 100 : 0;
+
+  const averageRoi =
+    sales.length > 0
+      ? sales.reduce((sum, sale) => sum + sale.roi, 0) / sales.length
+      : 0;
+
+  const salesPerformanceScore =
+    totalProfit > 0 && averageRoi >= 50 && sellingCostRate <= 20
+      ? "A+"
+      : totalProfit > 0 && averageRoi >= 25 && sellingCostRate <= 30
+      ? "A"
+      : totalProfit > 0 && averageRoi >= 10 && sellingCostRate <= 40
+      ? "B"
+      : totalProfit > 0
+      ? "C"
+      : sales.length > 0
+      ? "Needs Review"
+      : "Pending";
+
+  const salesPerformanceMessage =
+    salesPerformanceScore === "A+"
+      ? "Excellent seller performance. Profit, ROI, and cost control are all strong."
+      : salesPerformanceScore === "A"
+      ? "Strong seller performance. Keep tracking platform fees and continue scaling your best channels."
+      : salesPerformanceScore === "B"
+      ? "Good performance, but there is room to improve ROI or reduce selling costs."
+      : salesPerformanceScore === "C"
+      ? "You are profitable, but platform fees, shipping, or low ROI may be limiting growth."
+      : salesPerformanceScore === "Needs Review"
+      ? "Sales are recorded, but profit is not strong yet. Review cost basis, fees, and platform selection."
+      : "Record sales to unlock your seller performance score.";
+
   const averageProfit = sales.length > 0 ? totalProfit / sales.length : 0;
 
   const bestSale =
@@ -6102,6 +6147,25 @@ function SalesTracker({
         )[0]
       : null;
 
+  const activePlatformCount = Object.keys(platformBreakdown).length;
+
+  const salesHubSummary =
+    sales.length > 0
+      ? `You have recorded ${sales.length} sale${
+          sales.length === 1 ? "" : "s"
+        } across ${activePlatformCount} platform${
+          activePlatformCount === 1 ? "" : "s"
+        }, generating ${money(totalRevenue)} in revenue and ${money(
+          totalProfit
+        )} in profit. ${
+          topPlatform
+            ? `${topPlatform[0]} is currently your strongest platform, with a selling cost rate of ${sellingCostRate.toFixed(
+                1
+              )}%.`
+            : `Your current selling cost rate is ${sellingCostRate.toFixed(1)}%.`
+        }`
+      : "Record your first sale to unlock Sales Hub intelligence, platform analytics, fee impact tracking, and seller performance scoring.";
+
   const platformOptions = [
     "All Platforms",
     ...Array.from(new Set(sales.map((sale) => sale.platform))),
@@ -6126,6 +6190,32 @@ function SalesTracker({
     (sum, sale) => sum + sale.netProceeds,
     0
   );
+
+  const filteredSellingCosts = filteredSales.reduce(
+    (sum, sale) => sum + sale.fees + sale.shippingCost + sale.taxes,
+    0
+  );
+
+  const filteredSellingCostRate =
+    filteredRevenue > 0 ? (filteredSellingCosts / filteredRevenue) * 100 : 0;
+
+  const platformInsight =
+    topPlatform && topPlatform[1].count > 0
+      ? {
+          platformName: topPlatform[0],
+          totalRevenue: topPlatform[1].revenue,
+          totalProfit: topPlatform[1].profit,
+          saleCount: topPlatform[1].count,
+          averageProfit: topPlatform[1].profit / topPlatform[1].count,
+        }
+      : null;
+
+  const sellerRecommendation =
+    platformInsight && platformInsight.totalProfit > 0
+      ? `${platformInsight.platformName} is currently your strongest sales channel based on profit. Consider listing more similar cards there.`
+      : sales.length > 0
+      ? "Sales are being tracked, but profit is not strong yet. Review fees, shipping, and platform choice before scaling."
+      : "Record sales across eBay, Whatnot, breaks, card shows, and direct buyers to unlock seller recommendations.";
 
   const listedValue = listedCards.reduce(
     (sum, card) => sum + card.estimatedValue,
@@ -6269,6 +6359,34 @@ function SalesTracker({
         <MiniStat label="Real Profit" value={money(totalProfit)} />
       </div>
 
+      <Panel className="mb-6 border-vaultGold/30 bg-black/40">
+        <div className="flex items-start justify-between gap-6">
+          <div>
+            <p className="text-xs font-black uppercase tracking-widest text-vaultGold">
+              Sales Hub Executive Summary
+            </p>
+            <h2 className="mt-2 text-2xl font-black text-white">
+              {sales.length > 0
+                ? "Your selling data is active and ready for decision-making."
+                : "Start recording sales to activate your seller command center."}
+            </h2>
+            <p className="mt-3 max-w-5xl text-sm leading-6 text-zinc-300">
+              {salesHubSummary}
+            </p>
+          </div>
+
+          <div className="min-w-[180px] rounded-2xl border border-steelBorder bg-graphite900/70 p-4 text-center">
+            <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
+              Score
+            </p>
+            <p className="mt-2 text-4xl font-black text-vaultGold">
+              {salesPerformanceScore}
+            </p>
+            <p className="mt-1 text-xs text-zinc-400">Seller Performance</p>
+          </div>
+        </div>
+      </Panel>
+
       <Panel className="mb-6">
         <div className="mb-5 flex items-center justify-between gap-4">
           <div>
@@ -6378,6 +6496,52 @@ function SalesTracker({
             >
               Use Platform
             </button>
+          </div>
+        </div>
+      </Panel>
+
+      <Panel className="mb-6 border-vaultGold/30 bg-vaultGold/5">
+        <div className="flex items-start justify-between gap-6">
+          <div>
+            <p className="text-xs font-black uppercase tracking-widest text-vaultGold">
+              Seller Intelligence
+            </p>
+            <h2 className="mt-2 text-2xl font-black text-white">
+              {platformInsight
+                ? `${platformInsight.platformName} is leading your sales performance`
+                : "Start recording sales to unlock platform recommendations"}
+            </h2>
+            <p className="mt-3 max-w-4xl text-sm leading-6 text-zinc-300">
+              {sellerRecommendation}
+            </p>
+          </div>
+
+          <div className="min-w-[260px] rounded-2xl border border-steelBorder bg-black/40 p-4">
+            <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
+              Current Best Platform
+            </p>
+
+            <p className="mt-2 text-2xl font-black text-vaultGold">
+              {platformInsight ? platformInsight.platformName : "Pending Data"}
+            </p>
+
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <MiniDarkStat
+                label="Sales"
+                value={platformInsight ? String(platformInsight.saleCount) : "0"}
+              />
+              <MiniDarkStat
+                label="Avg. Profit"
+                value={
+                  platformInsight
+                    ? money(platformInsight.averageProfit)
+                    : money(0)
+                }
+                positive={
+                  platformInsight ? platformInsight.averageProfit >= 0 : true
+                }
+              />
+            </div>
           </div>
         </div>
       </Panel>
@@ -6601,7 +6765,7 @@ function SalesTracker({
           </div>
 
           {sales.length > 0 && (
-            <div className="mb-5 grid grid-cols-3 gap-4">
+            <div className="mb-5 grid grid-cols-4 gap-4">
               <MiniDarkStat
                 label={`${platformFilter} Revenue`}
                 value={money(filteredRevenue)}
@@ -6616,6 +6780,11 @@ function SalesTracker({
                 label={`${platformFilter} Profit`}
                 value={money(filteredProfit)}
                 positive={filteredProfit >= 0}
+              />
+              <MiniDarkStat
+                label={`${platformFilter} Cost Rate`}
+                value={`${filteredSellingCostRate.toFixed(1)}%`}
+                positive={filteredSellingCostRate <= 20}
               />
             </div>
           )}
@@ -6707,6 +6876,31 @@ function SalesTracker({
           <h2 className="text-lg font-bold text-vaultGold">Sales Decision</h2>
 
           <div className="mt-5 space-y-4">
+            <div className="rounded-xl border border-vaultGold/40 bg-vaultGold/10 p-4">
+              <p className="text-xs font-black uppercase tracking-widest text-vaultGold">
+                Seller Performance Score
+              </p>
+
+              <div className="mt-3 flex items-center justify-between gap-4">
+                <p className="text-4xl font-black text-white">
+                  {salesPerformanceScore}
+                </p>
+
+                <div className="text-right">
+                  <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
+                    Avg. ROI
+                  </p>
+                  <p className="text-lg font-black text-vaultGold">
+                    {averageRoi.toFixed(1)}%
+                  </p>
+                </div>
+              </div>
+
+              <p className="mt-3 text-xs leading-5 text-zinc-300">
+                {salesPerformanceMessage}
+              </p>
+            </div>
+
             <MiniDarkStat
               label="Total Revenue"
               value={money(totalRevenue)}
@@ -6727,6 +6921,40 @@ function SalesTracker({
               value={money(averageProfit)}
               positive={averageProfit >= 0}
             />
+
+            <div className="rounded-xl border border-steelBorder bg-black/40 p-4">
+              <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
+                Fee Impact
+              </p>
+
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <MiniDarkStat
+                  label="Fees"
+                  value={money(totalFees)}
+                  positive={totalFees <= totalRevenue * 0.15}
+                />
+                <MiniDarkStat
+                  label="Shipping"
+                  value={money(totalShippingCosts)}
+                  positive={totalShippingCosts <= totalRevenue * 0.1}
+                />
+                <MiniDarkStat
+                  label="Taxes"
+                  value={money(totalTaxes)}
+                  positive={totalTaxes <= totalRevenue * 0.1}
+                />
+                <MiniDarkStat
+                  label="Cost Rate"
+                  value={`${sellingCostRate.toFixed(1)}%`}
+                  positive={sellingCostRate <= 20}
+                />
+              </div>
+
+              <p className="mt-4 text-xs leading-5 text-zinc-400">
+                Selling costs include platform fees, shipping cost, and taxes.
+                Lower cost rate usually means stronger platform efficiency.
+              </p>
+            </div>
 
             {bestSale && (
               <div className="rounded-xl border border-steelBorder bg-black/40 p-4">
