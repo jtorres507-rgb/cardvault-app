@@ -148,12 +148,42 @@ type TemporaryScanRecord = {
   receiptImage?: string;
   scanStatus: "Needs Review" | "Ready to Keep" | "Ready to Sell";
   scanSource: "Camera Upload" | "Manual Upload" | "Demo Scan";
+
+  // Phase 6 Dallas Card Show beta fields
+  boothNumber: string;
+  dealerName: string;
+  askingPrice: number;
+  recentComp: number;
+  offerTarget: number;
+  maxBuyPrice: number;
+  negotiationNotes: string;
+  betaDecision: "Buy" | "Watch" | "Pass" | "Keep" | "Sell";
+
   createdAt: string;
 
   // Phase 5.7 simulated AI review foundation
   aiReviewStatus?: "Not Started" | "Simulated Review Complete";
   aiConfidence?: string;
   aiSuggestedMatch?: string;
+};
+
+const MAX_TEMPORARY_SCANS = 30;
+const TEMPORARY_SCAN_WARNING_LIMIT = 25;
+
+type BetaFeedbackRecord = {
+  id: number;
+  category:
+    | "Workflow"
+    | "Quick Scan"
+    | "Mobile Layout"
+    | "Pricing"
+    | "Dealer Tracking"
+    | "Decision Flow"
+    | "Bug"
+    | "Feature Request";
+  priority: "Low" | "Medium" | "High";
+  note: string;
+  createdAt: string;
 };
 
 type SaleRecord = {
@@ -651,14 +681,23 @@ function App() {
     }
   );
 
-  const [selectedTemporaryScanId, setSelectedTemporaryScanId] = useState<
-    number | null
-  >(null);
+ const [selectedTemporaryScanId, setSelectedTemporaryScanId] = useState<
+  number | null
+>(null);
 
-  const [pendingDeleteCardId, setPendingDeleteCardId] = useState<number | null>(
-    null
-  );
+const [betaFeedback, setBetaFeedback] = useState<BetaFeedbackRecord[]>([]);
 
+const [newBetaFeedback, setNewBetaFeedback] = useState<BetaFeedbackRecord>({
+  id: Date.now(),
+  category: "Workflow",
+  priority: "Medium",
+  note: "",
+  createdAt: new Date().toISOString(),
+});
+
+const [pendingDeleteCardId, setPendingDeleteCardId] = useState<number | null>(
+  null
+);
   const [defaultReport, setDefaultReport] = useState<
     | "cardAnalysis"
     | "myCollection"
@@ -762,6 +801,15 @@ function App() {
       receiptImage: "",
       scanStatus: "Needs Review",
       scanSource: "Demo Scan",
+      // Phase 6 Dallas Card Show beta fields
+      boothNumber: "",
+      dealerName: "",
+      askingPrice: 0,
+      recentComp: 0,
+      offerTarget: 0,
+      maxBuyPrice: 0,
+      negotiationNotes: "",
+      betaDecision: "Watch",
       createdAt: new Date().toISOString(),
     };
 
@@ -770,53 +818,79 @@ function App() {
     setActiveScreen("Temporary Card Detail");
   }
 
-  function createTemporaryScanFromImages(frontImage: string, backImage: string) {
+ function createTemporaryScanFromImages(frontImage: string, backImage: string) {
+  if (temporaryScans.length >= MAX_TEMPORARY_SCANS) {
+    alert(
+      "Temporary Scan Queue Full. You have reached the 30-card beta storage limit. " +
+      "Export your beta backup or delete older scans before adding more."
+    );
+    return;
+  }
+
+  if (temporaryScans.length >= TEMPORARY_SCAN_WARNING_LIMIT) {
+    alert(
+      `Beta Storage Warning: You are at ${temporaryScans.length} of ${MAX_TEMPORARY_SCANS} temporary scans. ` +
+       "Consider exporting your beta backup before continuing."
+    );
+  }
+
     const newTemporaryScan: TemporaryScanRecord = {
-      id: Date.now(),
-      player: "Pending Identification",
-      card: "Uploaded Card Scan",
-      team: "Pending",
-      sport: "Pending",
-      year: "Pending",
-      brand: "Pending",
-      set: "Pending",
-      cardNumber: "Pending",
-      parallel: "Pending",
-      grade: "Raw",
-      grader: "Review",
-      serialNumber: "N/A",
-      sku: `TEMP-${Date.now()}`,
-      status: "Personal Collection",
-      purchaseDate: "Pending",
-      purchasePrice: 0,
-      taxesFees: 0,
-      shippingCost: 0,
-      totalCostBasis: 0,
-      source: "Camera Upload",
-      seller: "Pending",
-      paymentMethod: "Pending",
-      storageLocation: "Temporary Scan Queue",
-      estimatedValue: 0,
-      lastSale: 0,
-      averageComp: 0,
-      highComp: 0,
-      lowComp: 0,
-      compConfidence: "Pending AI Review",
-      gainLoss: 0,
-      roi: 0,
-      notes:
-        "Temporary scan created from uploaded card images. Confirm card details before adding to collection or moving to sell queue.",
-      frontImage,
-      backImage,
-      slabImage: "",
-      receiptImage: "",
-      scanStatus: "Needs Review",
-      scanSource: "Manual Upload",
-      aiReviewStatus: "Not Started",
-      aiConfidence: "Pending",
-      aiSuggestedMatch: "Pending AI Review",
-      createdAt: new Date().toISOString(),
-    };
+  id: Date.now(),
+  player: "Pending Identification",
+  card: "Uploaded Card Scan",
+  team: "Pending",
+  sport: "Pending",
+  year: "Pending",
+  brand: "Pending",
+  set: "Pending",
+  cardNumber: "Pending",
+  parallel: "Pending",
+  grade: "Raw",
+  grader: "Review",
+  serialNumber: "N/A",
+  sku: `TEMP-${Date.now()}`,
+  status: "Personal Collection",
+  purchaseDate: "Pending",
+  purchasePrice: 0,
+  taxesFees: 0,
+  shippingCost: 0,
+  totalCostBasis: 0,
+  source: "Camera Upload",
+  seller: "Pending",
+  paymentMethod: "Pending",
+  storageLocation: "Temporary Scan Queue",
+  estimatedValue: 0,
+  lastSale: 0,
+  averageComp: 0,
+  highComp: 0,
+  lowComp: 0,
+  compConfidence: "Pending AI Review",
+  gainLoss: 0,
+  roi: 0,
+  notes:
+    "Temporary scan created from uploaded card images. Confirm card details before adding to collection or moving to sell queue.",
+  frontImage,
+  backImage,
+  slabImage: "",
+  receiptImage: "",
+  scanStatus: "Needs Review",
+  scanSource: "Manual Upload",
+
+  // Phase 6 Dallas Card Show beta fields
+  boothNumber: "",
+  dealerName: "",
+  askingPrice: 0,
+  recentComp: 0,
+  offerTarget: 0,
+  maxBuyPrice: 0,
+  negotiationNotes: "",
+  betaDecision: "Watch",
+
+  aiReviewStatus: "Not Started",
+  aiConfidence: "Pending",
+  aiSuggestedMatch: "Pending AI Review",
+  createdAt: new Date().toISOString(),
+};
 
     setTemporaryScans((currentScans) => [newTemporaryScan, ...currentScans]);
     setSelectedTemporaryScanId(newTemporaryScan.id);
@@ -849,6 +923,76 @@ function App() {
     setSelectedTemporaryScanId(normalizedScan.id);
     setActiveScreen("Temporary Card Detail");
   }
+
+function updateTemporaryScanBetaDecision(
+  scanId: number,
+  betaDecision: TemporaryScanRecord["betaDecision"]
+) {
+  setTemporaryScans((currentScans) =>
+    currentScans.map((scan) =>
+      scan.id === scanId
+        ? {
+            ...scan,
+            betaDecision,
+          }
+        : scan
+    )
+  );
+}
+
+function addBetaFeedbackNote() {
+  if (!newBetaFeedback.note.trim()) {
+    window.alert("Add a feedback note before saving.");
+    return;
+  }
+
+  setBetaFeedback((currentFeedback) => [
+    {
+      ...newBetaFeedback,
+      id: Date.now(),
+      createdAt: new Date().toISOString(),
+    },
+    ...currentFeedback,
+  ]);
+
+  setNewBetaFeedback({
+    id: Date.now(),
+    category: "Workflow",
+    priority: "Medium",
+    note: "",
+    createdAt: new Date().toISOString(),
+  });
+}
+
+function exportDallasBetaBackup() {
+  const backupData = {
+    exportedAt: new Date().toISOString(),
+    phase: "Phase 6 — Dallas Card Show Beta Prep",
+    event: "Dallas Card Show Beta Test",
+    maxTemporaryScans: MAX_TEMPORARY_SCANS,
+    totalTemporaryScans: temporaryScans.length,
+    temporaryScans,
+    betaFeedback,
+  };
+
+  const backupBlob = new Blob([JSON.stringify(backupData, null, 2)], {
+    type: "application/json",
+  });
+
+  const backupUrl = URL.createObjectURL(backupBlob);
+  const backupLink = document.createElement("a");
+
+  backupLink.href = backupUrl;
+  backupLink.download = `cardvault-dallas-beta-backup-${new Date()
+    .toISOString()
+    .slice(0, 10)}.json`;
+
+  document.body.appendChild(backupLink);
+  backupLink.click();
+  document.body.removeChild(backupLink);
+
+  URL.revokeObjectURL(backupUrl);
+}
 
   function deleteTemporaryScan(scanId: number) {
     setTemporaryScans((currentScans) =>
@@ -1194,6 +1338,12 @@ function App() {
                 openTemporaryScanDetail={openTemporaryScanDetail}
                 createDemoTemporaryScan={createDemoTemporaryScan}
                 createTemporaryScanFromImages={createTemporaryScanFromImages}
+                updateTemporaryScanBetaDecision={updateTemporaryScanBetaDecision}
+                exportDallasBetaBackup={exportDallasBetaBackup}
+                betaFeedback={betaFeedback}
+                newBetaFeedback={newBetaFeedback}
+                setNewBetaFeedback={setNewBetaFeedback}
+                addBetaFeedbackNote={addBetaFeedbackNote}
               />
             )}
 
@@ -8402,11 +8552,26 @@ function ScanReviewQueue({
   openTemporaryScanDetail,
   createDemoTemporaryScan,
   createTemporaryScanFromImages,
+  updateTemporaryScanBetaDecision,
+  exportDallasBetaBackup,
+  betaFeedback,
+  newBetaFeedback,
+  setNewBetaFeedback,
+  addBetaFeedbackNote,
 }: {
   temporaryScans: TemporaryScanRecord[];
   openTemporaryScanDetail: (scanId: number) => void;
   createDemoTemporaryScan: () => void;
   createTemporaryScanFromImages: (frontImage: string, backImage: string) => void;
+  updateTemporaryScanBetaDecision: (
+    scanId: number,
+    betaDecision: TemporaryScanRecord["betaDecision"]
+  ) => void;
+  exportDallasBetaBackup: () => void;
+  betaFeedback: BetaFeedbackRecord[];
+  newBetaFeedback: BetaFeedbackRecord;
+  setNewBetaFeedback: React.Dispatch<React.SetStateAction<BetaFeedbackRecord>>;
+  addBetaFeedbackNote: () => void;
 }) {
   const [frontUploadPreview, setFrontUploadPreview] = useState("");
   const [backUploadPreview, setBackUploadPreview] = useState("");
@@ -8422,6 +8587,21 @@ function ScanReviewQueue({
   const readyToSellScans = temporaryScans.filter(
     (scan) => scan.scanStatus === "Ready to Sell"
   );
+
+  const buyDecisionScans = temporaryScans.filter(
+    (scan) => scan.betaDecision === "Buy"
+  );
+
+  const watchDecisionScans = temporaryScans.filter(
+    (scan) => scan.betaDecision === "Watch"
+  );
+
+  const passDecisionScans = temporaryScans.filter(
+    (scan) => scan.betaDecision === "Pass"
+  );
+
+  const betaStorageIsWarning =
+    temporaryScans.length >= TEMPORARY_SCAN_WARNING_LIMIT;
 
   async function handleTemporaryImageUpload(
     side: "front" | "back",
@@ -8476,10 +8656,49 @@ function ScanReviewQueue({
   return (
     <>
       <PageHeader
-        eyebrow="Phase 5 Camera AI Foundation"
+        eyebrow="Phase 6.7 Dallas Card Show Beta Prep"
         title="Scan Review Queue"
         subtitle="Temporary holding area for scanned or uploaded cards before they are added to your collection or moved to the sell queue."
       />
+
+      <div className="mt-4 rounded-2xl border border-vaultGold/25 bg-black/60 p-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p
+              className={`text-xs font-black uppercase tracking-[0.25em] ${
+                betaStorageIsWarning ? "text-red-400" : "text-vaultGold"
+              }`}
+            >
+              Beta Storage: {temporaryScans.length}/{MAX_TEMPORARY_SCANS}
+            </p>
+
+            <p className="mt-1 text-sm font-semibold text-zinc-400">
+              Dallas Card Show temporary scan capacity. Warning begins at{" "}
+              {TEMPORARY_SCAN_WARNING_LIMIT} scans.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <div
+              className={`rounded-xl border px-4 py-2 text-xs font-black uppercase tracking-[0.2em] ${
+                betaStorageIsWarning
+                  ? "border-red-400/60 bg-red-950/40 text-red-300"
+                  : "border-vaultGold/40 bg-vaultGold/10 text-vaultGold"
+              }`}
+            >
+              {betaStorageIsWarning ? "Storage Warning" : "Beta Ready"}
+            </div>
+
+            <button
+              type="button"
+              onClick={exportDallasBetaBackup}
+              className="min-h-[44px] rounded-xl border border-vaultGold bg-vaultGold px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-black shadow-vault transition hover:bg-goldHover active:scale-[0.98]"
+            >
+              Export Beta Backup
+            </button>
+          </div>
+        </div>
+      </div>
 
       <Panel>
         <div className="flex flex-wrap items-center justify-between gap-5">
@@ -8502,7 +8721,7 @@ function ScanReviewQueue({
           <button
             type="button"
             onClick={createDemoTemporaryScan}
-            className="rounded-xl border border-vaultGold/50 bg-black/50 px-6 py-3 text-sm font-black text-vaultGold shadow-vault transition hover:bg-vaultGold hover:text-black"
+            className="min-h-[46px] rounded-xl border border-vaultGold/50 bg-black/50 px-6 py-3 text-sm font-black text-vaultGold shadow-vault transition hover:bg-vaultGold hover:text-black active:scale-[0.98]"
           >
             + Create Demo Scan
           </button>
@@ -8530,7 +8749,7 @@ function ScanReviewQueue({
 
             <label
               htmlFor="temporary-front-upload"
-              className="mt-4 flex cursor-pointer items-center justify-center rounded-xl border border-vaultGold/50 bg-vaultGold/10 px-4 py-3 text-xs font-black uppercase tracking-widest text-vaultGold transition hover:bg-vaultGold hover:text-black"
+              className="mt-4 flex min-h-[46px] cursor-pointer items-center justify-center rounded-xl border border-vaultGold/50 bg-vaultGold/10 px-4 py-3 text-xs font-black uppercase tracking-widest text-vaultGold transition hover:bg-vaultGold hover:text-black active:scale-[0.98]"
             >
               Upload Front
             </label>
@@ -8565,7 +8784,7 @@ function ScanReviewQueue({
 
             <label
               htmlFor="temporary-back-upload"
-              className="mt-4 flex cursor-pointer items-center justify-center rounded-xl border border-vaultGold/50 bg-vaultGold/10 px-4 py-3 text-xs font-black uppercase tracking-widest text-vaultGold transition hover:bg-vaultGold hover:text-black"
+              className="mt-4 flex min-h-[46px] cursor-pointer items-center justify-center rounded-xl border border-vaultGold/50 bg-vaultGold/10 px-4 py-3 text-xs font-black uppercase tracking-widest text-vaultGold transition hover:bg-vaultGold hover:text-black active:scale-[0.98]"
             >
               Upload Back
             </label>
@@ -8599,7 +8818,7 @@ function ScanReviewQueue({
               <button
                 type="button"
                 onClick={createUploadedScan}
-                className="w-full rounded-xl border border-vaultGold bg-vaultGold px-5 py-3 text-sm font-black text-black shadow-vault transition hover:bg-goldHover"
+                className="min-h-[48px] w-full rounded-xl border border-vaultGold bg-vaultGold px-5 py-3 text-sm font-black text-black shadow-vault transition hover:bg-goldHover active:scale-[0.98]"
               >
                 Create Scan From Images
               </button>
@@ -8610,7 +8829,7 @@ function ScanReviewQueue({
                   setFrontUploadPreview("");
                   setBackUploadPreview("");
                 }}
-                className="w-full rounded-xl border border-steelBorder bg-black/50 px-5 py-3 text-sm font-bold text-zinc-300 transition hover:text-white"
+                className="min-h-[46px] w-full rounded-xl border border-steelBorder bg-black/50 px-5 py-3 text-sm font-bold text-zinc-300 transition hover:text-white active:scale-[0.98]"
               >
                 Clear Uploads
               </button>
@@ -8619,13 +8838,40 @@ function ScanReviewQueue({
         </div>
       </Panel>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-3">
-        <div className="rounded-2xl border border-steelBorder bg-black/50 p-4">
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-zinc-500">
-            Needs Review
+      <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+        <div className="rounded-2xl border border-vaultGold/30 bg-vaultGold/10 p-4">
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-vaultGold">
+            Beta Storage
           </p>
           <p className="mt-2 text-3xl font-black text-white">
-            {needsReviewScans.length}
+            {temporaryScans.length}/{MAX_TEMPORARY_SCANS}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-profitGreen/30 bg-profitGreen/10 p-4">
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-profitGreen">
+            Buy
+          </p>
+          <p className="mt-2 text-3xl font-black text-white">
+            {buyDecisionScans.length}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-vaultGold/30 bg-vaultGold/10 p-4">
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-vaultGold">
+            Watch
+          </p>
+          <p className="mt-2 text-3xl font-black text-white">
+            {watchDecisionScans.length}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-red-700/40 bg-red-950/30 p-4">
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-red-400">
+            Pass
+          </p>
+          <p className="mt-2 text-3xl font-black text-white">
+            {passDecisionScans.length}
           </p>
         </div>
 
@@ -8666,7 +8912,7 @@ function ScanReviewQueue({
           </div>
         </Panel>
       ) : (
-        <div className="mt-6 grid gap-5 xl:grid-cols-3 lg:grid-cols-2">
+        <div className="mt-6 grid gap-5 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           {temporaryScans.map((scan) => (
             <article
               key={scan.id}
@@ -8754,10 +9000,31 @@ function ScanReviewQueue({
                   </div>
                 </div>
 
+                <div className="mt-5 grid grid-cols-3 gap-2">
+                  {(["Buy", "Watch", "Pass"] as TemporaryScanRecord["betaDecision"][]).map(
+                    (decision) => (
+                      <button
+                        key={decision}
+                        type="button"
+                        onClick={() =>
+                          updateTemporaryScanBetaDecision(scan.id, decision)
+                        }
+                        className={`min-h-[46px] rounded-xl border px-3 py-3 text-sm font-black uppercase tracking-widest transition active:scale-[0.98] ${
+                          scan.betaDecision === decision
+                            ? "border-vaultGold bg-vaultGold text-black"
+                            : "border-steelBorder bg-black/50 text-zinc-400 hover:border-vaultGold hover:text-vaultGold"
+                        }`}
+                      >
+                        {decision}
+                      </button>
+                    )
+                  )}
+                </div>
+
                 <button
                   type="button"
                   onClick={() => openTemporaryScanDetail(scan.id)}
-                  className="mt-5 flex w-full items-center justify-center rounded-xl border border-vaultGold/50 bg-vaultGold/10 px-5 py-3 text-sm font-black text-vaultGold transition hover:bg-vaultGold hover:text-black"
+                  className="mt-3 flex min-h-[48px] w-full items-center justify-center rounded-xl border border-vaultGold/50 bg-vaultGold/10 px-5 py-3 text-sm font-black text-vaultGold transition hover:bg-vaultGold hover:text-black active:scale-[0.98]"
                 >
                   Open Review →
                 </button>
@@ -8766,6 +9033,150 @@ function ScanReviewQueue({
           ))}
         </div>
       )}
+
+      <Panel className="mt-6">
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+              Phase 6.6 Beta Feedback Log
+            </p>
+
+            <h2 className="mt-2 text-3xl font-black text-white">
+              Dallas Card Show Field Notes
+            </h2>
+
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">
+              Capture bugs, workflow issues, mobile layout problems, feature
+              requests, and pricing/dealer tracking notes during live beta
+              testing.
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-vaultGold/40 bg-vaultGold/10 px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-vaultGold">
+            {betaFeedback.length} Notes
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-4 lg:grid-cols-[220px_180px_1fr_180px]">
+          <div>
+            <label className="mb-2 block text-xs font-black uppercase tracking-widest text-zinc-500">
+              Category
+            </label>
+
+            <select
+              value={newBetaFeedback.category}
+              onChange={(event) =>
+                setNewBetaFeedback((currentFeedback) => ({
+                  ...currentFeedback,
+                  category:
+                    event.target.value as BetaFeedbackRecord["category"],
+                }))
+              }
+              className="w-full rounded-xl border border-steelBorder bg-black/60 px-4 py-3 text-sm font-bold text-white outline-none focus:border-vaultGold"
+            >
+              <option value="Workflow">Workflow</option>
+              <option value="Quick Scan">Quick Scan</option>
+              <option value="Mobile Layout">Mobile Layout</option>
+              <option value="Pricing">Pricing</option>
+              <option value="Dealer Tracking">Dealer Tracking</option>
+              <option value="Decision Flow">Decision Flow</option>
+              <option value="Bug">Bug</option>
+              <option value="Feature Request">Feature Request</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-xs font-black uppercase tracking-widest text-zinc-500">
+              Priority
+            </label>
+
+            <select
+              value={newBetaFeedback.priority}
+              onChange={(event) =>
+                setNewBetaFeedback((currentFeedback) => ({
+                  ...currentFeedback,
+                  priority:
+                    event.target.value as BetaFeedbackRecord["priority"],
+                }))
+              }
+              className="w-full rounded-xl border border-steelBorder bg-black/60 px-4 py-3 text-sm font-bold text-white outline-none focus:border-vaultGold"
+            >
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-xs font-black uppercase tracking-widest text-zinc-500">
+              Feedback Note
+            </label>
+
+            <textarea
+              value={newBetaFeedback.note}
+              onChange={(event) =>
+                setNewBetaFeedback((currentFeedback) => ({
+                  ...currentFeedback,
+                  note: event.target.value,
+                }))
+              }
+              className="min-h-[100px] w-full rounded-xl border border-steelBorder bg-black/60 p-3 text-sm text-white outline-none focus:border-vaultGold"
+              placeholder="Example: Buttons need to be bigger on mobile while walking the show floor."
+            />
+          </div>
+
+          <div className="flex items-end">
+            <button
+              type="button"
+              onClick={addBetaFeedbackNote}
+              className="min-h-[48px] w-full rounded-xl border border-vaultGold bg-vaultGold px-5 py-3 text-sm font-black text-black shadow-vault transition hover:bg-goldHover active:scale-[0.98]"
+            >
+              Save Note
+            </button>
+          </div>
+        </div>
+
+        {betaFeedback.length > 0 && (
+          <div className="mt-6 space-y-3">
+            {betaFeedback.map((feedback) => (
+              <div
+                key={feedback.id}
+                className="rounded-2xl border border-steelBorder bg-black/50 p-4"
+              >
+                <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                  <div>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="rounded-full border border-vaultGold/40 bg-vaultGold/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-vaultGold">
+                        {feedback.category}
+                      </span>
+
+                      <span
+                        className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-widest ${
+                          feedback.priority === "High"
+                            ? "border-red-500/50 bg-red-950/40 text-red-300"
+                            : feedback.priority === "Medium"
+                            ? "border-vaultGold/40 bg-vaultGold/10 text-vaultGold"
+                            : "border-steelBorder bg-black/40 text-zinc-400"
+                        }`}
+                      >
+                        {feedback.priority}
+                      </span>
+                    </div>
+
+                    <p className="mt-3 text-sm leading-6 text-zinc-300">
+                      {feedback.note}
+                    </p>
+                  </div>
+
+                  <p className="text-xs font-bold text-zinc-500">
+                    {new Date(feedback.createdAt).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Panel>
     </>
   );
 }
@@ -8786,8 +9197,28 @@ function TemporaryCardDetail({
   setActiveScreen: React.Dispatch<React.SetStateAction<Screen>>;
 }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [editScan, setEditScan] = useState<TemporaryScanRecord>(scan);
-  const [saveMessage, setSaveMessage] = useState("");
+
+function normalizeTemporaryScanBetaFields(
+  currentScan: TemporaryScanRecord
+): TemporaryScanRecord {
+  return {
+    ...currentScan,
+    boothNumber: currentScan.boothNumber ?? "",
+    dealerName: currentScan.dealerName ?? "",
+    askingPrice: currentScan.askingPrice ?? 0,
+    recentComp: currentScan.recentComp ?? 0,
+    offerTarget: currentScan.offerTarget ?? 0,
+    maxBuyPrice: currentScan.maxBuyPrice ?? 0,
+    negotiationNotes: currentScan.negotiationNotes ?? "",
+    betaDecision: currentScan.betaDecision ?? "Watch",
+  };
+}
+
+const [editScan, setEditScan] = useState<TemporaryScanRecord>(() =>
+  normalizeTemporaryScanBetaFields(scan)
+);
+
+const [saveMessage, setSaveMessage] = useState("");
   const [pendingDeleteScanId, setPendingDeleteScanId] = useState<number | null>(
     null
   );
@@ -8795,11 +9226,13 @@ function TemporaryCardDetail({
     "keep" | "sell" | null
   >(null);
 
-  useEffect(() => {
-    setEditScan(scan);
-  }, [scan]);
+ useEffect(() => {
+  setEditScan(normalizeTemporaryScanBetaFields(scan));
+}, [scan]);
 
-  const displayScan = isEditing ? editScan : scan;
+const displayScan = isEditing
+  ? normalizeTemporaryScanBetaFields(editScan)
+  : normalizeTemporaryScanBetaFields(scan);
 
   const marketValue = displayScan.estimatedValue || 0;
   const costBasis =
@@ -8886,56 +9319,61 @@ function TemporaryCardDetail({
   }
 
   function runSimulatedAiReview() {
-  const simulatedAiScan: TemporaryScanRecord = {
-    ...displayScan,
-    player:
-      displayScan.player === "Pending Identification"
-        ? "Victor Wembanyama"
-        : displayScan.player,
-    card:
-      displayScan.card === "Uploaded Card Scan" ||
-      displayScan.card === "Temporary Scan Record"
-        ? "Rookie Card"
-        : displayScan.card,
-    team: displayScan.team === "Pending" ? "San Antonio Spurs" : displayScan.team,
-    sport:
-      displayScan.sport === "Pending" ? "Basketball" : displayScan.sport,
-    year: displayScan.year === "Pending" ? "2023-24" : displayScan.year,
-    brand:
-      displayScan.brand === "Pending" ? "Panini Prizm" : displayScan.brand,
-    set:
-      displayScan.set === "Pending"
-        ? "2023-24 Panini Prizm"
-        : displayScan.set,
-    cardNumber:
-      displayScan.cardNumber === "Pending" ? "136" : displayScan.cardNumber,
-    parallel:
-      displayScan.parallel === "Pending" ? "Base Rookie" : displayScan.parallel,
-    estimatedValue: displayScan.estimatedValue || 125,
-    lastSale: displayScan.lastSale || 118,
-    averageComp: displayScan.averageComp || 125,
-    highComp: displayScan.highComp || 155,
-    lowComp: displayScan.lowComp || 95,
-    compConfidence: "Simulated AI Match",
-    scanStatus: "Ready to Keep",
-    aiReviewStatus: "Simulated Review Complete",
-    aiConfidence: "87%",
-    aiSuggestedMatch:
-      "2023-24 Panini Prizm Victor Wembanyama Rookie Card #136",
-    notes: `${displayScan.notes}
+    const simulatedAiScan: TemporaryScanRecord = {
+      ...displayScan,
+      player:
+        displayScan.player === "Pending Identification"
+          ? "Victor Wembanyama"
+          : displayScan.player,
+      card:
+        displayScan.card === "Uploaded Card Scan" ||
+        displayScan.card === "Temporary Scan Record"
+          ? "Rookie Card"
+          : displayScan.card,
+      team:
+        displayScan.team === "Pending"
+          ? "San Antonio Spurs"
+          : displayScan.team,
+      sport:
+        displayScan.sport === "Pending" ? "Basketball" : displayScan.sport,
+      year: displayScan.year === "Pending" ? "2023-24" : displayScan.year,
+      brand:
+        displayScan.brand === "Pending" ? "Panini Prizm" : displayScan.brand,
+      set:
+        displayScan.set === "Pending"
+          ? "2023-24 Panini Prizm"
+          : displayScan.set,
+      cardNumber:
+        displayScan.cardNumber === "Pending" ? "136" : displayScan.cardNumber,
+      parallel:
+        displayScan.parallel === "Pending"
+          ? "Base Rookie"
+          : displayScan.parallel,
+      estimatedValue: displayScan.estimatedValue || 125,
+      lastSale: displayScan.lastSale || 118,
+      averageComp: displayScan.averageComp || 125,
+      highComp: displayScan.highComp || 155,
+      lowComp: displayScan.lowComp || 95,
+      compConfidence: "Simulated AI Match",
+      scanStatus: "Ready to Keep",
+      aiReviewStatus: "Simulated Review Complete",
+      aiConfidence: "87%",
+      aiSuggestedMatch:
+        "2023-24 Panini Prizm Victor Wembanyama Rookie Card #136",
+      notes: `${displayScan.notes}
 
 Simulated AI Review:
 CardVault Pro identified a likely match and filled in suggested card details. This is a Phase 5.7 front-end simulation only and will later connect to real camera AI, OCR, and market data.`,
-  };
+    };
 
-  updateTemporaryScan(simulatedAiScan);
-  setEditScan(simulatedAiScan);
-  setSaveMessage("Simulated AI review complete. Backend AI connection pending.");
+    updateTemporaryScan(simulatedAiScan);
+    setEditScan(simulatedAiScan);
+    setSaveMessage("Simulated AI review complete. Backend AI connection pending.");
 
-  window.setTimeout(() => {
-    setSaveMessage("");
-  }, 2500);
-}
+    window.setTimeout(() => {
+      setSaveMessage("");
+    }, 2500);
+  }
 
   return (
     <div className="relative isolate overflow-hidden">
@@ -8972,15 +9410,16 @@ CardVault Pro identified a likely match and filled in suggested card details. Th
             ← Back to Scan Queue
           </button>
 
-        {!isEditing && (
-          <button
-             type="button"
-             onClick={runSimulatedAiReview}
-             className="rounded-lg border border-cyan-400/50 bg-cyan-400/10 px-6 py-3 text-sm font-black text-cyan-300 transition hover:bg-cyan-400 hover:text-black"
-            >  
-                Simulate AI Review
+          {!isEditing && (
+            <button
+              type="button"
+              onClick={runSimulatedAiReview}
+              className="rounded-lg border border-cyan-400/50 bg-cyan-400/10 px-6 py-3 text-sm font-black text-cyan-300 transition hover:bg-cyan-400 hover:text-black"
+            >
+              Simulate AI Review
             </button>
           )}
+
           {isEditing ? (
             <>
               <button
@@ -9065,15 +9504,15 @@ CardVault Pro identified a likely match and filled in suggested card details. Th
               />
 
               <CardBadge
-                 icon="AI"
-                 label={displayScan.aiConfidence || "Pending"}
-                 sublabel={
-                 displayScan.aiReviewStatus === "Simulated Review Complete"
-                 ? "Simulated Match"
-                 : "AI Backend Pending"
-              }
-              accent="text-cyan-300"
-            />
+                icon="AI"
+                label={displayScan.aiConfidence || "Pending"}
+                sublabel={
+                  displayScan.aiReviewStatus === "Simulated Review Complete"
+                    ? "Simulated Match"
+                    : "AI Backend Pending"
+                }
+                accent="text-cyan-300"
+              />
 
               <CardBadge
                 icon="$"
@@ -9084,31 +9523,31 @@ CardVault Pro identified a likely match and filled in suggested card details. Th
             </div>
           </Panel>
 
-            {displayScan.aiReviewStatus === "Simulated Review Complete" && (
-          <Panel>
-            <p className="text-xs font-black uppercase tracking-[0.3em] text-cyan-300">
-                 Simulate AI Result
-            </p>
+          {displayScan.aiReviewStatus === "Simulated Review Complete" && (
+            <Panel>
+              <p className="text-xs font-black uppercase tracking-[0.3em] text-cyan-300">
+                Simulate AI Result
+              </p>
 
-            <h3 className="mt-2 text-2xl font-black text-white">
+              <h3 className="mt-2 text-2xl font-black text-white">
                 Simulated Match Found
-            </h3>
+              </h3>
 
-            <p className="mt-3 text-sm leading-6 text-zinc-400">
+              <p className="mt-3 text-sm leading-6 text-zinc-400">
                 {displayScan.aiSuggestedMatch || "No suggested match available."}
-            </p>
+              </p>
 
-            <div className="mt-4 rounded-xl border border-cyan-400/30 bg-cyan-400/10 p-4">
-            <p className="text-xs font-black uppercase tracking-widest text-cyan-300">
-                 Confidence
-            </p>
-            <p className="mt-1 text-2xl font-black text-white">
-                {displayScan.aiConfidence || "Pending"}
-            </p>
-          </div>
-          </Panel>
-        )}
-               { /* Left column block */}
+              <div className="mt-4 rounded-xl border border-cyan-400/30 bg-cyan-400/10 p-4">
+                <p className="text-xs font-black uppercase tracking-widest text-cyan-300">
+                  Confidence
+                </p>
+                <p className="mt-1 text-2xl font-black text-white">
+                  {displayScan.aiConfidence || "Pending"}
+                </p>
+              </div>
+            </Panel>
+          )}
+
           {isEditing && (
             <Panel>
               <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
@@ -9271,6 +9710,127 @@ CardVault Pro identified a likely match and filled in suggested card details. Th
                 isEditing={isEditing}
                 onChange={(value) => updateEditField("seller", value)}
               />
+            </div>
+          </Panel>
+
+          <Panel>
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+              Dallas Card Show Beta Notes
+            </p>
+
+            <h2 className="mt-2 text-2xl font-black text-white">
+              Booth-Side Decision Tracker
+            </h2>
+
+            <p className="mt-3 text-sm leading-6 text-zinc-400">
+              Use this section during the Dallas Card Show to track the dealer,
+              booth, asking price, recent comp, target offer, max buy price, and
+              final decision.
+            </p>
+
+            <div className="mt-5 grid grid-cols-2 gap-4">
+              <TemporaryEditField
+                label="Booth / Table #"
+                value={editScan.boothNumber}
+                displayValue={displayScan.boothNumber || "Not entered"}
+                isEditing={isEditing}
+                onChange={(value) => updateEditField("boothNumber", value)}
+              />
+
+              <TemporaryEditField
+                label="Dealer Name"
+                value={editScan.dealerName}
+                displayValue={displayScan.dealerName || "Not entered"}
+                isEditing={isEditing}
+                onChange={(value) => updateEditField("dealerName", value)}
+              />
+
+              <TemporaryEditField
+                label="Asking Price"
+                value={editScan.askingPrice}
+                displayValue={`$${displayScan.askingPrice.toLocaleString()}`}
+                isEditing={isEditing}
+                type="number"
+                onChange={(value) => updateEditNumberField("askingPrice", value)}
+              />
+
+              <TemporaryEditField
+                label="Recent Comp"
+                value={editScan.recentComp}
+                displayValue={`$${displayScan.recentComp.toLocaleString()}`}
+                isEditing={isEditing}
+                type="number"
+                onChange={(value) => updateEditNumberField("recentComp", value)}
+              />
+
+              <TemporaryEditField
+                label="Offer Target"
+                value={editScan.offerTarget}
+                displayValue={`$${displayScan.offerTarget.toLocaleString()}`}
+                isEditing={isEditing}
+                type="number"
+                onChange={(value) => updateEditNumberField("offerTarget", value)}
+              />
+
+              <TemporaryEditField
+                label="Max Buy Price"
+                value={editScan.maxBuyPrice}
+                displayValue={`$${displayScan.maxBuyPrice.toLocaleString()}`}
+                isEditing={isEditing}
+                type="number"
+                onChange={(value) => updateEditNumberField("maxBuyPrice", value)}
+              />
+            </div>
+
+            <div className="mt-5 rounded-xl border border-steelBorder bg-black/50 p-4">
+              <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
+                Beta Decision
+              </p>
+
+              {isEditing ? (
+                <select
+                  value={editScan.betaDecision}
+                  onChange={(event) =>
+                    updateEditField(
+                      "betaDecision",
+                      event.target.value as TemporaryScanRecord["betaDecision"]
+                    )
+                  }
+                  className="mt-3 w-full rounded-xl border border-steelBorder bg-black/70 px-4 py-3 text-sm font-bold text-white outline-none focus:border-vaultGold"
+                >
+                  <option value="Buy">Buy</option>
+                  <option value="Watch">Watch</option>
+                  <option value="Pass">Pass</option>
+                  <option value="Keep">Keep</option>
+                  <option value="Sell">Sell</option>
+                </select>
+              ) : (
+                <p className="mt-2 text-2xl font-black text-white">
+                  {displayScan.betaDecision}
+                </p>
+              )}
+            </div>
+
+            <div className="mt-5 rounded-xl border border-steelBorder bg-black/50 p-4">
+              <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
+                Negotiation Notes
+              </p>
+
+              {isEditing ? (
+                <textarea
+                  value={editScan.negotiationNotes}
+                  onChange={(event) =>
+                    updateEditField("negotiationNotes", event.target.value)
+                  }
+                  className="mt-3 min-h-[120px] w-full rounded-xl border border-steelBorder bg-black/70 p-3 text-sm text-white outline-none focus:border-vaultGold"
+                  placeholder="Example: Dealer asking $125. Recent comp around $105. Offer target $90. Max buy $100. Dealer may bundle with another card."
+                />
+              ) : (
+                <p className="mt-3 text-sm leading-6 text-zinc-400">
+                  {displayScan.negotiationNotes ||
+                    "No negotiation notes entered yet."}
+                </p>
+              )}
             </div>
           </Panel>
         </div>
