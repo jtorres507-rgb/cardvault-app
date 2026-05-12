@@ -41,11 +41,14 @@ import {
 type Screen =
   | "Dashboard"
   | "My Collection"
+  | "Collection"
   | "All Cards"
   | "Memorabilia"
   | "Add Card"
   | "Card Detail"
   | "CardVault Scan"
+  | "Scan Review Queue"
+  | "Temporary Card Detail"
   | "Market Comps"
   | "Grading Center"
   | "Reports"
@@ -60,6 +63,52 @@ type CardStatus =
   | "Sold";
 
 type CardRecord = {
+  id: number;
+  player: string;
+  card: string;
+  team: string;
+  sport: string;
+  year: string;
+  brand: string;
+  set: string;
+  cardNumber: string;
+  parallel: string;
+  rookie?: string;
+  autograph?: string;
+  patch?: string;
+  league?: string;
+  rookieCard?: string;
+  feature?: string;
+  grade: string;
+  grader: string;
+  serialNumber: string;
+  sku: string;
+  status: CardStatus;
+  purchaseDate: string;
+  purchasePrice: number;
+  taxesFees: number;
+  shippingCost: number;
+  totalCostBasis: number;
+  source: string;
+  seller: string;
+  paymentMethod: string;
+  storageLocation: string;
+  estimatedValue: number;
+  lastSale: number;
+  averageComp: number;
+  highComp: number;
+  lowComp: number;
+  compConfidence: string;
+  gainLoss: number;
+  roi: number;
+  notes: string;
+  frontImage?: string;
+  backImage?: string;
+  slabImage?: string;
+  receiptImage?: string;
+};
+
+type TemporaryScanRecord = {
   id: number;
   player: string;
   card: string;
@@ -97,6 +146,14 @@ type CardRecord = {
   backImage?: string;
   slabImage?: string;
   receiptImage?: string;
+  scanStatus: "Needs Review" | "Ready to Keep" | "Ready to Sell";
+  scanSource: "Camera Upload" | "Manual Upload" | "Demo Scan";
+  createdAt: string;
+
+  // Phase 5.7 simulated AI review foundation
+  aiReviewStatus?: "Not Started" | "Simulated Review Complete";
+  aiConfidence?: string;
+  aiSuggestedMatch?: string;
 };
 
 type SaleRecord = {
@@ -130,6 +187,7 @@ type AddCardForm = {
   parallel: string;
   rookie: string;
   autograph: string;
+  patch: string;
   serialNumber: string;
   sku: string;
   status: CardStatus;
@@ -168,6 +226,7 @@ const sidebarItems: {
   {label: "Memorabilia",icon: Award },
   { label: "Add Card", icon: PlusCircle },
   { label: "CardVault Scan", icon: Camera },
+  { label: "Scan Review Queue", icon: Camera },
   { label: "Market Comps", icon: TrendingUp },
   { label: "Grading Center", icon: ShieldCheck },
   { label: "Reports", icon: FileText },
@@ -486,8 +545,9 @@ const emptyForm: AddCardForm = {
   set: "",
   cardNumber: "",
   parallel: "",
-  rookie: "",
-  autograph: "",
+  rookie: "No",
+  autograph: "No",
+  patch: "No",
   serialNumber: "",
   sku: "CVP-WEMBY-PRIZM-001",
   status: "Personal Collection",
@@ -513,45 +573,53 @@ const emptyForm: AddCardForm = {
 
 function App() {
   const [activeScreen, setActiveScreen] = useState<Screen>("Dashboard");
+
   const [sales, setSales] = useState<SaleRecord[]>(() => {
-  const savedSales = localStorage.getItem("cardvault-sales");
+    const savedSales = localStorage.getItem("cardvault-sales");
 
-  if (!savedSales) {
-    return [];
-  }
-
-  try {
-    const parsedSales = JSON.parse(savedSales);
-
-    if (!Array.isArray(parsedSales)) {
+    if (!savedSales) {
       return [];
     }
 
-    return parsedSales as SaleRecord[];
-  } catch {
-    return [];
-  }
-});
+    try {
+      const parsedSales = JSON.parse(savedSales);
+
+      if (!Array.isArray(parsedSales)) {
+        return [];
+      }
+
+      return parsedSales as SaleRecord[];
+    } catch {
+      return [];
+    }
+  });
 
   const [cards, setCards] = useState<CardRecord[]>(() => {
+    const normalizeCard = (card: CardRecord): CardRecord => ({
+      ...card,
+      rookie: card.rookie || "No",
+      autograph: card.autograph || "No",
+      patch: card.patch || "No",
+    });
+
     const savedCards = localStorage.getItem("cardvault-cards");
 
     if (!savedCards) {
-      return initialCards;
+      return initialCards.map(normalizeCard);
     }
 
     try {
       const parsedCards = JSON.parse(savedCards);
 
       if (!Array.isArray(parsedCards)) {
-        return initialCards;
+        return initialCards.map(normalizeCard);
       }
 
       return parsedCards.length > 0
-        ? (parsedCards as CardRecord[])
-        : initialCards;
+        ? (parsedCards as CardRecord[]).map(normalizeCard)
+        : initialCards.map(normalizeCard);
     } catch {
-      return initialCards;
+      return initialCards.map(normalizeCard);
     }
   });
 
@@ -560,6 +628,32 @@ function App() {
   const [selectedCardId, setSelectedCardId] = useState<number>(
     initialCards[0].id
   );
+
+  const [temporaryScans, setTemporaryScans] = useState<TemporaryScanRecord[]>(
+    () => {
+      const savedScans = localStorage.getItem("cardvault-temporary-scans");
+
+      if (!savedScans) {
+        return [];
+      }
+
+      try {
+        const parsedScans = JSON.parse(savedScans);
+
+        if (!Array.isArray(parsedScans)) {
+          return [];
+        }
+
+        return parsedScans as TemporaryScanRecord[];
+      } catch {
+        return [];
+      }
+    }
+  );
+
+  const [selectedTemporaryScanId, setSelectedTemporaryScanId] = useState<
+    number | null
+  >(null);
 
   const [pendingDeleteCardId, setPendingDeleteCardId] = useState<number | null>(
     null
@@ -575,6 +669,9 @@ function App() {
 
   const selectedCard =
     cards.find((card) => card.id === selectedCardId) ?? cards[0] ?? null;
+
+  const selectedTemporaryScan =
+    temporaryScans.find((scan) => scan.id === selectedTemporaryScanId) ?? null;
 
   const collectionValue = cards.reduce(
     (sum, card) => sum + card.estimatedValue,
@@ -593,9 +690,283 @@ function App() {
     localStorage.setItem("cardvault-cards", JSON.stringify(cards));
   }, [cards]);
 
+  useEffect(() => {
+    localStorage.setItem(
+      "cardvault-temporary-scans",
+      JSON.stringify(temporaryScans)
+    );
+  }, [temporaryScans]);
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        "cardvault-temporary-scans",
+        JSON.stringify(temporaryScans)
+      );
+    } catch (error) {
+      console.error("Unable to save temporary scans to localStorage:", error);
+      window.alert(
+      "CardVault could not save this scan because the image files are too large. Try using smaller or compressed images."
+    );
+  }
+}, [temporaryScans]);
+
   function openCardDetail(cardId: number) {
     setSelectedCardId(cardId);
     setActiveScreen("Card Detail");
+  }
+
+  function openTemporaryScanDetail(scanId: number) {
+    setSelectedTemporaryScanId(scanId);
+    setActiveScreen("Temporary Card Detail");
+  }
+
+  function createDemoTemporaryScan() {
+    const newTemporaryScan: TemporaryScanRecord = {
+      id: Date.now(),
+      player: "Pending Identification",
+      card: "Temporary Scan Record",
+      team: "Pending",
+      sport: "Basketball",
+      year: "Pending",
+      brand: "Pending",
+      set: "Pending",
+      cardNumber: "Pending",
+      parallel: "Pending",
+      grade: "Raw",
+      grader: "Review",
+      serialNumber: "N/A",
+      sku: `TEMP-${Date.now()}`,
+      status: "Personal Collection",
+      purchaseDate: "Pending",
+      purchasePrice: 0,
+      taxesFees: 0,
+      shippingCost: 0,
+      totalCostBasis: 0,
+      source: "Camera Upload",
+      seller: "Pending",
+      paymentMethod: "Pending",
+      storageLocation: "Temporary Scan Queue",
+      estimatedValue: 0,
+      lastSale: 0,
+      averageComp: 0,
+      highComp: 0,
+      lowComp: 0,
+      compConfidence: "Pending AI Review",
+      gainLoss: 0,
+      roi: 0,
+      notes:
+        "Temporary scan created for review. Confirm card details before adding to collection or moving to sell queue.",
+      frontImage: "",
+      backImage: "",
+      slabImage: "",
+      receiptImage: "",
+      scanStatus: "Needs Review",
+      scanSource: "Demo Scan",
+      createdAt: new Date().toISOString(),
+    };
+
+    setTemporaryScans((currentScans) => [newTemporaryScan, ...currentScans]);
+    setSelectedTemporaryScanId(newTemporaryScan.id);
+    setActiveScreen("Temporary Card Detail");
+  }
+
+  function createTemporaryScanFromImages(frontImage: string, backImage: string) {
+    const newTemporaryScan: TemporaryScanRecord = {
+      id: Date.now(),
+      player: "Pending Identification",
+      card: "Uploaded Card Scan",
+      team: "Pending",
+      sport: "Pending",
+      year: "Pending",
+      brand: "Pending",
+      set: "Pending",
+      cardNumber: "Pending",
+      parallel: "Pending",
+      grade: "Raw",
+      grader: "Review",
+      serialNumber: "N/A",
+      sku: `TEMP-${Date.now()}`,
+      status: "Personal Collection",
+      purchaseDate: "Pending",
+      purchasePrice: 0,
+      taxesFees: 0,
+      shippingCost: 0,
+      totalCostBasis: 0,
+      source: "Camera Upload",
+      seller: "Pending",
+      paymentMethod: "Pending",
+      storageLocation: "Temporary Scan Queue",
+      estimatedValue: 0,
+      lastSale: 0,
+      averageComp: 0,
+      highComp: 0,
+      lowComp: 0,
+      compConfidence: "Pending AI Review",
+      gainLoss: 0,
+      roi: 0,
+      notes:
+        "Temporary scan created from uploaded card images. Confirm card details before adding to collection or moving to sell queue.",
+      frontImage,
+      backImage,
+      slabImage: "",
+      receiptImage: "",
+      scanStatus: "Needs Review",
+      scanSource: "Manual Upload",
+      aiReviewStatus: "Not Started",
+      aiConfidence: "Pending",
+      aiSuggestedMatch: "Pending AI Review",
+      createdAt: new Date().toISOString(),
+    };
+
+    setTemporaryScans((currentScans) => [newTemporaryScan, ...currentScans]);
+    setSelectedTemporaryScanId(newTemporaryScan.id);
+    setActiveScreen("Temporary Card Detail");
+  }
+
+  function updateTemporaryScan(updatedScan: TemporaryScanRecord) {
+    const marketValue = updatedScan.estimatedValue || 0;
+    const costBasis =
+      updatedScan.totalCostBasis || updatedScan.purchasePrice || 0;
+
+    const recalculatedGainLoss = marketValue - costBasis;
+
+    const recalculatedRoi =
+      costBasis > 0 ? (recalculatedGainLoss / costBasis) * 100 : 0;
+
+    const normalizedScan: TemporaryScanRecord = {
+      ...updatedScan,
+      gainLoss: recalculatedGainLoss,
+      roi: recalculatedRoi,
+      scanStatus: "Ready to Keep",
+    };
+
+    setTemporaryScans((currentScans) =>
+      currentScans.map((scan) =>
+        scan.id === normalizedScan.id ? normalizedScan : scan
+      )
+    );
+
+    setSelectedTemporaryScanId(normalizedScan.id);
+    setActiveScreen("Temporary Card Detail");
+  }
+
+  function deleteTemporaryScan(scanId: number) {
+    setTemporaryScans((currentScans) =>
+      currentScans.filter((scan) => scan.id !== scanId)
+    );
+
+    setSelectedTemporaryScanId(null);
+    setActiveScreen("Scan Review Queue");
+  }
+
+  function addTemporaryScanToCollection(scan: TemporaryScanRecord) {
+    const newCard: CardRecord = {
+      id: Date.now(),
+      player: scan.player,
+      card: scan.card,
+      team: scan.team,
+      sport: scan.sport,
+      year: scan.year,
+      brand: scan.brand,
+      set: scan.set,
+      cardNumber: scan.cardNumber,
+      parallel: scan.parallel,
+      rookie: "No",
+      autograph: "No",
+      patch: "No",
+      grade: scan.grade,
+      grader: scan.grader,
+      serialNumber: scan.serialNumber,
+      sku: scan.sku.replace("TEMP", "CVP"),
+      status: "Personal Collection",
+      purchaseDate: scan.purchaseDate,
+      purchasePrice: scan.purchasePrice,
+      taxesFees: scan.taxesFees,
+      shippingCost: scan.shippingCost,
+      totalCostBasis: scan.totalCostBasis,
+      source: scan.source,
+      seller: scan.seller,
+      paymentMethod: scan.paymentMethod,
+      storageLocation: "Vault A-01",
+      estimatedValue: scan.estimatedValue,
+      lastSale: scan.lastSale,
+      averageComp: scan.averageComp,
+      highComp: scan.highComp,
+      lowComp: scan.lowComp,
+      compConfidence: scan.compConfidence,
+      gainLoss: scan.gainLoss,
+      roi: scan.roi,
+      notes: scan.notes,
+      frontImage: scan.frontImage,
+      backImage: scan.backImage,
+      slabImage: scan.slabImage,
+      receiptImage: scan.receiptImage,
+    };
+
+    setCards((currentCards) => [newCard, ...currentCards]);
+
+    setTemporaryScans((currentScans) =>
+      currentScans.filter((temporaryScan) => temporaryScan.id !== scan.id)
+    );
+
+    setSelectedCardId(newCard.id);
+    setSelectedTemporaryScanId(null);
+    setActiveScreen("Card Detail");
+  }
+
+  function moveTemporaryScanToSellQueue(scan: TemporaryScanRecord) {
+    const newCardForSale: CardRecord = {
+      id: Date.now(),
+      player: scan.player,
+      card: scan.card,
+      team: scan.team,
+      sport: scan.sport,
+      year: scan.year,
+      brand: scan.brand,
+      set: scan.set,
+      cardNumber: scan.cardNumber,
+      parallel: scan.parallel,
+      rookie: "No",
+      autograph: "No",
+      patch: "No",
+      grade: scan.grade,
+      grader: scan.grader,
+      serialNumber: scan.serialNumber,
+      sku: scan.sku.replace("TEMP", "SALE"),
+      status: "For Sale",
+      purchaseDate: scan.purchaseDate,
+      purchasePrice: scan.purchasePrice,
+      taxesFees: scan.taxesFees,
+      shippingCost: scan.shippingCost,
+      totalCostBasis: scan.totalCostBasis,
+      source: scan.source,
+      seller: scan.seller,
+      paymentMethod: scan.paymentMethod,
+      storageLocation: "Sell Queue",
+      estimatedValue: scan.estimatedValue,
+      lastSale: scan.lastSale,
+      averageComp: scan.averageComp,
+      highComp: scan.highComp,
+      lowComp: scan.lowComp,
+      compConfidence: scan.compConfidence,
+      gainLoss: scan.gainLoss,
+      roi: scan.roi,
+      notes: `${scan.notes} Moved from temporary scan review into Sell Queue.`,
+      frontImage: scan.frontImage,
+      backImage: scan.backImage,
+      slabImage: scan.slabImage,
+      receiptImage: scan.receiptImage,
+    };
+
+    setCards((currentCards) => [newCardForSale, ...currentCards]);
+
+    setTemporaryScans((currentScans) =>
+      currentScans.filter((temporaryScan) => temporaryScan.id !== scan.id)
+    );
+
+    setSelectedCardId(newCardForSale.id);
+    setSelectedTemporaryScanId(null);
+    setActiveScreen("Sales Tracker");
   }
 
   function requestDeleteCard(cardId: number) {
@@ -649,6 +1020,11 @@ function App() {
       set: formData.set || "N/A",
       cardNumber: formData.cardNumber || "N/A",
       parallel: formData.parallel || "N/A",
+
+      rookie: formData.rookie || "No",
+      autograph: formData.autograph || "No",
+      patch: formData.patch || "No",
+
       grade: formData.grade || "Raw",
       grader: formData.grader || "Review",
       serialNumber: formData.serialNumber || "N/A",
@@ -690,13 +1066,20 @@ function App() {
   }
 
   function updateCard(updatedCard: CardRecord) {
+    const normalizedCard: CardRecord = {
+      ...updatedCard,
+      rookie: updatedCard.rookie || "No",
+      autograph: updatedCard.autograph || "No",
+      patch: updatedCard.patch || "No",
+    };
+
     setCards((currentCards) =>
       currentCards.map((card) =>
-        card.id === updatedCard.id ? updatedCard : card
+        card.id === normalizedCard.id ? normalizedCard : card
       )
     );
 
-    setSelectedCardId(updatedCard.id);
+    setSelectedCardId(normalizedCard.id);
     setActiveScreen("Card Detail");
   }
 
@@ -707,8 +1090,15 @@ function App() {
 
     if (!confirmed) return;
 
-    setCards(initialCards);
-    setSelectedCardId(initialCards[0].id);
+    const normalizedInitialCards = initialCards.map((card) => ({
+      ...card,
+      rookie: card.rookie || "No",
+      autograph: card.autograph || "No",
+      patch: card.patch || "No",
+    }));
+
+    setCards(normalizedInitialCards);
+    setSelectedCardId(normalizedInitialCards[0]?.id ?? initialCards[0].id);
     setActiveScreen("Dashboard");
   }
 
@@ -754,16 +1144,16 @@ function App() {
               />
             )}
 
-          {activeScreen === "All Cards" && (
-            <AllCards
-              cards={cards}
-              openCardDetail={openCardDetail}
-              setActiveScreen={setActiveScreen}
-              openCollectionReport={() => {
-              setDefaultReport("myCollection");
-              setActiveScreen("Reports");
-              }}
-             />
+            {activeScreen === "All Cards" && (
+              <AllCards
+                cards={cards}
+                openCardDetail={openCardDetail}
+                setActiveScreen={setActiveScreen}
+                openCollectionReport={() => {
+                  setDefaultReport("myCollection");
+                  setActiveScreen("Reports");
+                }}
+              />
             )}
 
             {activeScreen === "Memorabilia" && (
@@ -798,6 +1188,34 @@ function App() {
               />
             )}
 
+            {activeScreen === "Scan Review Queue" && (
+              <ScanReviewQueue
+                temporaryScans={temporaryScans}
+                openTemporaryScanDetail={openTemporaryScanDetail}
+                createDemoTemporaryScan={createDemoTemporaryScan}
+                createTemporaryScanFromImages={createTemporaryScanFromImages}
+              />
+            )}
+
+            {activeScreen === "Temporary Card Detail" &&
+              (selectedTemporaryScan ? (
+                <TemporaryCardDetail
+                  scan={selectedTemporaryScan}
+                  updateTemporaryScan={updateTemporaryScan}
+                  addTemporaryScanToCollection={addTemporaryScanToCollection}
+                  moveTemporaryScanToSellQueue={moveTemporaryScanToSellQueue}
+                  deleteTemporaryScan={deleteTemporaryScan}
+                  setActiveScreen={setActiveScreen}
+                />
+              ) : (
+                <EmptyVaultState
+                  title="No Temporary Scan Selected"
+                  message="There is no temporary scan selected. Return to the scan review queue or create a new temporary scan."
+                  actionLabel="Go to Scan Review Queue"
+                  onAction={() => setActiveScreen("Scan Review Queue")}
+                />
+              ))}
+
             {activeScreen === "Market Comps" && <MarketComps cards={cards} />}
 
             {activeScreen === "Grading Center" && (
@@ -813,7 +1231,12 @@ function App() {
             )}
 
             {activeScreen === "Sales Tracker" && (
-              <SalesTracker cards={cards} setCards={setCards} sales={sales} setSales={setSales} />
+              <SalesTracker
+                cards={cards}
+                setCards={setCards}
+                sales={sales}
+                setSales={setSales}
+              />
             )}
 
             {activeScreen === "Settings" && (
@@ -901,12 +1324,12 @@ function Sidebar({
           );
         })}
       </nav>
-
+  {/* Sidebar bottom Announcement */}
       <div className="mt-12 rounded-2xl border border-vaultGold/40 bg-vaultGold/10 p-4">
-        <p className="text-sm font-bold text-vaultGold">GOAT Phase 1</p>
+        <p className="text-sm font-bold text-vaultGold">GOAT Phase 5.4</p>
         <p className="mt-2 text-xs leading-5 text-zinc-300">
-          Frontend demo build: dashboard, collection, add card, card detail,
-          reports, and settings.
+          Front/back image uploads, temporary scan queue, card review, 
+          and Keep / Sell / Delete workflow.
         </p>
       </div>
     </aside>
@@ -5033,7 +5456,7 @@ function CardDetail({
   card: CardRecord;
   deleteCard: (cardId: number) => void;
   updateCard: (updatedCard: CardRecord) => void;
-  setActiveScreen: (screen: Screen) => void;
+  setActiveScreen: React.Dispatch<React.SetStateAction<Screen>>;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editCard, setEditCard] = useState<CardRecord>(card);
@@ -5042,6 +5465,8 @@ function CardDetail({
   useEffect(() => {
     setEditCard(card);
   }, [card]);
+
+  const displayCard = isEditing ? editCard : card;
 
   function updateEditField<K extends keyof CardRecord>(
     field: K,
@@ -5053,59 +5478,112 @@ function CardDetail({
     }));
   }
 
-  function saveEditedCard() {
-    const recalculatedGainLoss =
-      editCard.estimatedValue - editCard.totalCostBasis;
+  function handleCardImageUpload(
+    field: "frontImage" | "backImage",
+    event: React.ChangeEvent<HTMLInputElement>
+  ) {
+    const file = event.target.files?.[0];
 
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      const imageDataUrl = reader.result;
+
+      if (typeof imageDataUrl === "string") {
+        updateEditField(field, imageDataUrl);
+      }
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  function removeCardImage(field: "frontImage" | "backImage") {
+    updateEditField(field, "");
+  }
+
+  function saveEditedCard() {
+    const marketValue = editCard.estimatedValue || 0;
+    const costBasis = editCard.totalCostBasis || editCard.purchasePrice || 0;
+    const profitLoss = marketValue - costBasis;
     const recalculatedRoi =
-      editCard.totalCostBasis > 0
-        ? (recalculatedGainLoss / editCard.totalCostBasis) * 100
-        : 0;
+      costBasis > 0 ? (profitLoss / costBasis) * 100 : 0;
 
     updateCard({
       ...editCard,
-      gainLoss: recalculatedGainLoss,
+      gainLoss: profitLoss,
       roi: recalculatedRoi,
     });
 
     setIsEditing(false);
-    setSaveMessage("Card updated successfully.");
+    setSaveMessage("Card images updated successfully.");
 
     window.setTimeout(() => {
       setSaveMessage("");
     }, 2500);
   }
 
-  const displayCard = isEditing ? editCard : card;
+  const onBack = () => setActiveScreen("My Collection");
+  const onDelete = () => deleteCard(card.id);
 
-  const isRookieCard =
+  const marketValue = displayCard.estimatedValue || 0;
+  const costBasis =
+    displayCard.totalCostBasis || displayCard.purchasePrice || 0;
+  const profitLoss = marketValue - costBasis;
+  const roi = costBasis > 0 ? (profitLoss / costBasis) * 100 : 0;
+
+  const rookieDisplay =
     displayCard.card.toLowerCase().includes("rookie") ||
     displayCard.year === "2023" ||
-    displayCard.year === "2017";
+    displayCard.year === "2017"
+      ? "Yes"
+      : "No";
 
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-vaultGold/25 bg-black p-6 shadow-[0_0_60px_rgba(0,0,0,0.75)]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(245,196,81,0.16),transparent_30%),radial-gradient(circle_at_70%_16%,rgba(245,196,81,0.08),transparent_28%),linear-gradient(135deg,rgba(0,0,0,0.25),rgba(0,0,0,0.95))]" />
+    <div className="relative isolate overflow-hidden">
+      {/* Page watermark */}
+      <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center opacity-[0.045]">
+        <img
+          src="/safe-door-emblem.png"
+          alt=""
+          className="h-[760px] w-[760px] object-contain grayscale"
+        />
+      </div>
 
-      <div className="relative mb-6 flex flex-wrap items-center justify-between gap-5">
+      <div className="mb-6 flex items-start justify-between gap-6">
         <div>
-          <h1 className="font-vault-heading text-5xl font-black tracking-[-0.04em] text-white">
-            Card Detail
-          </h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-5xl font-black tracking-wide text-white">
+              Card Detail
+            </h1>
+            <button
+              type="button"
+              className="text-2xl text-zinc-300 transition hover:text-vaultGold"
+            >
+              ☆
+            </button>
+            <button
+              type="button"
+              className="text-2xl text-zinc-300 transition hover:text-vaultGold"
+            >
+              ⤴
+            </button>
+          </div>
 
-          <p className="mt-2 text-lg text-zinc-300">
-            {displayCard.player} — {displayCard.card}
+          <p className="mt-3 text-lg text-zinc-300">
+            {displayCard.player} — {displayCard.year} {displayCard.brand}{" "}
+            {displayCard.parallel}
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex gap-3">
           <button
             type="button"
-            onClick={() => setActiveScreen("My Collection")}
-            className="inline-flex items-center gap-2 rounded-xl border border-vaultGold/40 bg-black/60 px-6 py-3 text-sm font-black text-white transition hover:border-vaultGold hover:text-vaultGold"
+            onClick={onBack}
+            className="rounded-lg border border-vaultGold/40 bg-black/40 px-6 py-3 text-sm font-bold text-white transition hover:border-vaultGold hover:text-vaultGold"
           >
-            <ArrowLeft size={17} />
-            Back to Collection
+            ← Back to Collection
           </button>
 
           {isEditing ? (
@@ -5113,10 +5591,9 @@ function CardDetail({
               <button
                 type="button"
                 onClick={saveEditedCard}
-                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-[#fff3a0] via-vaultGold to-[#9b6a10] px-6 py-3 text-sm font-black text-black shadow-vault"
+                className="rounded-lg border border-vaultGold bg-vaultGold px-6 py-3 text-sm font-black text-black transition hover:bg-goldHover"
               >
-                <BadgeCheck size={17} />
-                Save Changes
+                ✓ Save Changes
               </button>
 
               <button
@@ -5125,7 +5602,7 @@ function CardDetail({
                   setEditCard(card);
                   setIsEditing(false);
                 }}
-                className="inline-flex items-center gap-2 rounded-xl border border-steelBorder bg-black/60 px-6 py-3 text-sm font-black text-zinc-300 hover:text-white"
+                className="rounded-lg border border-steelBorder bg-black/40 px-6 py-3 text-sm font-bold text-zinc-300 transition hover:text-white"
               >
                 Cancel
               </button>
@@ -5134,251 +5611,694 @@ function CardDetail({
             <button
               type="button"
               onClick={() => setIsEditing(true)}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-[#fff3a0] via-vaultGold to-[#9b6a10] px-6 py-3 text-sm font-black text-black shadow-vault"
+              className="rounded-lg border border-vaultGold bg-vaultGold px-6 py-3 text-sm font-black text-black transition hover:bg-goldHover"
             >
-              <Edit3 size={17} />
-              Edit Card
+              ✎ Edit Card
             </button>
           )}
 
           <button
             type="button"
-            onClick={() => deleteCard(card.id)}
-            className="inline-flex items-center gap-2 rounded-xl border border-red-500/60 bg-red-950/20 px-6 py-3 text-sm font-black text-red-400 hover:bg-red-500 hover:text-white"
+            onClick={onDelete}
+            className="rounded-lg border border-red-700 bg-red-950/40 px-6 py-3 text-sm font-black text-red-400 transition hover:bg-red-900/40"
           >
-            <Trash2 size={17} />
-            Delete Card
+            🗑 Delete Card
           </button>
         </div>
       </div>
 
       {saveMessage && (
-        <div className="relative mb-6 rounded-2xl border border-profitGreen/30 bg-profitGreen/10 px-5 py-4 text-sm font-bold text-profitGreen shadow-vault">
+        <div className="mb-6 rounded-2xl border border-profitGreen/30 bg-profitGreen/10 px-5 py-4 text-sm font-bold text-profitGreen">
           {saveMessage}
         </div>
       )}
 
-      <div className="relative grid gap-6 xl:grid-cols-[1.45fr_1fr]">
-        <section className="rounded-3xl border border-vaultGold/35 bg-black/55 p-6 shadow-[0_0_55px_rgba(245,196,81,0.16)]">
-          <div className="grid gap-5 md:grid-cols-2">
-            <CardVaultImagePanel
-              label="Front"
-              image={displayCard.frontImage}
-              placeholder={`${displayCard.player} Front`}
-            />
-
-            <CardVaultImagePanel
-              label="Back"
-              image={displayCard.backImage}
-              placeholder={`${displayCard.player} Back`}
-            />
-          </div>
-
-          <div className="mt-6 grid grid-cols-1 overflow-hidden rounded-2xl border border-vaultGold/25 bg-black/65 md:grid-cols-3">
-            <DetailBadge
-              icon={
-                <Gem className="h-12 w-12 text-vaultGold drop-shadow-[0_0_18px_rgba(245,196,81,0.55)]" />
-              }
-              title="Super Rare"
-              subtitle="Condition"
-            />
-
-            <DetailBadge
-              icon={<RookieCardEmblem />}
-              title={isRookieCard ? "Rookie Card" : "Base Card"}
-              subtitle="Rookie Indicator"
-            />
-
-            <button
-              type="button"
-              onClick={() => setActiveScreen("Sales Tracker")}
-              className="flex items-center gap-4 border-t border-vaultGold/20 p-5 text-left transition hover:bg-vaultGold/10 md:border-l md:border-t-0"
-            >
-              <div className="flex h-14 w-14 items-center justify-center rounded-full border border-vaultGold bg-black text-vaultGold shadow-[0_0_25px_rgba(245,196,81,0.35)]">
-                <DollarSign className="h-8 w-8" />
-              </div>
-
-              <div>
-                <p className="text-lg font-black uppercase text-white">
-                  Sell Card
-                </p>
-                <p className="text-xs font-bold uppercase tracking-wide text-zinc-400">
-                  List this card
-                </p>
-              </div>
-            </button>
-          </div>
-        </section>
-
-        <aside className="space-y-4">
-          <DetailPanel title="Card Profile" icon={<User size={20} />}>
-            <DetailGrid
-              items={[
-                ["Player", displayCard.player],
-                ["Brand", displayCard.brand],
-                ["Card", displayCard.card],
-                ["Serial Number", displayCard.serialNumber || "N/A"],
-                ["Team", displayCard.team],
-                ["SKU", displayCard.sku || "N/A"],
-                ["Sport", displayCard.sport],
-                ["Storage", displayCard.storageLocation || "N/A"],
-                ["Year", displayCard.year],
-              ]}
-            />
-          </DetailPanel>
-
-          <DetailPanel title="Grading Strategy" icon={<BarChart3 size={20} />}>
-            <DetailGrid
-              items={[
-                [
-                  "Preferred Grade",
-                  displayCard.grader === "PSA"
-                    ? "PSA 10"
-                    : `${displayCard.grader} Review`,
-                ],
-                [
-                  "Grading Status",
-                  displayCard.grade === "Raw" ? "Planning" : "Graded",
-                ],
-                [
-                  "Expected Grade",
-                  displayCard.grade === "Raw"
-                    ? "Review Needed"
-                    : displayCard.grade,
-                ],
-                ["Actual Grade", displayCard.grade],
-              ]}
-            />
-
-            <button
-              type="button"
-              onClick={() => setActiveScreen("Grading Center")}
-              className="mt-4 w-full rounded-xl border border-vaultGold/50 bg-black/50 px-4 py-3 text-sm font-black text-vaultGold hover:bg-vaultGold hover:text-black"
-            >
-              View Grading Tracker
-            </button>
-          </DetailPanel>
-
-          <DetailPanel title="Sale Information" icon={<DollarSign size={20} />}>
-            <DetailGrid
-              items={[
-                [
-                  "Target Sale Price",
-                  money(displayCard.highComp || displayCard.estimatedValue),
-                ],
-                ["Market Value", money(displayCard.estimatedValue)],
-                [
-                  "Platform / Show",
-                  displayCard.status === "For Sale" ? displayCard.source : "TBD",
-                ],
-                ["Date Added", displayCard.purchaseDate || "TBD"],
-              ]}
-            />
-          </DetailPanel>
-
-          <DetailPanel
-            title="Purchase Information"
-            icon={<ShoppingCart size={20} />}
-          >
-            <DetailGrid
-              items={[
-                [
-                  "Purchase Price",
-                  money(displayCard.totalCostBasis || displayCard.purchasePrice),
-                ],
-                ["Source", displayCard.source || "TBD"],
-                ["Purchase Date", displayCard.purchaseDate || "TBD"],
-                ["Seller", displayCard.seller || "TBD"],
-              ]}
-            />
-          </DetailPanel>
-
-          <DetailPanel title="Storage Information" icon={<Box size={20} />}>
-            <DetailGrid
-              items={[
-                ["Storage Location", displayCard.storageLocation || "Vault A-01"],
-                ["Storage Type", "Magnetic Case"],
-                ["Added To Storage", displayCard.purchaseDate || "TBD"],
-                ["Condition", "Stored Securely"],
-              ]}
-            />
-          </DetailPanel>
-
-          <DetailPanel title="Notes" icon={<NotebookText size={20} />}>
-            {isEditing ? (
-              <textarea
-                value={editCard.notes}
-                onChange={(event) =>
-                  updateEditField("notes", event.target.value)
+      <div className="grid grid-cols-12 items-start gap-6">
+        {/* Left image showcase */}
+        <div className="col-span-5 space-y-5">
+          <Panel className="bg-black/70 backdrop-blur-sm">
+            <div className="grid grid-cols-2 gap-5">
+              <CardImageFrame
+                label="Front"
+                image={displayCard.frontImage}
+                isEditing={isEditing}
+                inputId={`front-image-${displayCard.id}`}
+                onUpload={(event) =>
+                  handleCardImageUpload("frontImage", event)
                 }
-                className="min-h-[110px] w-full rounded-xl border border-steelBorder bg-black/60 p-3 text-sm text-white outline-none focus:border-vaultGold"
+                onRemove={() => removeCardImage("frontImage")}
               />
-            ) : (
-              <p className="text-sm leading-6 text-zinc-300">
-                {displayCard.notes || "No notes added yet."}
-              </p>
-            )}
-          </DetailPanel>
-        </aside>
-      </div>
-    </section>
-  );
-}
 
-function CardVaultImagePanel({
-  label,
-  image,
-  placeholder,
-}: {
-  label: string;
-  image?: string;
-  placeholder: string;
-}) {
-  return (
-    <div>
-      <p className="mb-3 text-center text-xs font-black uppercase tracking-[0.22em] text-vaultGold">
-        {label}
-      </p>
-
-      <div className="overflow-hidden rounded-xl border border-vaultGold/35 bg-black shadow-[0_0_32px_rgba(245,196,81,0.16)]">
-        {image ? (
-          <img
-            src={image}
-            alt={placeholder}
-            className="aspect-[3/4] w-full object-cover"
-          />
-        ) : (
-          <div className="flex aspect-[3/4] w-full items-center justify-center bg-gradient-to-br from-graphite900 via-black to-graphite900">
-            <div className="text-center">
-              <Crown className="mx-auto h-16 w-16 text-vaultGold/70" />
-              <p className="mt-3 text-xs font-black uppercase tracking-[0.22em] text-vaultGold">
-                {placeholder}
-              </p>
+              <CardImageFrame
+                label="Back"
+                image={displayCard.backImage}
+                isEditing={isEditing}
+                inputId={`back-image-${displayCard.id}`}
+                onUpload={(event) => handleCardImageUpload("backImage", event)}
+                onRemove={() => removeCardImage("backImage")}
+              />
             </div>
-          </div>
-        )}
+
+            <div className="mt-5 grid grid-cols-3 overflow-hidden rounded-xl border border-vaultGold/30">
+            <CardBadge
+               icon="◇"
+               label={displayCard.parallel || "Base"}
+               sublabel="Parallel / Variety"
+               accent="text-cyan-300"
+              />
+              <CardBadge
+                icon="RC"
+                label={rookieDisplay}
+                sublabel="Rookie Card"
+                accent="text-vaultGold"
+              />
+              <CardBadge
+                icon="$"
+                label={displayCard.status || "Personal Collection"}
+                sublabel="Collection"
+                accent="text-vaultGold"
+              />
+            </div>
+          </Panel>
+        </div>
+
+        {/* Middle market intelligence */}
+        <div className="col-span-4 space-y-5">
+          <MarketIntelligencePanel
+            card={displayCard}
+            marketValue={marketValue}
+            costBasis={costBasis}
+            profitLoss={profitLoss}
+            roi={roi}
+          />
+        </div>
+
+        {/* Right card info */}
+        <div className="col-span-3 space-y-5">
+          <CardInfoPanel card={displayCard} />
+          <NotesPanel card={displayCard} />
+          <PurchaseInformationCard card={displayCard} />
+        </div>
+
+        {/* Bottom row */}
+        <VaultLocationCard card={displayCard} />
+        <GradingStrategyCard card={displayCard} />
       </div>
     </div>
   );
 }
 
+function CardImageFrame({
+  label,
+  image,
+  isEditing = false,
+  inputId,
+  onUpload,
+  onRemove,
+}: {
+  label: string;
+  image?: string;
+  isEditing?: boolean;
+  inputId?: string;
+  onUpload?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onRemove?: () => void;
+}) {
+  return (
+    <div>
+      <p className="mb-4 text-center text-sm font-black uppercase tracking-[0.35em] text-vaultGold">
+        {label}
+      </p>
+
+      <div className="flex min-h-[420px] items-center justify-center rounded-2xl border border-vaultGold/30 bg-black/50 p-4">
+        {image ? (
+          <img
+            src={image}
+            alt={`${label} card image`}
+            className="max-h-[380px] w-full rounded-xl object-contain"
+          />
+        ) : (
+          <div className="flex h-[380px] w-full items-center justify-center rounded-xl border border-dashed border-steelBorder bg-graphite900/70">
+            <p className="text-sm font-bold uppercase tracking-widest text-zinc-500">
+              No {label} Image
+            </p>
+          </div>
+        )}
+      </div>
+
+      {isEditing && inputId && onUpload && (
+        <div className="mt-4 rounded-xl border border-vaultGold/20 bg-black/60 p-3">
+          <label
+            htmlFor={inputId}
+            className="flex cursor-pointer items-center justify-center rounded-lg border border-vaultGold/50 bg-vaultGold/10 px-4 py-3 text-xs font-black uppercase tracking-widest text-vaultGold transition hover:bg-vaultGold hover:text-black"
+          >
+            Upload {label} Image
+          </label>
+
+          <input
+            id={inputId}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={onUpload}
+          />
+
+          {image && onRemove && (
+            <button
+              type="button"
+              onClick={onRemove}
+              className="mt-3 w-full rounded-lg border border-red-500/50 bg-red-950/30 px-4 py-2 text-xs font-black uppercase tracking-widest text-red-400 transition hover:bg-red-500 hover:text-white"
+            >
+              Remove {label} Image
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CardBadge({
+  icon,
+  label,
+  sublabel,
+  accent,
+}: {
+  icon: string;
+  label: string;
+  sublabel: string;
+  accent: string;
+}) {
+  return (
+    <div className="flex items-center justify-center gap-4 border-r border-vaultGold/20 bg-black/40 px-5 py-4 last:border-r-0">
+      <div
+        className={`flex h-11 w-11 items-center justify-center rounded-full border border-vaultGold/40 text-xl font-black ${accent}`}
+      >
+        {icon}
+      </div>
+      <div>
+        <p className="text-sm font-black uppercase tracking-[0.18em] text-white">
+          {label}
+        </p>
+        <p className="mt-1 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+          {sublabel}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function MarketIntelligencePanel({
+  card,
+  marketValue,
+  costBasis,
+  profitLoss,
+  roi,
+}: {
+  card: CardRecord;
+  marketValue: number;
+  costBasis: number;
+  profitLoss: number;
+  roi: number;
+}) {
+  const positive = profitLoss >= 0;
+
+  return (
+    <Panel className="border-vaultGold/40 bg-black/75 backdrop-blur-sm">
+      <div className="mb-5 flex items-center justify-between">
+        <div>
+          <p className="text-sm font-black uppercase tracking-[0.32em] text-vaultGold">
+            Market Intelligence
+          </p>
+        </div>
+
+        <p className="text-xs text-zinc-500">Updated just now ↻</p>
+      </div>
+
+      <div className="rounded-xl border border-steelBorder bg-black/50 p-5">
+        <div className="grid grid-cols-2 gap-5">
+          <div>
+            <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
+              Estimated Value
+            </p>
+            <p className="mt-2 text-4xl font-black text-white">
+              {money(marketValue)}
+            </p>
+            <p className="mt-1 text-sm text-zinc-400">
+              Market Range: {money(card.lowComp || 0)} –{" "}
+              {money(card.highComp || 0)}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-vaultGold/40 bg-black/40 p-4 text-center">
+            <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
+              Suggested Action
+            </p>
+            <p className="mt-3 text-3xl font-black uppercase tracking-[0.25em] text-vaultGold">
+              Hold
+            </p>
+            <p className="mt-2 text-xs leading-5 text-zinc-400">
+              Strong long-term hold with upside.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid grid-cols-2 gap-4">
+          <MarketMiniCard
+            label="Last 7 Days"
+            value="+6.2%"
+            subvalue={money(card.lastSale || 0)}
+            positive
+          />
+          <MarketMiniCard
+            label="Current ROI"
+            value={`${roi.toFixed(1)}%`}
+            subvalue={positive ? "Positive position" : "Negative position"}
+            positive={positive}
+          />
+        </div>
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-4">
+        <div className="rounded-xl border border-steelBorder bg-black/40 p-4">
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-vaultGold">
+            Comparable Sales
+          </p>
+
+          <div className="mt-4 space-y-3 text-sm">
+            <div className="flex justify-between">
+              <span className="font-bold text-white">
+                {money(card.highComp || 0)}
+              </span>
+              <span className="text-zinc-500">High Comp</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-bold text-white">
+                {money(card.averageComp || 0)}
+              </span>
+              <span className="text-zinc-500">Avg Comp</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-bold text-white">
+                {money(card.lowComp || 0)}
+              </span>
+              <span className="text-zinc-500">Low Comp</span>
+            </div>
+          </div>
+
+          <button className="mt-4 w-full rounded-lg border border-vaultGold/40 py-2 text-sm font-black text-vaultGold transition hover:bg-vaultGold/10">
+            View All Comps
+          </button>
+        </div>
+
+        <div className="rounded-xl border border-steelBorder bg-black/40 p-4">
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-vaultGold">
+            Grading Upside
+          </p>
+
+          <div className="mt-4">
+            <p className="text-sm text-zinc-400">PSA 10 Potential</p>
+            <p className="mt-1 text-2xl font-black text-profitGreen">
+              {money((card.highComp || marketValue) - marketValue)}
+            </p>
+          </div>
+
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <MiniDetail label="PSA 10 Pop" value="18" />
+            <MiniDetail label="Pop Higher" value="2" />
+          </div>
+
+          <button className="mt-4 w-full rounded-lg border border-vaultGold/40 py-2 text-sm font-black text-vaultGold transition hover:bg-vaultGold/10">
+            View Grading Analysis
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-4 rounded-xl border border-steelBorder bg-black/40 p-4">
+        <div className="grid grid-cols-2 gap-5">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">
+              Profit / Loss
+            </p>
+            <p
+              className={`mt-2 text-2xl font-black ${
+                positive ? "text-profitGreen" : "text-red-400"
+              }`}
+            >
+              {money(profitLoss)}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">
+              Cost Basis
+            </p>
+            <p className="mt-2 text-2xl font-black text-white">
+              {money(costBasis)}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 grid grid-cols-3 gap-3">
+        <button className="rounded-xl border border-profitGreen/50 bg-profitGreen/10 px-4 py-4 text-sm font-black text-profitGreen">
+          Sell Now
+          <span className="mt-1 block text-xs font-normal text-zinc-400">
+            List on Market
+          </span>
+        </button>
+
+        <button className="rounded-xl border border-vaultGold/50 bg-vaultGold/10 px-4 py-4 text-sm font-black text-vaultGold">
+          Hold
+          <span className="mt-1 block text-xs font-normal text-zinc-400">
+            Keep in Collection
+          </span>
+        </button>
+
+        <button className="rounded-xl border border-red-500/50 bg-red-950/30 px-4 py-4 text-sm font-black text-red-300">
+          Grade Card
+          <span className="mt-1 block text-xs font-normal text-zinc-400">
+            Submit to PSA
+          </span>
+        </button>
+      </div>
+    </Panel>
+  );
+}
+
+function MarketMiniCard({
+  label,
+  value,
+  subvalue,
+  positive,
+}: {
+  label: string;
+  value: string;
+  subvalue: string;
+  positive: boolean;
+}) {
+  return (
+    <div className="rounded-xl border border-steelBorder bg-graphite900/70 p-4">
+      <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
+        {label}
+      </p>
+      <p
+        className={`mt-2 text-xl font-black ${
+          positive ? "text-profitGreen" : "text-red-400"
+        }`}
+      >
+        {value}
+      </p>
+      <p className="mt-1 text-xs text-zinc-500">{subvalue}</p>
+    </div>
+  );
+}
+
+function CardInfoPanel({ card }: { card: CardRecord }) {
+  return (
+    <Panel className="bg-black/75 backdrop-blur-sm">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-lg font-black uppercase tracking-[0.25em] text-vaultGold">
+          Card Info
+        </h2>
+
+        <p className="text-xs font-bold uppercase tracking-widest text-zinc-400">
+          SKU: {card.sku}
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-x-8 gap-y-5">
+        <DetailInfo label="Player / Athlete" value={card.player} />
+        <DetailInfo label="Team" value={card.team} />
+
+        <DetailInfo label="Season" value={card.year} />
+        <DetailInfo label="Brand" value={card.brand} />
+
+        <DetailInfo label="Set" value={card.set} />
+        <DetailInfo label="Card Number" value={card.cardNumber} />
+
+        <DetailInfo label="Parallel / Variety" value={card.parallel} />
+        <DetailInfo label="Serial Number" value={card.serialNumber} />
+
+        <DetailInfo label="Autograph" value={card.autograph ?? "No"} />
+        <DetailInfo label="Rookie Card" value={card.rookieCard ?? "No"} />
+
+        <DetailInfo label="League" value={card.league ?? "NBA"} />
+        <DetailInfo label="Sport" value={card.sport} />
+
+        <DetailInfo label="Feature" value={card.feature ?? "—"} />
+        <DetailInfo label="Collection Decision" value={card.status} />
+
+      </div>
+    </Panel>
+  );
+}
+
+function DetailInfo({
+  label,
+  value,
+  wide = false,
+}: {
+  label: string;
+  value: string | number;
+  wide?: boolean;
+}) {
+  return (
+    <div className={wide ? "col-span-2" : ""}>
+      <p className="text-xs text-zinc-400">{label}</p>
+      <p className="mt-1 text-lg font-black tracking-wide text-white">
+        {value || "—"}
+      </p>
+    </div>
+  );
+}
+
+function NotesPanel({ card }: { card: CardRecord }) {
+  return (
+    <Panel className="bg-black/70 px-5 py-4 backdrop-blur-sm">
+      <h2 className="text-sm font-black uppercase tracking-[0.22em] text-vaultGold">
+        ▣ Notes
+      </h2>
+
+      <p className="mt-3 text-xs leading-5 text-zinc-300">
+        {card.notes ||
+          "Acquired during rookie season. Monitor market and pop reports."}
+      </p>
+
+      <button className="mt-4 w-full rounded-lg border border-vaultGold/40 py-2 text-xs font-black text-vaultGold transition hover:bg-vaultGold/10">
+        Edit Notes
+      </button>
+    </Panel>
+  );
+}
+
+function VaultLocationCard({ card }: { card: CardRecord }) {
+  return (
+    <Panel className="col-span-2 h-[132px] bg-black/70 px-4 py-3 backdrop-blur-sm">
+      <div className="flex h-full items-center gap-4">
+        <img
+          src="/safe-door-emblem.png"
+          alt="vault location emblem"
+          className="h-20 w-20 shrink-0 object-contain"
+        />
+
+        <div>
+          <p className="text-sm font-black uppercase tracking-[0.22em] text-vaultGold">
+            Location
+          </p>
+          <p className="mt-1 text-xs text-zinc-400">Card Location</p>
+          <p className="mt-1 text-xl font-black tracking-[0.1em] text-white">
+            {card.storageLocation || "Vault A-01"}
+          </p>
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
+function GradingStrategyCard({ card }: { card: CardRecord }) {
+  return (
+    <Panel className="col-span-4 h-[132px] bg-black/70 px-5 py-3 backdrop-blur-sm">
+      <h2 className="text-sm font-black uppercase tracking-[0.22em] text-vaultGold">
+        ▥ Grading Strategy
+      </h2>
+
+      <div className="mt-3 grid grid-cols-4 gap-3">
+        <MiniDetail label="Preferred" value={card.grade || "PSA 10"} />
+        <MiniDetail label="Expected" value={card.grade || "PSA 10"} />
+        <MiniDetail
+          label="Status"
+          value={card.grader ? "Graded" : "Raw"}
+        />
+        <MiniDetail label="Actual" value={card.grade || "—"} />
+      </div>
+
+      <button className="mt-3 w-full rounded-lg border border-vaultGold/40 py-1.5 text-xs font-black text-vaultGold transition hover:bg-vaultGold/10">
+        View Grading Tracker
+      </button>
+    </Panel>
+  );
+}
+
+function MiniDetail({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) {
+  return (
+    <div>
+      <p className="text-[10px] text-zinc-400">{label}</p>
+      <p className="mt-1 text-sm font-black text-white">{value || "—"}</p>
+    </div>
+  );
+}
+
+function PurchaseInformationCard({ card }: { card: CardRecord }) {
+  return (
+    <Panel className="col-span-3 h-[132px] bg-black/70 px-5 py-3 backdrop-blur-sm">
+      <h2 className="text-sm font-black uppercase tracking-[0.22em] text-vaultGold">
+        🛒 Purchase Information
+      </h2>
+
+      <div className="mt-3 grid grid-cols-3 gap-3">
+        <MiniDetail label="Price" value={money(card.purchasePrice)} />
+        <MiniDetail label="Date" value={card.purchaseDate || "—"} />
+        <MiniDetail label="Source" value={card.source || "—"} />
+      </div>
+
+      <button className="mt-3 w-full rounded-lg border border-vaultGold/40 py-1.5 text-xs font-black text-vaultGold transition hover:bg-vaultGold/10">
+        View Receipt
+      </button>
+    </Panel>
+  );
+}
+
+function getCardPrintRun(card: CardRecord) {
+  const valuesToCheck = [
+    card.serialNumber,
+    card.parallel,
+    card.card,
+    card.cardNumber,
+    card.notes,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const match = valuesToCheck.match(/\/\s*(\d+)/);
+
+  if (!match) return null;
+
+  return Number(match[1]);
+}
+
+function getCardDetailBadges(card: CardRecord) {
+  const printRun = getCardPrintRun(card);
+
+  const searchableText = [
+    card.card,
+    card.parallel,
+    card.notes,
+    card.set,
+    card.brand,
+    card.cardNumber,
+    card.serialNumber,
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  const badges: {
+    key: string;
+    title: string;
+    icon: React.ReactNode;
+  }[] = [];
+
+  if (printRun === 1) {
+    badges.push({
+      key: "one-of-kind",
+      title: "One of a Kind",
+      icon: (
+        <Gem className="h-14 w-14 text-vaultGold drop-shadow-[0_0_18px_rgba(245,196,81,0.75)]" />
+      ),
+    });
+  } else if (printRun !== null && printRun <= 100) {
+    badges.push({
+      key: "super-rare",
+      title: "Super Rare",
+      icon: (
+        <Gem className="h-14 w-14 text-sky-300 drop-shadow-[0_0_18px_rgba(125,211,252,0.75)]" />
+      ),
+    });
+  } else if (printRun !== null && printRun <= 250) {
+    badges.push({
+      key: "rare",
+      title: "Rare",
+      icon: (
+        <Gem className="h-14 w-14 text-zinc-300 drop-shadow-[0_0_18px_rgba(212,212,216,0.55)]" />
+      ),
+    });
+  }
+
+  if (
+    searchableText.includes("auto") ||
+    searchableText.includes("autograph") ||
+    searchableText.includes("signature")
+  ) {
+    badges.push({
+      key: "autograph",
+      title: "Autograph",
+      icon: (
+        <BadgeCheck className="h-14 w-14 text-vaultGold drop-shadow-[0_0_18px_rgba(245,196,81,0.65)]" />
+      ),
+    });
+  }
+
+  if (
+    searchableText.includes("patch") ||
+    searchableText.includes("jersey") ||
+    searchableText.includes("relic")
+  ) {
+    badges.push({
+      key: "patch",
+      title: "Patch Card",
+      icon: (
+        <Shield className="h-14 w-14 text-zinc-300 drop-shadow-[0_0_18px_rgba(212,212,216,0.55)]" />
+      ),
+    });
+  }
+
+  if (
+    searchableText.includes("rookie") ||
+    searchableText.includes("rc") ||
+    card.year === "2023" ||
+    card.year === "2017"
+  ) {
+    badges.push({
+      key: "rookie-card",
+      title: "Rookie Card",
+      icon: <RookieCardEmblem />,
+    });
+  }
+
+  return badges;
+}
+
 function DetailBadge({
   icon,
   title,
-  subtitle,
 }: {
   icon: React.ReactNode;
   title: string;
-  subtitle: string;
 }) {
   return (
-    <div className="flex items-center gap-4 border-t border-vaultGold/20 p-5 first:border-t-0 md:border-l md:border-t-0 md:first:border-l-0">
-      {icon}
+    <div className="flex min-h-[104px] items-center gap-5 bg-black/95 p-6">
+      <div className="flex h-16 w-16 shrink-0 items-center justify-center">
+        {icon}
+      </div>
 
-      <div>
-        <p className="text-lg font-black uppercase text-white">{title}</p>
-        <p className="text-xs font-bold uppercase tracking-wide text-zinc-400">
-          {subtitle}
+      <div className="min-w-0">
+        <p className="whitespace-nowrap text-xl font-black uppercase tracking-[0.08em] text-white">
+          {title}
         </p>
       </div>
     </div>
@@ -5387,10 +6307,10 @@ function DetailBadge({
 
 function RookieCardEmblem() {
   return (
-    <div className="flex h-14 w-14 items-center justify-center text-vaultGold">
-      <div className="relative flex h-12 w-12 items-center justify-center">
-        <Shield className="absolute h-12 w-12 fill-vaultGold/10 text-vaultGold drop-shadow-[0_0_18px_rgba(245,196,81,0.45)]" />
-        <span className="relative text-sm font-black">RC</span>
+    <div className="flex h-16 w-16 items-center justify-center text-vaultGold">
+      <div className="relative flex h-14 w-14 items-center justify-center">
+        <Shield className="absolute h-14 w-14 fill-vaultGold/10 text-vaultGold drop-shadow-[0_0_18px_rgba(245,196,81,0.55)]" />
+        <span className="relative text-lg font-black">RC</span>
       </div>
     </div>
   );
@@ -5406,10 +6326,12 @@ function DetailPanel({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-vaultGold/25 bg-black/60 p-5 shadow-[0_0_24px_rgba(0,0,0,0.6)]">
+    <section className="rounded-2xl border border-vaultGold/25 bg-black/55 p-5 shadow-[0_0_24px_rgba(0,0,0,0.7)] backdrop-blur">
       <div className="mb-4 flex items-center gap-3 text-vaultGold">
         {icon}
-        <h3 className="text-sm font-black uppercase tracking-wide">{title}</h3>
+        <h3 className="text-base font-black uppercase tracking-[0.08em] text-vaultGold">
+          {title}
+        </h3>
       </div>
 
       {children}
@@ -5430,7 +6352,7 @@ function DetailGrid({
           className="flex items-center justify-between gap-4 border-b border-white/5 pb-2"
         >
           <span className="text-zinc-400">{label}</span>
-          <span className="text-right font-bold text-white">{value}</span>
+          <span className="text-right font-black text-white">{value}</span>
         </div>
       ))}
     </div>
@@ -7077,6 +7999,35 @@ function SalesTracker({
   );
 }
 
+function ComingSoonScreen({
+  title,
+  subtitle,
+}: {
+  title: string;
+  subtitle: string;
+}) {
+  return (
+    <>
+      <PageHeader eyebrow="CardVault Pro" title={title} subtitle={subtitle} />
+
+      <Panel>
+        <div className="flex items-center gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-vaultGold/40 bg-vaultGold/10 text-vaultGold">
+            <BarChart3 />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold">Coming next</h2>
+            <p className="mt-1 text-zinc-400">
+              This screen is part of the product roadmap and will be expanded
+              after the Phase 1 user-flow review.
+            </p>
+          </div>
+        </div>
+      </Panel>
+    </>
+  );
+}
+
 function SettingsScreen({
   resetDemoData,
 }: {
@@ -7331,26 +8282,28 @@ function SettingsScreen({
           </div>
         </Panel>
 
-        <Panel>
-  <div className="flex items-center justify-between gap-6">
-    <div>
-      <p className="text-xs font-black uppercase tracking-[0.25em] text-vaultGold">
-        Developer Utility
-      </p>
-      <h3 className="mt-2 text-2xl font-black text-white">Reset Demo Data</h3>
-      <p className="mt-2 text-sm leading-6 text-zinc-400">
-        Restore the original sample cards and clear your current local test data.
-      </p>
-    </div>
+        <Panel className="col-span-12">
+          <div className="flex items-center justify-between gap-6">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.25em] text-vaultGold">
+                Developer Utility
+              </p>
+              <h3 className="mt-2 text-2xl font-black text-white">
+                Reset Demo Data
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-zinc-400">
+                Restore the original sample cards and clear your current local test data.
+              </p>
+            </div>
 
-        <button
-          onClick={resetDemoData}
-          className="rounded-xl border border-red-500/40 bg-red-500/10 px-5 py-3 text-sm font-black text-red-300 hover:bg-red-500/20"
+            <button
+              onClick={resetDemoData}
+              className="rounded-xl border border-red-500/40 bg-red-500/10 px-5 py-3 text-sm font-black text-red-300 hover:bg-red-500/20"
             >
-          Reset Data
-        </button>
-        </div>
-      </Panel>
+              Reset Data
+            </button>
+          </div>
+        </Panel>
 
         <Panel className="col-span-12">
           <div className="mb-5 flex items-center justify-between">
@@ -7397,32 +8350,1182 @@ function SettingsScreen({
   );
 }
 
-function ComingSoonScreen({
-  title,
-  subtitle,
+function compressImageFile(
+  file: File,
+  maxWidth = 900,
+  quality = 0.72
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const image = new Image();
+
+      image.onload = () => {
+        const canvas = document.createElement("canvas");
+
+        const scale = Math.min(1, maxWidth / image.width);
+        canvas.width = image.width * scale;
+        canvas.height = image.height * scale;
+
+        const context = canvas.getContext("2d");
+
+        if (!context) {
+          reject(new Error("Could not create image compression context."));
+          return;
+        }
+
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+        const compressedDataUrl = canvas.toDataURL("image/jpeg", quality);
+
+        resolve(compressedDataUrl);
+      };
+
+      image.onerror = () => {
+        reject(new Error("Could not load image for compression."));
+      };
+
+      image.src = String(reader.result);
+    };
+
+    reader.onerror = () => {
+      reject(new Error("Could not read image file."));
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+function ScanReviewQueue({
+  temporaryScans,
+  openTemporaryScanDetail,
+  createDemoTemporaryScan,
+  createTemporaryScanFromImages,
 }: {
-  title: string;
-  subtitle: string;
+  temporaryScans: TemporaryScanRecord[];
+  openTemporaryScanDetail: (scanId: number) => void;
+  createDemoTemporaryScan: () => void;
+  createTemporaryScanFromImages: (frontImage: string, backImage: string) => void;
 }) {
+  const [frontUploadPreview, setFrontUploadPreview] = useState("");
+  const [backUploadPreview, setBackUploadPreview] = useState("");
+
+  const needsReviewScans = temporaryScans.filter(
+    (scan) => scan.scanStatus === "Needs Review"
+  );
+
+  const readyToKeepScans = temporaryScans.filter(
+    (scan) => scan.scanStatus === "Ready to Keep"
+  );
+
+  const readyToSellScans = temporaryScans.filter(
+    (scan) => scan.scanStatus === "Ready to Sell"
+  );
+
+  async function handleTemporaryImageUpload(
+    side: "front" | "back",
+    event: React.ChangeEvent<HTMLInputElement>
+  ) {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    try {
+      const compressedImage = await compressImageFile(file);
+
+      if (side === "front") {
+        setFrontUploadPreview(compressedImage);
+      } else {
+        setBackUploadPreview(compressedImage);
+      }
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      window.alert(
+        "CardVault could not process this image. Try a smaller image or screenshot."
+      );
+    }
+  }
+
+  function createUploadedScan() {
+    if (!frontUploadPreview && !backUploadPreview) {
+      window.alert(
+        "No card images detected. Upload a front image, back image, or both before creating a temporary scan."
+      );
+      return;
+    }
+
+    createTemporaryScanFromImages(frontUploadPreview, backUploadPreview);
+
+    setFrontUploadPreview("");
+    setBackUploadPreview("");
+  }
+
+  function statusBadgeClass(scanStatus: TemporaryScanRecord["scanStatus"]) {
+    if (scanStatus === "Ready to Keep") {
+      return "border-profitGreen/40 bg-profitGreen/10 text-profitGreen";
+    }
+
+    if (scanStatus === "Ready to Sell") {
+      return "border-vaultGold/50 bg-vaultGold/10 text-vaultGold";
+    }
+
+    return "border-zinc-600 bg-zinc-900/70 text-zinc-300";
+  }
+
   return (
     <>
-      <PageHeader eyebrow="CardVault Pro" title={title} subtitle={subtitle} />
+      <PageHeader
+        eyebrow="Phase 5 Camera AI Foundation"
+        title="Scan Review Queue"
+        subtitle="Temporary holding area for scanned or uploaded cards before they are added to your collection or moved to the sell queue."
+      />
 
       <Panel>
-        <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-vaultGold/40 bg-vaultGold/10 text-vaultGold">
-            <BarChart3 />
-          </div>
+        <div className="flex flex-wrap items-center justify-between gap-5">
           <div>
-            <h2 className="text-xl font-bold">Coming next</h2>
-            <p className="mt-1 text-zinc-400">
-              This screen is part of the product roadmap and will be expanded
-              after the Phase 1 user-flow review.
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+              Temporary Scan Workflow
             </p>
+
+            <h2 className="mt-2 text-3xl font-black text-white">
+              Upload Card Images
+            </h2>
+
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">
+              Upload a front and back card image. CardVault Pro will create a
+              temporary scan record first, then you can review it before sending
+              it to your collection or sell queue.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={createDemoTemporaryScan}
+            className="rounded-xl border border-vaultGold/50 bg-black/50 px-6 py-3 text-sm font-black text-vaultGold shadow-vault transition hover:bg-vaultGold hover:text-black"
+          >
+            + Create Demo Scan
+          </button>
+        </div>
+
+        <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_1fr_260px]">
+          <div className="rounded-2xl border border-vaultGold/25 bg-black/60 p-4">
+            <p className="mb-3 text-center text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+              Front Image
+            </p>
+
+            <div className="flex min-h-[260px] items-center justify-center rounded-xl border border-dashed border-steelBorder bg-graphite900/70 p-3">
+              {frontUploadPreview ? (
+                <img
+                  src={frontUploadPreview}
+                  alt="Front upload preview"
+                  className="max-h-[240px] w-full rounded-lg object-contain"
+                />
+              ) : (
+                <p className="text-center text-xs font-black uppercase tracking-widest text-zinc-500">
+                  No Front Image Uploaded
+                </p>
+              )}
+            </div>
+
+            <label
+              htmlFor="temporary-front-upload"
+              className="mt-4 flex cursor-pointer items-center justify-center rounded-xl border border-vaultGold/50 bg-vaultGold/10 px-4 py-3 text-xs font-black uppercase tracking-widest text-vaultGold transition hover:bg-vaultGold hover:text-black"
+            >
+              Upload Front
+            </label>
+
+            <input
+              id="temporary-front-upload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(event) => handleTemporaryImageUpload("front", event)}
+            />
+          </div>
+
+          <div className="rounded-2xl border border-vaultGold/25 bg-black/60 p-4">
+            <p className="mb-3 text-center text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+              Back Image
+            </p>
+
+            <div className="flex min-h-[260px] items-center justify-center rounded-xl border border-dashed border-steelBorder bg-graphite900/70 p-3">
+              {backUploadPreview ? (
+                <img
+                  src={backUploadPreview}
+                  alt="Back upload preview"
+                  className="max-h-[240px] w-full rounded-lg object-contain"
+                />
+              ) : (
+                <p className="text-center text-xs font-black uppercase tracking-widest text-zinc-500">
+                  No Back Image Uploaded
+                </p>
+              )}
+            </div>
+
+            <label
+              htmlFor="temporary-back-upload"
+              className="mt-4 flex cursor-pointer items-center justify-center rounded-xl border border-vaultGold/50 bg-vaultGold/10 px-4 py-3 text-xs font-black uppercase tracking-widest text-vaultGold transition hover:bg-vaultGold hover:text-black"
+            >
+              Upload Back
+            </label>
+
+            <input
+              id="temporary-back-upload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(event) => handleTemporaryImageUpload("back", event)}
+            />
+          </div>
+
+          <div className="flex flex-col justify-between rounded-2xl border border-vaultGold/25 bg-black/60 p-5">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+                Next Step
+              </p>
+
+              <h3 className="mt-2 text-2xl font-black text-white">
+                Create Temporary Scan
+              </h3>
+
+              <p className="mt-3 text-sm leading-6 text-zinc-400">
+                This will send the uploaded images into the Scan Review Queue as
+                a temporary card detail.
+              </p>
+            </div>
+
+            <div className="mt-6 space-y-3">
+              <button
+                type="button"
+                onClick={createUploadedScan}
+                className="w-full rounded-xl border border-vaultGold bg-vaultGold px-5 py-3 text-sm font-black text-black shadow-vault transition hover:bg-goldHover"
+              >
+                Create Scan From Images
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setFrontUploadPreview("");
+                  setBackUploadPreview("");
+                }}
+                className="w-full rounded-xl border border-steelBorder bg-black/50 px-5 py-3 text-sm font-bold text-zinc-300 transition hover:text-white"
+              >
+                Clear Uploads
+              </button>
+            </div>
           </div>
         </div>
       </Panel>
+
+      <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <div className="rounded-2xl border border-steelBorder bg-black/50 p-4">
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-zinc-500">
+            Needs Review
+          </p>
+          <p className="mt-2 text-3xl font-black text-white">
+            {needsReviewScans.length}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-profitGreen/30 bg-profitGreen/10 p-4">
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-profitGreen">
+            Ready to Keep
+          </p>
+          <p className="mt-2 text-3xl font-black text-white">
+            {readyToKeepScans.length}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-vaultGold/30 bg-vaultGold/10 p-4">
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-vaultGold">
+            Ready to Sell
+          </p>
+          <p className="mt-2 text-3xl font-black text-white">
+            {readyToSellScans.length}
+          </p>
+        </div>
+      </div>
+
+      {temporaryScans.length === 0 ? (
+        <Panel className="mt-6">
+          <div className="flex min-h-[260px] flex-col items-center justify-center text-center">
+            <div className="flex h-20 w-20 items-center justify-center rounded-3xl border border-vaultGold/40 bg-vaultGold/10 text-4xl text-vaultGold">
+              📷
+            </div>
+
+            <h3 className="mt-5 text-2xl font-black text-white">
+              No Temporary Scans Yet
+            </h3>
+
+            <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">
+              Upload card images above or create a demo scan to test the review
+              workflow.
+            </p>
+          </div>
+        </Panel>
+      ) : (
+        <div className="mt-6 grid gap-5 xl:grid-cols-3 lg:grid-cols-2">
+          {temporaryScans.map((scan) => (
+            <article
+              key={scan.id}
+              className="group rounded-3xl border border-vaultGold/25 bg-black/70 p-5 shadow-[0_0_35px_rgba(0,0,0,0.45)] transition hover:border-vaultGold hover:shadow-[0_0_45px_rgba(245,196,81,0.16)]"
+            >
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <span
+                  className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] ${statusBadgeClass(
+                    scan.scanStatus
+                  )}`}
+                >
+                  {scan.scanStatus}
+                </span>
+
+                <span className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500">
+                  {scan.scanSource}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex h-48 items-center justify-center rounded-2xl border border-vaultGold/25 bg-graphite900/70">
+                  {scan.frontImage ? (
+                    <img
+                      src={scan.frontImage}
+                      alt="Temporary front scan"
+                      className="h-full w-full rounded-2xl object-contain p-2"
+                    />
+                  ) : (
+                    <div className="text-center">
+                      <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
+                        Front
+                      </p>
+                      <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-zinc-600">
+                        Missing
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex h-48 items-center justify-center rounded-2xl border border-vaultGold/25 bg-graphite900/70">
+                  {scan.backImage ? (
+                    <img
+                      src={scan.backImage}
+                      alt="Temporary back scan"
+                      className="h-full w-full rounded-2xl object-contain p-2"
+                    />
+                  ) : (
+                    <div className="text-center">
+                      <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
+                        Back
+                      </p>
+                      <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-zinc-600">
+                        Missing
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <h3 className="text-2xl font-black text-white">
+                  {scan.player}
+                </h3>
+
+                <p className="mt-1 text-sm leading-5 text-zinc-400">
+                  {scan.year} {scan.brand} {scan.card}
+                </p>
+
+                <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
+                  <div className="rounded-xl border border-steelBorder bg-black/50 p-3">
+                    <p className="font-black uppercase text-zinc-500">
+                      Images
+                    </p>
+                    <p className="mt-1 font-bold text-white">
+                      {scan.frontImage ? "Front" : "No Front"} /{" "}
+                      {scan.backImage ? "Back" : "No Back"}
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-steelBorder bg-black/50 p-3">
+                    <p className="font-black uppercase text-zinc-500">Value</p>
+                    <p className="mt-1 font-bold text-white">
+                      ${scan.estimatedValue.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => openTemporaryScanDetail(scan.id)}
+                  className="mt-5 flex w-full items-center justify-center rounded-xl border border-vaultGold/50 bg-vaultGold/10 px-5 py-3 text-sm font-black text-vaultGold transition hover:bg-vaultGold hover:text-black"
+                >
+                  Open Review →
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
     </>
+  );
+}
+
+function TemporaryCardDetail({
+  scan,
+  updateTemporaryScan,
+  addTemporaryScanToCollection,
+  moveTemporaryScanToSellQueue,
+  deleteTemporaryScan,
+  setActiveScreen,
+}: {
+  scan: TemporaryScanRecord;
+  updateTemporaryScan: (updatedScan: TemporaryScanRecord) => void;
+  addTemporaryScanToCollection: (scan: TemporaryScanRecord) => void;
+  moveTemporaryScanToSellQueue: (scan: TemporaryScanRecord) => void;
+  deleteTemporaryScan: (scanId: number) => void;
+  setActiveScreen: React.Dispatch<React.SetStateAction<Screen>>;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editScan, setEditScan] = useState<TemporaryScanRecord>(scan);
+  const [saveMessage, setSaveMessage] = useState("");
+  const [pendingDeleteScanId, setPendingDeleteScanId] = useState<number | null>(
+    null
+  );
+  const [pendingScanAction, setPendingScanAction] = useState<
+    "keep" | "sell" | null
+  >(null);
+
+  useEffect(() => {
+    setEditScan(scan);
+  }, [scan]);
+
+  const displayScan = isEditing ? editScan : scan;
+
+  const marketValue = displayScan.estimatedValue || 0;
+  const costBasis =
+    displayScan.totalCostBasis || displayScan.purchasePrice || 0;
+  const profitLoss = marketValue - costBasis;
+  const roi = costBasis > 0 ? (profitLoss / costBasis) * 100 : 0;
+
+  function updateEditField<K extends keyof TemporaryScanRecord>(
+    field: K,
+    value: TemporaryScanRecord[K]
+  ) {
+    setEditScan((currentScan) => ({
+      ...currentScan,
+      [field]: value,
+    }));
+  }
+
+  function updateEditNumberField<K extends keyof TemporaryScanRecord>(
+    field: K,
+    value: string
+  ) {
+    const numericValue = Number(value) || 0;
+
+    setEditScan((currentScan) => ({
+      ...currentScan,
+      [field]: numericValue,
+    }));
+  }
+
+  function saveTemporaryScanChanges() {
+    const recalculatedCostBasis =
+      editScan.totalCostBasis ||
+      editScan.purchasePrice + editScan.taxesFees + editScan.shippingCost;
+
+    const recalculatedGainLoss =
+      editScan.estimatedValue - recalculatedCostBasis;
+
+    const recalculatedRoi =
+      recalculatedCostBasis > 0
+        ? (recalculatedGainLoss / recalculatedCostBasis) * 100
+        : 0;
+
+    updateTemporaryScan({
+      ...editScan,
+      totalCostBasis: recalculatedCostBasis,
+      gainLoss: recalculatedGainLoss,
+      roi: recalculatedRoi,
+      scanStatus: "Ready to Keep",
+    });
+
+    setIsEditing(false);
+    setSaveMessage("Temporary scan updated successfully.");
+
+    window.setTimeout(() => {
+      setSaveMessage("");
+    }, 2500);
+  }
+
+  function confirmDeleteTemporaryScan() {
+    if (pendingDeleteScanId === null) return;
+
+    deleteTemporaryScan(pendingDeleteScanId);
+    setPendingDeleteScanId(null);
+  }
+
+  function cancelDeleteTemporaryScan() {
+    setPendingDeleteScanId(null);
+  }
+
+  function confirmTemporaryScanAction() {
+    if (pendingScanAction === "keep") {
+      addTemporaryScanToCollection(displayScan);
+    }
+
+    if (pendingScanAction === "sell") {
+      moveTemporaryScanToSellQueue(displayScan);
+    }
+
+    setPendingScanAction(null);
+  }
+
+  function cancelTemporaryScanAction() {
+    setPendingScanAction(null);
+  }
+
+  function runSimulatedAiReview() {
+  const simulatedAiScan: TemporaryScanRecord = {
+    ...displayScan,
+    player:
+      displayScan.player === "Pending Identification"
+        ? "Victor Wembanyama"
+        : displayScan.player,
+    card:
+      displayScan.card === "Uploaded Card Scan" ||
+      displayScan.card === "Temporary Scan Record"
+        ? "Rookie Card"
+        : displayScan.card,
+    team: displayScan.team === "Pending" ? "San Antonio Spurs" : displayScan.team,
+    sport:
+      displayScan.sport === "Pending" ? "Basketball" : displayScan.sport,
+    year: displayScan.year === "Pending" ? "2023-24" : displayScan.year,
+    brand:
+      displayScan.brand === "Pending" ? "Panini Prizm" : displayScan.brand,
+    set:
+      displayScan.set === "Pending"
+        ? "2023-24 Panini Prizm"
+        : displayScan.set,
+    cardNumber:
+      displayScan.cardNumber === "Pending" ? "136" : displayScan.cardNumber,
+    parallel:
+      displayScan.parallel === "Pending" ? "Base Rookie" : displayScan.parallel,
+    estimatedValue: displayScan.estimatedValue || 125,
+    lastSale: displayScan.lastSale || 118,
+    averageComp: displayScan.averageComp || 125,
+    highComp: displayScan.highComp || 155,
+    lowComp: displayScan.lowComp || 95,
+    compConfidence: "Simulated AI Match",
+    scanStatus: "Ready to Keep",
+    aiReviewStatus: "Simulated Review Complete",
+    aiConfidence: "87%",
+    aiSuggestedMatch:
+      "2023-24 Panini Prizm Victor Wembanyama Rookie Card #136",
+    notes: `${displayScan.notes}
+
+Simulated AI Review:
+CardVault Pro identified a likely match and filled in suggested card details. This is a Phase 5.7 front-end simulation only and will later connect to real camera AI, OCR, and market data.`,
+  };
+
+  updateTemporaryScan(simulatedAiScan);
+  setEditScan(simulatedAiScan);
+  setSaveMessage("Simulated AI review complete. Backend AI connection pending.");
+
+  window.setTimeout(() => {
+    setSaveMessage("");
+  }, 2500);
+}
+
+  return (
+    <div className="relative isolate overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center opacity-[0.045]">
+        <img
+          src="/safe-door-emblem.png"
+          alt=""
+          className="h-[760px] w-[760px] object-contain grayscale"
+        />
+      </div>
+
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-6">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+            Temporary Card Detail
+          </p>
+
+          <h1 className="mt-2 text-5xl font-black tracking-wide text-white">
+            Scan Review
+          </h1>
+
+          <p className="mt-3 text-lg text-zinc-300">
+            {displayScan.player} — {displayScan.year} {displayScan.brand}{" "}
+            {displayScan.parallel}
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => setActiveScreen("Scan Review Queue")}
+            className="rounded-lg border border-vaultGold/40 bg-black/40 px-6 py-3 text-sm font-bold text-white transition hover:border-vaultGold hover:text-vaultGold"
+          >
+            ← Back to Scan Queue
+          </button>
+
+        {!isEditing && (
+          <button
+             type="button"
+             onClick={runSimulatedAiReview}
+             className="rounded-lg border border-cyan-400/50 bg-cyan-400/10 px-6 py-3 text-sm font-black text-cyan-300 transition hover:bg-cyan-400 hover:text-black"
+            >  
+                Simulate AI Review
+            </button>
+          )}
+          {isEditing ? (
+            <>
+              <button
+                type="button"
+                onClick={saveTemporaryScanChanges}
+                className="rounded-lg border border-profitGreen bg-profitGreen px-6 py-3 text-sm font-black text-black transition hover:brightness-110"
+              >
+                Save Temporary Scan
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setEditScan(scan);
+                  setIsEditing(false);
+                }}
+                className="rounded-lg border border-steelBorder bg-black/40 px-6 py-3 text-sm font-bold text-zinc-300 transition hover:text-white"
+              >
+                Cancel
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              className="rounded-lg border border-vaultGold bg-vaultGold px-6 py-3 text-sm font-black text-black transition hover:bg-goldHover"
+            >
+              ✎ Edit Scan
+            </button>
+          )}
+
+          {!isEditing && (
+            <>
+              <button
+                type="button"
+                onClick={() => setPendingScanAction("keep")}
+                className="rounded-lg border border-profitGreen bg-profitGreen px-6 py-3 text-sm font-black text-black transition hover:brightness-110"
+              >
+                Keep / Add to Collection
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setPendingScanAction("sell")}
+                className="rounded-lg border border-vaultGold bg-vaultGold px-6 py-3 text-sm font-black text-black transition hover:bg-goldHover"
+              >
+                Move to Sell Queue
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setPendingDeleteScanId(displayScan.id)}
+                className="rounded-lg border border-red-700 bg-red-950/40 px-6 py-3 text-sm font-black text-red-400 transition hover:bg-red-900/40"
+              >
+                Delete Scan
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {saveMessage && (
+        <div className="mb-6 rounded-2xl border border-profitGreen/30 bg-profitGreen/10 px-5 py-4 text-sm font-bold text-profitGreen">
+          {saveMessage}
+        </div>
+      )}
+
+      <div className="grid grid-cols-12 items-start gap-6">
+        <div className="col-span-5 space-y-5">
+          <Panel className="bg-black/70 backdrop-blur-sm">
+            <div className="grid grid-cols-2 gap-5">
+              <CardImageFrame label="Front" image={displayScan.frontImage} />
+              <CardImageFrame label="Back" image={displayScan.backImage} />
+            </div>
+
+            <div className="mt-5 grid grid-cols-3 overflow-hidden rounded-xl border border-vaultGold/30">
+              <CardBadge
+                icon="📷"
+                label={displayScan.scanStatus}
+                sublabel="Scan Status"
+                accent="text-vaultGold"
+              />
+
+              <CardBadge
+                 icon="AI"
+                 label={displayScan.aiConfidence || "Pending"}
+                 sublabel={
+                 displayScan.aiReviewStatus === "Simulated Review Complete"
+                 ? "Simulated Match"
+                 : "AI Backend Pending"
+              }
+              accent="text-cyan-300"
+            />
+
+              <CardBadge
+                icon="$"
+                label={displayScan.status || "Review"}
+                sublabel="Next Action"
+                accent="text-vaultGold"
+              />
+            </div>
+          </Panel>
+
+            {displayScan.aiReviewStatus === "Simulated Review Complete" && (
+          <Panel>
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-cyan-300">
+                 Simulate AI Result
+            </p>
+
+            <h3 className="mt-2 text-2xl font-black text-white">
+                Simulated Match Found
+            </h3>
+
+            <p className="mt-3 text-sm leading-6 text-zinc-400">
+                {displayScan.aiSuggestedMatch || "No suggested match available."}
+            </p>
+
+            <div className="mt-4 rounded-xl border border-cyan-400/30 bg-cyan-400/10 p-4">
+            <p className="text-xs font-black uppercase tracking-widest text-cyan-300">
+                 Confidence
+            </p>
+            <p className="mt-1 text-2xl font-black text-white">
+                {displayScan.aiConfidence || "Pending"}
+            </p>
+          </div>
+          </Panel>
+        )}
+               { /* Left column block */}
+          {isEditing && (
+            <Panel>
+              <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+                Scan Status
+              </p>
+
+              <div className="mt-4 grid gap-3">
+                <label className="text-xs font-black uppercase tracking-widest text-zinc-500">
+                  Review Status
+                </label>
+
+                <select
+                  value={editScan.scanStatus}
+                  onChange={(event) =>
+                    updateEditField(
+                      "scanStatus",
+                      event.target.value as TemporaryScanRecord["scanStatus"]
+                    )
+                  }
+                  className="rounded-xl border border-steelBorder bg-black/60 px-4 py-3 text-sm font-bold text-white outline-none focus:border-vaultGold"
+                >
+                  <option value="Needs Review">Needs Review</option>
+                  <option value="Ready to Keep">Ready to Keep</option>
+                  <option value="Ready to Sell">Ready to Sell</option>
+                </select>
+              </div>
+            </Panel>
+          )}
+        </div>
+
+        <div className="col-span-4 space-y-5">
+          <Panel>
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+              Temporary Scan Intelligence
+            </p>
+
+            <h2 className="mt-2 text-2xl font-black text-white">
+              {isEditing ? "Edit Scan Data" : "Backend AI Pending"}
+            </h2>
+
+            <p className="mt-3 text-sm leading-6 text-zinc-400">
+              This temporary card is not part of your main collection yet.
+              Confirm the details, save the scan, then choose Keep, Sell, or
+              Delete.
+            </p>
+
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              <div className="rounded-xl border border-steelBorder bg-black/50 p-4">
+                <p className="text-xs font-black uppercase text-zinc-500">
+                  Market Value
+                </p>
+                {isEditing ? (
+                  <input
+                    type="number"
+                    value={editScan.estimatedValue}
+                    onChange={(event) =>
+                      updateEditNumberField(
+                        "estimatedValue",
+                        event.target.value
+                      )
+                    }
+                    className="mt-2 w-full rounded-lg border border-steelBorder bg-black/70 px-3 py-2 text-lg font-black text-white outline-none focus:border-vaultGold"
+                  />
+                ) : (
+                  <p className="mt-2 text-2xl font-black text-white">
+                    ${marketValue.toLocaleString()}
+                  </p>
+                )}
+              </div>
+
+              <div className="rounded-xl border border-steelBorder bg-black/50 p-4">
+                <p className="text-xs font-black uppercase text-zinc-500">
+                  Cost Basis
+                </p>
+                <p className="mt-2 text-2xl font-black text-white">
+                  ${costBasis.toLocaleString()}
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-steelBorder bg-black/50 p-4">
+                <p className="text-xs font-black uppercase text-zinc-500">
+                  Gain / Loss
+                </p>
+                <p className="mt-2 text-2xl font-black text-white">
+                  ${profitLoss.toLocaleString()}
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-steelBorder bg-black/50 p-4">
+                <p className="text-xs font-black uppercase text-zinc-500">
+                  ROI
+                </p>
+                <p className="mt-2 text-2xl font-black text-white">
+                  {roi.toFixed(1)}%
+                </p>
+              </div>
+            </div>
+          </Panel>
+
+          <Panel>
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+              Purchase / Market Data
+            </p>
+
+            <div className="mt-5 grid grid-cols-2 gap-4">
+              <TemporaryEditField
+                label="Purchase Price"
+                value={editScan.purchasePrice}
+                displayValue={`$${displayScan.purchasePrice.toLocaleString()}`}
+                isEditing={isEditing}
+                type="number"
+                onChange={(value) =>
+                  updateEditNumberField("purchasePrice", value)
+                }
+              />
+
+              <TemporaryEditField
+                label="Taxes / Fees"
+                value={editScan.taxesFees}
+                displayValue={`$${displayScan.taxesFees.toLocaleString()}`}
+                isEditing={isEditing}
+                type="number"
+                onChange={(value) => updateEditNumberField("taxesFees", value)}
+              />
+
+              <TemporaryEditField
+                label="Shipping"
+                value={editScan.shippingCost}
+                displayValue={`$${displayScan.shippingCost.toLocaleString()}`}
+                isEditing={isEditing}
+                type="number"
+                onChange={(value) =>
+                  updateEditNumberField("shippingCost", value)
+                }
+              />
+
+              <TemporaryEditField
+                label="Total Cost Basis"
+                value={editScan.totalCostBasis}
+                displayValue={`$${displayScan.totalCostBasis.toLocaleString()}`}
+                isEditing={isEditing}
+                type="number"
+                onChange={(value) =>
+                  updateEditNumberField("totalCostBasis", value)
+                }
+              />
+
+              <TemporaryEditField
+                label="Source"
+                value={editScan.source}
+                displayValue={displayScan.source}
+                isEditing={isEditing}
+                onChange={(value) => updateEditField("source", value)}
+              />
+
+              <TemporaryEditField
+                label="Seller"
+                value={editScan.seller}
+                displayValue={displayScan.seller}
+                isEditing={isEditing}
+                onChange={(value) => updateEditField("seller", value)}
+              />
+            </div>
+          </Panel>
+        </div>
+
+        <div className="col-span-3 space-y-5">
+          <Panel>
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+              Card Info
+            </p>
+
+            <div className="mt-5 space-y-4">
+              <TemporaryEditField
+                label="Player"
+                value={editScan.player}
+                displayValue={displayScan.player}
+                isEditing={isEditing}
+                onChange={(value) => updateEditField("player", value)}
+              />
+
+              <TemporaryEditField
+                label="Card"
+                value={editScan.card}
+                displayValue={displayScan.card}
+                isEditing={isEditing}
+                onChange={(value) => updateEditField("card", value)}
+              />
+
+              <TemporaryEditField
+                label="Team"
+                value={editScan.team}
+                displayValue={displayScan.team}
+                isEditing={isEditing}
+                onChange={(value) => updateEditField("team", value)}
+              />
+
+              <TemporaryEditField
+                label="Sport"
+                value={editScan.sport}
+                displayValue={displayScan.sport}
+                isEditing={isEditing}
+                onChange={(value) => updateEditField("sport", value)}
+              />
+
+              <TemporaryEditField
+                label="Year"
+                value={editScan.year}
+                displayValue={displayScan.year}
+                isEditing={isEditing}
+                onChange={(value) => updateEditField("year", value)}
+              />
+
+              <TemporaryEditField
+                label="Brand"
+                value={editScan.brand}
+                displayValue={displayScan.brand}
+                isEditing={isEditing}
+                onChange={(value) => updateEditField("brand", value)}
+              />
+
+              <TemporaryEditField
+                label="Set"
+                value={editScan.set}
+                displayValue={displayScan.set}
+                isEditing={isEditing}
+                onChange={(value) => updateEditField("set", value)}
+              />
+
+              <TemporaryEditField
+                label="Card Number"
+                value={editScan.cardNumber}
+                displayValue={displayScan.cardNumber}
+                isEditing={isEditing}
+                onChange={(value) => updateEditField("cardNumber", value)}
+              />
+
+              <TemporaryEditField
+                label="Parallel"
+                value={editScan.parallel}
+                displayValue={displayScan.parallel}
+                isEditing={isEditing}
+                onChange={(value) => updateEditField("parallel", value)}
+              />
+
+              <TemporaryEditField
+                label="Grade"
+                value={editScan.grade}
+                displayValue={displayScan.grade}
+                isEditing={isEditing}
+                onChange={(value) => updateEditField("grade", value)}
+              />
+
+              <TemporaryEditField
+                label="Grader"
+                value={editScan.grader}
+                displayValue={displayScan.grader}
+                isEditing={isEditing}
+                onChange={(value) => updateEditField("grader", value)}
+              />
+
+              <TemporaryEditField
+                label="Serial Number"
+                value={editScan.serialNumber}
+                displayValue={displayScan.serialNumber}
+                isEditing={isEditing}
+                onChange={(value) => updateEditField("serialNumber", value)}
+              />
+
+              <TemporaryEditField
+                label="Storage"
+                value={editScan.storageLocation}
+                displayValue={displayScan.storageLocation}
+                isEditing={isEditing}
+                onChange={(value) => updateEditField("storageLocation", value)}
+              />
+            </div>
+          </Panel>
+
+          <Panel>
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+              Notes
+            </p>
+
+            {isEditing ? (
+              <textarea
+                value={editScan.notes}
+                onChange={(event) =>
+                  updateEditField("notes", event.target.value)
+                }
+                className="mt-4 min-h-[130px] w-full rounded-xl border border-steelBorder bg-black/60 p-3 text-sm text-white outline-none focus:border-vaultGold"
+              />
+            ) : (
+              <p className="mt-4 text-sm leading-6 text-zinc-400">
+                {displayScan.notes}
+              </p>
+            )}
+          </Panel>
+        </div>
+      </div>
+
+      {pendingScanAction !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-6 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-3xl border border-vaultGold/40 bg-graphite900 p-6 text-white shadow-[0_0_60px_rgba(245,196,81,0.18)]">
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+              {pendingScanAction === "keep"
+                ? "Confirm Keep"
+                : "Confirm Sell Queue"}
+            </p>
+
+            <h2 className="mt-3 text-3xl font-black">
+              {pendingScanAction === "keep"
+                ? "Add to collection?"
+                : "Move to sell queue?"}
+            </h2>
+
+            <p className="mt-3 text-sm leading-6 text-zinc-400">
+              {pendingScanAction === "keep"
+                ? "This will create a permanent card record in your main vault and remove the temporary scan from the review queue."
+                : "This will create a For Sale card record and remove the temporary scan from the review queue."}
+            </p>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={cancelTemporaryScanAction}
+                className="rounded-xl border border-steelBorder bg-black/40 px-5 py-3 text-sm font-bold text-zinc-300 hover:text-white"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={confirmTemporaryScanAction}
+                className="rounded-xl bg-vaultGold px-5 py-3 text-sm font-black text-black shadow-vault hover:brightness-110"
+              >
+                {pendingScanAction === "keep"
+                  ? "Add to Collection"
+                  : "Move to Sell Queue"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {pendingDeleteScanId !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-6 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-3xl border border-vaultGold/40 bg-graphite900 p-6 text-white shadow-[0_0_60px_rgba(245,196,81,0.18)]">
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+              Confirm Delete
+            </p>
+
+            <h2 className="mt-3 text-3xl font-black">Delete this scan?</h2>
+
+            <p className="mt-3 text-sm leading-6 text-zinc-400">
+              This will remove the temporary scan from your review queue. This
+              action cannot be undone.
+            </p>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={cancelDeleteTemporaryScan}
+                className="rounded-xl border border-steelBorder bg-black/40 px-5 py-3 text-sm font-bold text-zinc-300 hover:text-white"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={confirmDeleteTemporaryScan}
+                className="rounded-xl bg-vaultGold px-5 py-3 text-sm font-black text-black shadow-vault hover:brightness-110"
+              >
+                Delete Scan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TemporaryEditField({
+  label,
+  value,
+  displayValue,
+  isEditing,
+  onChange,
+  type = "text",
+}: {
+  label: string;
+  value: string | number;
+  displayValue: string;
+  isEditing: boolean;
+  onChange: (value: string) => void;
+  type?: "text" | "number";
+}) {
+  return (
+    <div>
+      <p className="mb-1 text-xs font-black uppercase tracking-widest text-zinc-500">
+        {label}
+      </p>
+
+      {isEditing ? (
+        <input
+          type={type}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          className="w-full rounded-lg border border-steelBorder bg-black/70 px-3 py-2 text-sm font-bold text-white outline-none focus:border-vaultGold"
+        />
+      ) : (
+        <p className="border-b border-steelBorder/60 pb-2 text-sm font-bold text-white">
+          {displayValue || "N/A"}
+        </p>
+      )}
+    </div>
   );
 }
 
