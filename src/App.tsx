@@ -2400,106 +2400,95 @@ function MyCollection({
   return (
     <div className="w-full max-w-full space-y-6 overflow-x-hidden">
       {/* Mobile / Tablet Collection Hero */}
-      <section className="relative overflow-hidden rounded-[2rem] border border-vaultGold/25 bg-black/70 px-5 py-6 shadow-vault xl:hidden">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(212,175,55,0.18),transparent_38%),linear-gradient(135deg,rgba(255,255,255,0.05),transparent_45%)]" />
+<section className="relative overflow-hidden rounded-[2rem] border border-vaultGold/25 bg-black/70 px-5 py-6 shadow-vault xl:hidden">
+  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(212,175,55,0.18),transparent_38%),linear-gradient(135deg,rgba(255,255,255,0.05),transparent_45%)]" />
 
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.08]">
-          <img
-            src={cardgemzLogo}
-            alt="CARDGEMZ watermark"
-            className="h-[360px] w-[360px] object-contain"
-          />
-        </div>
+  <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.08]">
+    <img
+      src={cardgemzLogo}
+      alt="CARDGEMZ watermark"
+      className="h-[360px] w-[360px] object-contain"
+    />
+  </div>
 
-        <div className="relative z-10">
-          <div className="mb-5 flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.45em] text-vaultGold">
-                CardVault Pro
-              </p>
-              <h1 className="mt-3 text-4xl font-black leading-none text-white">
-                My
-                <br />
-                Collection
-              </h1>
-            </div>
+  <div className="relative z-10">
+    <div className="mb-5">
+      <p className="text-xs font-black uppercase tracking-[0.45em] text-vaultGold">
+        CardVault Pro
+      </p>
 
-            <button
-              type="button"
-              onClick={() => setActiveScreen("Dashboard")}
-              className="shrink-0 rounded-full border border-vaultGold/40 bg-vaultGold/10 px-4 py-2 text-xs font-black text-vaultGold shadow-vault"
-            >
-              Dashboard →
-            </button>
-          </div>
+      <h1 className="mt-3 whitespace-nowrap text-4xl font-black leading-none text-white">
+        My Collection
+      </h1>
+    </div>
 
-          <p className="max-w-md text-base font-bold leading-7 text-zinc-400">
-            Track your full card inventory, market value, grading status,
-            storage, and collection decisions — all in one place.
-          </p>
+    <p className="max-w-md text-base font-bold leading-7 text-zinc-400">
+      Track your full card inventory, market value, grading status,
+      storage, and collection decisions — all in one place.
+    </p>
 
-          <div className="mt-6 grid grid-cols-1 gap-3">
-            <button
-              type="button"
-              onClick={() => setActiveScreen("Add Card")}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-vaultGold/70 bg-black/60 px-5 py-4 text-sm font-black text-vaultGold shadow-vault transition hover:bg-vaultGold hover:text-black"
-            >
-              <Plus size={18} />
-              Add Card
-            </button>
+    <div className="mt-6 grid grid-cols-1 gap-3">
+      <button
+        type="button"
+        onClick={() => setActiveScreen("Add Card")}
+        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-vaultGold/70 bg-black/60 px-5 py-4 text-sm font-black text-vaultGold shadow-vault transition hover:bg-vaultGold hover:text-black"
+      >
+        <Plus size={18} />
+        Add Card
+      </button>
 
-            <button
-              type="button"
-              onClick={openCollectionReport}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-b from-[#fff3a0] via-vaultGold to-[#9b6a10] px-5 py-4 text-sm font-black text-black shadow-vault transition hover:scale-[1.02]"
-            >
-              <Download size={18} />
-              Export Collection
-            </button>
-          </div>
+      <button
+        type="button"
+        onClick={openCollectionReport}
+        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-b from-[#fff3a0] via-vaultGold to-[#9b6a10] px-5 py-4 text-sm font-black text-black shadow-vault transition hover:scale-[1.02]"
+      >
+        <Download size={18} />
+        Export Collection
+      </button>
+    </div>
 
-          <div className="mt-6 grid grid-cols-2 overflow-hidden rounded-3xl border border-vaultGold/20 bg-black/55">
-            <div className="border-b border-r border-vaultGold/10 p-4">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
-                Total Cards
-              </p>
-              <p className="mt-2 text-2xl font-black text-white">
-                {cards.length}
-              </p>
-            </div>
+    <div className="mt-6 grid grid-cols-2 overflow-hidden rounded-3xl border border-vaultGold/20 bg-black/55">
+      <div className="border-b border-r border-vaultGold/10 p-4">
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
+          Total Cards
+        </p>
+        <p className="mt-2 text-2xl font-black text-white">
+          {cards.length}
+        </p>
+      </div>
 
-            <div className="border-b border-vaultGold/10 p-4">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
-                Value
-              </p>
-              <p className="mt-2 text-2xl font-black text-vaultGold">
-                ${collectionValue.toLocaleString()}
-              </p>
-            </div>
+      <div className="border-b border-vaultGold/10 p-4">
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
+          Value
+        </p>
+        <p className="mt-2 text-2xl font-black text-vaultGold">
+          ${collectionValue.toLocaleString()}
+        </p>
+      </div>
 
-            <div className="border-r border-vaultGold/10 p-4">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
-                Graded
-              </p>
-              <p className="mt-2 text-2xl font-black text-white">
-                {gradedCards}
-              </p>
-            </div>
+      <div className="border-r border-vaultGold/10 p-4">
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
+          Graded
+        </p>
+        <p className="mt-2 text-2xl font-black text-white">
+          {gradedCards}
+        </p>
+      </div>
 
-            <div className="p-4">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
-                Raw / Sets
-              </p>
-              <p className="mt-2 text-2xl font-black text-white">
-                {rawCards}
-                <span className="ml-2 text-sm text-zinc-500">
-                  / {trackedSets}
-                </span>
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <div className="p-4">
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
+          Raw / Sets
+        </p>
+        <p className="mt-2 text-2xl font-black text-white">
+          {rawCards}
+          <span className="ml-2 text-sm text-zinc-500">
+            / {trackedSets}
+          </span>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* Desktop Collection Hero */}
       <div className="hidden xl:block">
