@@ -652,7 +652,7 @@ function CardVaultMobileHeader({
 
         {/* Center Brand */}
         <div className="text-center">
-          <p className="text-[23px] font-black uppercase tracking-[0.28em] text-vaultGold">
+          <p className="text-[15px] font-black uppercase tracking-[0.28em] text-vaultGold">
             CardVault
           </p>
           <p className="-mt-1 text-[10px] font-black uppercase tracking-[0.38em] text-vaultGold/80">
