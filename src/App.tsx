@@ -646,18 +646,18 @@ function CardVaultMobileHeader() {
           </button>
         </div>
 
-        {/* Center Brand - slightly larger */}
+        {/* Center Brand */}
         <div className="text-center">
-          <p className="text-[22px] font-black uppercase tracking-[0.48em] text-vaultGold">
+          <p className="text-[20px] font-black uppercase tracking-[0.45em] text-vaultGold">
             CardVault
           </p>
-          <p className="-mt-1 text-[11px] font-black uppercase tracking-[0.45em] text-vaultGold/80">
+          <p className="-mt-1 text-[11px] font-black uppercase tracking-[0.42em] text-vaultGold/80">
             Pro
           </p>
         </div>
 
-        {/* Right Status + Notification Bell */}
-        <div className="flex items-center gap-5 text-center">
+        {/* Right Status */}
+        <div className="flex items-center gap-6 text-center">
           <div>
             <p className="text-[15px] font-black uppercase tracking-[0.2em] text-cyan-100">
               OSS
@@ -667,14 +667,14 @@ function CardVaultMobileHeader() {
             </p>
           </div>
 
-          <button
-            type="button"
-            className="relative flex h-10 w-10 items-center justify-center rounded-full border border-cyan-400/15 bg-black/20 text-cyan-100 shadow-inner shadow-cyan-950/40"
-            aria-label="Notifications"
-          >
-            <span className="text-xl leading-none">🔔</span>
-            <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.8)]" />
-          </button>
+          <div>
+            <p className="text-[15px] font-black uppercase tracking-[0.2em] text-cyan-100">
+              S7S
+            </p>
+            <p className="mt-1 text-[9px] font-black uppercase tracking-[0.18em] text-cyan-300">
+              Sync
+            </p>
+          </div>
         </div>
       </div>
     </div>
