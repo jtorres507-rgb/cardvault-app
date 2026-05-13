@@ -6290,6 +6290,7 @@ function CardDetail({
   }, [card]);
 
   const displayCard = isEditing ? editCard : card;
+  const cardData = displayCard as any;
 
   function updateEditField<K extends keyof CardRecord>(
     field: K,
@@ -6363,60 +6364,175 @@ function CardDetail({
       ? "Yes"
       : "No";
 
+  const suggestedAction =
+    marketValue > costBasis && roi >= 25
+      ? "HOLD"
+      : marketValue > costBasis
+      ? "WATCH"
+      : "REVIEW";
+
+  const marketRangeLow = Math.max(0, Math.round(marketValue * 0.92));
+  const marketRangeHigh = Math.round(marketValue * 1.08);
+
+  const mobileInfoRows = [
+    ["Player", displayCard.player],
+    ["Team", cardData.team || "Not listed"],
+    ["Year", displayCard.year],
+    ["Brand", displayCard.brand],
+    ["Set", cardData.set || cardData.cardSet || displayCard.card],
+    ["Card #", cardData.cardNumber || "Not listed"],
+    ["Parallel", displayCard.parallel || "Base"],
+    ["Rookie", rookieDisplay],
+  ];
+
+  const mobileCollectionRows = [
+    ["Status", displayCard.status || "Personal Collection"],
+    ["Cost Basis", `$${costBasis.toLocaleString()}`],
+    ["Purchase Price", `$${(displayCard.purchasePrice || 0).toLocaleString()}`],
+    ["Market Value", `$${marketValue.toLocaleString()}`],
+    ["Profit / Loss", `${profitLoss >= 0 ? "+" : ""}$${profitLoss.toLocaleString()}`],
+    ["ROI", `${roi.toFixed(1)}%`],
+  ];
+
   return (
-    <div className="relative isolate overflow-hidden">
-      {/* Page watermark */}
-      <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center opacity-[0.045]">
-        <img
-          src="/safe-door-emblem.png"
-          alt=""
-          className="h-[760px] w-[760px] object-contain grayscale"
-        />
-      </div>
-
-      <div className="mb-6 flex items-start justify-between gap-6">
-        <div>
-          <div className="flex items-center gap-4">
-            <h1 className="text-5xl font-black tracking-wide text-white">
-              Card Detail
-            </h1>
-            <button
-              type="button"
-              className="text-2xl text-zinc-300 transition hover:text-vaultGold"
-            >
-              ☆
-            </button>
-            <button
-              type="button"
-              className="text-2xl text-zinc-300 transition hover:text-vaultGold"
-            >
-              ⤴
-            </button>
-          </div>
-
-          <p className="mt-3 text-lg text-zinc-300">
-            {displayCard.player} — {displayCard.year} {displayCard.brand}{" "}
-            {displayCard.parallel}
-          </p>
+    <div className="relative isolate w-full max-w-full overflow-hidden">
+      {/* Phone / Tablet Card Detail Layout */}
+      <div className="relative space-y-5 overflow-hidden xl:hidden">
+        {/* CARDGEMZ watermark background */}
+        <div className="pointer-events-none absolute inset-0 -z-10 flex items-start justify-center opacity-[0.08]">
+          <img
+            src={cardgemzLogo}
+            alt=""
+            className="mt-24 h-[560px] w-[560px] object-contain"
+          />
         </div>
 
-        <div className="flex gap-3">
+        <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_50%_0%,rgba(212,175,55,0.14),transparent_34%),linear-gradient(180deg,rgba(0,0,0,0.2),rgba(0,0,0,0.95))]" />
+
+        {/* Mobile Header */}
+        <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
           <button
             type="button"
             onClick={onBack}
-            className="rounded-lg border border-vaultGold/40 bg-black/40 px-6 py-3 text-sm font-bold text-white transition hover:border-vaultGold hover:text-vaultGold"
+            className="mb-4 inline-flex items-center rounded-full border border-vaultGold/30 bg-black/30 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-vaultGold"
           >
-            ← Back to Collection
+            ← Collection
           </button>
 
+          <p className="text-xs font-black uppercase tracking-[0.42em] text-vaultGold">
+            Card Detail
+          </p>
+
+          <h1 className="mt-3 text-3xl font-black uppercase leading-none text-white">
+            {displayCard.player}
+          </h1>
+
+          <p className="mt-2 text-sm font-bold uppercase leading-6 text-zinc-400">
+            {displayCard.year} {displayCard.brand} {displayCard.card}
+            {displayCard.parallel ? ` • ${displayCard.parallel}` : ""}
+          </p>
+
+          <div className="mt-5 grid grid-cols-3 gap-2">
+            <div className="rounded-2xl border border-vaultGold/20 bg-black/45 p-3 text-center backdrop-blur-xl">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-zinc-500">
+                Value
+              </p>
+              <p className="mt-1 text-lg font-black text-vaultGold">
+                ${marketValue.toLocaleString()}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-vaultGold/20 bg-black/45 p-3 text-center backdrop-blur-xl">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-zinc-500">
+                ROI
+              </p>
+              <p
+                className={`mt-1 text-lg font-black ${
+                  roi >= 0 ? "text-profitGreen" : "text-red-400"
+                }`}
+              >
+                {roi.toFixed(1)}%
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-vaultGold/20 bg-black/45 p-3 text-center backdrop-blur-xl">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-zinc-500">
+                Action
+              </p>
+              <p className="mt-1 text-lg font-black text-white">
+                {suggestedAction}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {saveMessage && (
+          <div className="rounded-2xl border border-profitGreen/30 bg-profitGreen/10 px-5 py-4 text-sm font-bold text-profitGreen">
+            {saveMessage}
+          </div>
+        )}
+
+        {/* Swipe Image Carousel */}
+        <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-4 shadow-vault backdrop-blur-xl">
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+                Card Images
+              </p>
+              <p className="mt-1 text-xs font-bold text-zinc-500">
+                Swipe front to back
+              </p>
+            </div>
+
+            <div className="flex gap-2 text-xs font-black uppercase tracking-[0.2em] text-zinc-500">
+              <span>Front</span>
+              <span>•</span>
+              <span>Back</span>
+            </div>
+          </div>
+
+          <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3">
+            <div className="min-w-full snap-center">
+              <CardImageFrame
+                label="Front"
+                image={displayCard.frontImage}
+                isEditing={isEditing}
+                inputId={`mobile-front-image-${displayCard.id}`}
+                onUpload={(event) =>
+                  handleCardImageUpload("frontImage", event)
+                }
+                onRemove={() => removeCardImage("frontImage")}
+              />
+            </div>
+
+            <div className="min-w-full snap-center">
+              <CardImageFrame
+                label="Back"
+                image={displayCard.backImage}
+                isEditing={isEditing}
+                inputId={`mobile-back-image-${displayCard.id}`}
+                onUpload={(event) => handleCardImageUpload("backImage", event)}
+                onRemove={() => removeCardImage("backImage")}
+              />
+            </div>
+          </div>
+
+          <div className="mt-2 flex items-center justify-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-vaultGold" />
+            <span className="h-2 w-2 rounded-full bg-zinc-600" />
+          </div>
+        </section>
+
+        {/* Mobile Action Buttons */}
+        <section className="grid grid-cols-2 gap-3">
           {isEditing ? (
             <>
               <button
                 type="button"
                 onClick={saveEditedCard}
-                className="rounded-lg border border-vaultGold bg-vaultGold px-6 py-3 text-sm font-black text-black transition hover:bg-goldHover"
+                className="rounded-2xl border border-vaultGold bg-vaultGold px-4 py-3 text-sm font-black text-black shadow-vault"
               >
-                ✓ Save Changes
+                ✓ Save
               </button>
 
               <button
@@ -6425,7 +6541,7 @@ function CardDetail({
                   setEditCard(card);
                   setIsEditing(false);
                 }}
-                className="rounded-lg border border-steelBorder bg-black/40 px-6 py-3 text-sm font-bold text-zinc-300 transition hover:text-white"
+                className="rounded-2xl border border-steelBorder bg-black/45 px-4 py-3 text-sm font-black text-zinc-300 backdrop-blur-xl"
               >
                 Cancel
               </button>
@@ -6434,7 +6550,7 @@ function CardDetail({
             <button
               type="button"
               onClick={() => setIsEditing(true)}
-              className="rounded-lg border border-vaultGold bg-vaultGold px-6 py-3 text-sm font-black text-black transition hover:bg-goldHover"
+              className="rounded-2xl border border-vaultGold bg-vaultGold px-4 py-3 text-sm font-black text-black shadow-vault"
             >
               ✎ Edit Card
             </button>
@@ -6443,89 +6559,293 @@ function CardDetail({
           <button
             type="button"
             onClick={onDelete}
-            className="rounded-lg border border-red-700 bg-red-950/40 px-6 py-3 text-sm font-black text-red-400 transition hover:bg-red-900/40"
+            className="rounded-2xl border border-red-700 bg-red-950/40 px-4 py-3 text-sm font-black text-red-300 backdrop-blur-xl"
           >
-            🗑 Delete Card
+            🗑 Delete
           </button>
-        </div>
+        </section>
+
+        {/* Overview */}
+        <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
+          <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+            Overview
+          </p>
+
+          <p className="mt-4 text-sm font-bold leading-7 text-zinc-300">
+            {displayCard.year} {displayCard.player} {displayCard.brand}{" "}
+            {displayCard.card}
+            {displayCard.parallel ? ` ${displayCard.parallel}` : ""}. Current
+            estimated value is{" "}
+            <span className="font-black text-vaultGold">
+              ${marketValue.toLocaleString()}
+            </span>{" "}
+            with a suggested action of{" "}
+            <span className="font-black text-white">{suggestedAction}</span>.
+          </p>
+        </section>
+
+        {/* Market Intelligence */}
+        <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
+          <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+            Market Intelligence
+          </p>
+
+          <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
+            {[
+              ["Estimated Value", `$${marketValue.toLocaleString()}`],
+              [
+                "Market Range",
+                `$${marketRangeLow.toLocaleString()} - $${marketRangeHigh.toLocaleString()}`,
+              ],
+              [
+                "Profit / Loss",
+                `${profitLoss >= 0 ? "+" : ""}$${profitLoss.toLocaleString()}`,
+              ],
+              ["ROI", `${roi.toFixed(1)}%`],
+              ["Suggested Action", suggestedAction],
+              ["Cost Basis", `$${costBasis.toLocaleString()}`],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                className="flex items-center justify-between gap-4 px-4 py-3"
+              >
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">
+                  {label}
+                </p>
+                <p className="text-right text-sm font-black text-white">
+                  {value}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Card Info */}
+        <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
+          <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+            Card Info
+          </p>
+
+          <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
+            {mobileInfoRows.map(([label, value]) => (
+              <div
+                key={label}
+                className="flex items-center justify-between gap-4 px-4 py-3"
+              >
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">
+                  {label}
+                </p>
+                <p className="text-right text-sm font-black text-white">
+                  {value || "Not listed"}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Collection Info */}
+        <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
+          <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+            Collection Info
+          </p>
+
+          <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
+            {mobileCollectionRows.map(([label, value]) => (
+              <div
+                key={label}
+                className="flex items-center justify-between gap-4 px-4 py-3"
+              >
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">
+                  {label}
+                </p>
+                <p className="text-right text-sm font-black text-white">
+                  {value}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Notes */}
+        <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
+          <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+            Notes
+          </p>
+
+          <p className="mt-4 text-sm font-bold leading-7 text-zinc-300">
+            {cardData.notes ||
+              cardData.purchaseNotes ||
+              "No notes have been added for this card yet."}
+          </p>
+        </section>
       </div>
 
-      {saveMessage && (
-        <div className="mb-6 rounded-2xl border border-profitGreen/30 bg-profitGreen/10 px-5 py-4 text-sm font-bold text-profitGreen">
-          {saveMessage}
-        </div>
-      )}
-
-      <div className="grid grid-cols-12 items-start gap-6">
-        {/* Left image showcase */}
-        <div className="col-span-5 space-y-5">
-          <Panel className="bg-black/70 backdrop-blur-sm">
-            <div className="grid grid-cols-2 gap-5">
-              <CardImageFrame
-                label="Front"
-                image={displayCard.frontImage}
-                isEditing={isEditing}
-                inputId={`front-image-${displayCard.id}`}
-                onUpload={(event) =>
-                  handleCardImageUpload("frontImage", event)
-                }
-                onRemove={() => removeCardImage("frontImage")}
-              />
-
-              <CardImageFrame
-                label="Back"
-                image={displayCard.backImage}
-                isEditing={isEditing}
-                inputId={`back-image-${displayCard.id}`}
-                onUpload={(event) => handleCardImageUpload("backImage", event)}
-                onRemove={() => removeCardImage("backImage")}
-              />
-            </div>
-
-            <div className="mt-5 grid grid-cols-3 overflow-hidden rounded-xl border border-vaultGold/30">
-            <CardBadge
-               icon="◇"
-               label={displayCard.parallel || "Base"}
-               sublabel="Parallel / Variety"
-               accent="text-cyan-300"
-              />
-              <CardBadge
-                icon="RC"
-                label={rookieDisplay}
-                sublabel="Rookie Card"
-                accent="text-vaultGold"
-              />
-              <CardBadge
-                icon="$"
-                label={displayCard.status || "Personal Collection"}
-                sublabel="Collection"
-                accent="text-vaultGold"
-              />
-            </div>
-          </Panel>
-        </div>
-
-        {/* Middle market intelligence */}
-        <div className="col-span-4 space-y-5">
-          <MarketIntelligencePanel
-            card={displayCard}
-            marketValue={marketValue}
-            costBasis={costBasis}
-            profitLoss={profitLoss}
-            roi={roi}
+      {/* Desktop Card Detail Layout - protected */}
+      <div className="relative isolate hidden overflow-hidden xl:block">
+        {/* Page watermark */}
+        <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center opacity-[0.045]">
+          <img
+            src="/safe-door-emblem.png"
+            alt=""
+            className="h-[760px] w-[760px] object-contain grayscale"
           />
         </div>
 
-        {/* Right card info */}
-        <div className="col-span-3 space-y-5">
-          <CardInfoPanel card={displayCard} />
-          <NotesPanel card={displayCard} />
-          <PurchaseInformationCard card={displayCard} />
+        <div className="mb-6 flex items-start justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-4">
+              <h1 className="text-5xl font-black tracking-wide text-white">
+                Card Detail
+              </h1>
+              <button
+                type="button"
+                className="text-2xl text-zinc-300 transition hover:text-vaultGold"
+              >
+                ☆
+              </button>
+              <button
+                type="button"
+                className="text-2xl text-zinc-300 transition hover:text-vaultGold"
+              >
+                ⤴
+              </button>
+            </div>
+
+            <p className="mt-3 text-lg text-zinc-300">
+              {displayCard.player} — {displayCard.year} {displayCard.brand}{" "}
+              {displayCard.parallel}
+            </p>
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={onBack}
+              className="rounded-lg border border-vaultGold/40 bg-black/40 px-6 py-3 text-sm font-bold text-white transition hover:border-vaultGold hover:text-vaultGold"
+            >
+              ← Back to Collection
+            </button>
+
+            {isEditing ? (
+              <>
+                <button
+                  type="button"
+                  onClick={saveEditedCard}
+                  className="rounded-lg border border-vaultGold bg-vaultGold px-6 py-3 text-sm font-black text-black transition hover:bg-goldHover"
+                >
+                  ✓ Save Changes
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditCard(card);
+                    setIsEditing(false);
+                  }}
+                  className="rounded-lg border border-steelBorder bg-black/40 px-6 py-3 text-sm font-bold text-zinc-300 transition hover:text-white"
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsEditing(true)}
+                className="rounded-lg border border-vaultGold bg-vaultGold px-6 py-3 text-sm font-black text-black transition hover:bg-goldHover"
+              >
+                ✎ Edit Card
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={onDelete}
+              className="rounded-lg border border-red-700 bg-red-950/40 px-6 py-3 text-sm font-black text-red-400 transition hover:bg-red-900/40"
+            >
+              🗑 Delete Card
+            </button>
+          </div>
         </div>
 
-        {/* Bottom row */}
-        <VaultLocationCard card={displayCard} />
-        <GradingStrategyCard card={displayCard} />
+        {saveMessage && (
+          <div className="mb-6 rounded-2xl border border-profitGreen/30 bg-profitGreen/10 px-5 py-4 text-sm font-bold text-profitGreen">
+            {saveMessage}
+          </div>
+        )}
+
+        <div className="grid grid-cols-12 items-start gap-6">
+          {/* Left image showcase */}
+          <div className="col-span-5 space-y-5">
+            <Panel className="bg-black/70 backdrop-blur-sm">
+              <div className="grid grid-cols-2 gap-5">
+                <CardImageFrame
+                  label="Front"
+                  image={displayCard.frontImage}
+                  isEditing={isEditing}
+                  inputId={`front-image-${displayCard.id}`}
+                  onUpload={(event) =>
+                    handleCardImageUpload("frontImage", event)
+                  }
+                  onRemove={() => removeCardImage("frontImage")}
+                />
+
+                <CardImageFrame
+                  label="Back"
+                  image={displayCard.backImage}
+                  isEditing={isEditing}
+                  inputId={`back-image-${displayCard.id}`}
+                  onUpload={(event) =>
+                    handleCardImageUpload("backImage", event)
+                  }
+                  onRemove={() => removeCardImage("backImage")}
+                />
+              </div>
+
+              <div className="mt-5 grid grid-cols-3 overflow-hidden rounded-xl border border-vaultGold/30">
+                <CardBadge
+                  icon="◇"
+                  label={displayCard.parallel || "Base"}
+                  sublabel="Parallel / Variety"
+                  accent="text-cyan-300"
+                />
+                <CardBadge
+                  icon="RC"
+                  label={rookieDisplay}
+                  sublabel="Rookie Card"
+                  accent="text-vaultGold"
+                />
+                <CardBadge
+                  icon="$"
+                  label={displayCard.status || "Personal Collection"}
+                  sublabel="Collection"
+                  accent="text-vaultGold"
+                />
+              </div>
+            </Panel>
+          </div>
+
+          {/* Middle market intelligence */}
+          <div className="col-span-4 space-y-5">
+            <MarketIntelligencePanel
+              card={displayCard}
+              marketValue={marketValue}
+              costBasis={costBasis}
+              profitLoss={profitLoss}
+              roi={roi}
+            />
+          </div>
+
+          {/* Right card info */}
+          <div className="col-span-3 space-y-5">
+            <CardInfoPanel card={displayCard} />
+            <NotesPanel card={displayCard} />
+            <PurchaseInformationCard card={displayCard} />
+          </div>
+
+          {/* Bottom row */}
+          <VaultLocationCard card={displayCard} />
+          <GradingStrategyCard card={displayCard} />
+        </div>
       </div>
     </div>
   );
