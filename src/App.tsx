@@ -1849,7 +1849,10 @@ function PhoneDashboard({
       value: `$${netGain.toLocaleString()}`,
       sub: `${roi.toFixed(1)}% ROI`,
       accent: netGain >= 0 ? "text-emerald-400" : "text-red-400",
-      rail: netGain >= 0 ? "from-emerald-400 via-emerald-400/40 to-transparent" : "from-red-400 via-red-400/40 to-transparent",
+      rail:
+        netGain >= 0
+          ? "from-emerald-400 via-emerald-400/40 to-transparent"
+          : "from-red-400 via-red-400/40 to-transparent",
     },
     {
       label: "Cards Owned",
@@ -1875,113 +1878,121 @@ function PhoneDashboard({
   ];
 
   return (
-    <div className="w-full max-w-full overflow-x-hidden space-y-4 pb-6">
-      {/* Phone-only compact header */}
-      <div className="rounded-[1.7rem] border border-vaultGold/20 bg-gradient-to-br from-black via-[#100b0f] to-black p-4 shadow-[0_18px_45px_rgba(0,0,0,0.6)]">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.28em] text-vaultGold">
-              CardVault Pro
-            </p>
-            <h1 className="mt-1 text-2xl font-black tracking-tight text-white">
-              Dashboard
-            </h1>
-          </div>
+    <div className="relative left-1/2 w-screen max-w-none -translate-x-1/2 overflow-x-hidden px-4 pb-6">
+      <div className="mx-auto w-full max-w-[430px] space-y-4">
+        {/* Phone-only compact header */}
+        <div className="rounded-[1.7rem] border border-vaultGold/20 bg-gradient-to-br from-black via-[#100b0f] to-black p-4 shadow-[0_18px_45px_rgba(0,0,0,0.6)]">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-vaultGold">
+                CardVault Pro
+              </p>
+              <h1 className="mt-1 text-2xl font-black tracking-tight text-white">
+                Dashboard
+              </h1>
+            </div>
 
-          <button
-            onClick={() => setActiveScreen("My Collection")}
-            className="rounded-2xl border border-vaultGold/40 bg-vaultGold/10 px-3 py-2 text-xs font-black text-vaultGold shadow-vault"
-          >
-            Collection →
-          </button>
-        </div>
-
-        <p className="mt-3 max-w-[280px] text-xs font-medium leading-5 text-zinc-400">
-          Portfolio value, card count, gain/loss, ROI, and key collection movement.
-        </p>
-      </div>
-
-      {/* Mini filter row like your example */}
-      <div className="grid grid-cols-4 overflow-hidden rounded-2xl border border-steelBorder bg-white/5 text-center text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400">
-        <button className="border-r border-steelBorder bg-vaultGold/15 px-2 py-2 text-vaultGold">
-          Day
-        </button>
-        <button className="border-r border-steelBorder px-2 py-2">Month</button>
-        <button className="border-r border-steelBorder px-2 py-2">Qtr</button>
-        <button className="px-2 py-2">2026</button>
-      </div>
-
-      {/* Phone KPI cards */}
-      <div className="grid w-full max-w-full grid-cols-2 gap-3">
-        {phoneStats.map((stat) => (
-          <div
-            key={stat.label}
-            className="relative min-w-0 min-h-[142px] overflow-hidden rounded-2xl border border-steelBorder bg-black/75 p-4 shadow-[0_16px_36px_rgba(0,0,0,0.48)]"
-          >
-            <div className={`absolute right-3 top-3 h-20 w-1 rounded-full bg-gradient-to-b ${stat.rail}`} />
-
-            <p className="max-w-[110px] text-[10px] font-black uppercase leading-5 tracking-[0.22em] text-zinc-400">
-              {stat.label}
-            </p>
-
-            <p className={`mt-4 break-words text-[1.6rem] font-black leading-tight tracking-tight ${stat.accent}`}>
-              {stat.value}
-            </p>
-
-            <p className="mt-2 max-w-[115px] text-[11px] font-medium leading-5 text-zinc-400">
-              {stat.sub}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* Phone insight cards */}
-      <div className="space-y-3">
-        <div className="rounded-2xl border border-steelBorder bg-black/75 p-4 shadow-[0_16px_36px_rgba(0,0,0,0.45)]">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-black text-white">Collection Trend</h2>
-            <span className="rounded-full border border-vaultGold/30 px-3 py-1 text-xs font-black text-vaultGold">
-              30D
-            </span>
-          </div>
-
-          <div className="mt-5 h-20 rounded-2xl border border-steelBorder bg-gradient-to-r from-vaultGold/10 via-emerald-400/10 to-transparent" />
-
-          <p className="mt-3 text-xs font-medium leading-5 text-zinc-400">
-            Track collection movement as comps, grades, and card values update.
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-steelBorder bg-black/75 p-4 shadow-[0_16px_36px_rgba(0,0,0,0.45)]">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-black text-white">Top Cards</h2>
             <button
               onClick={() => setActiveScreen("My Collection")}
-              className="text-xs font-black text-vaultGold"
+              className="shrink-0 rounded-2xl border border-vaultGold/40 bg-vaultGold/10 px-3 py-2 text-xs font-black text-vaultGold shadow-vault"
             >
-              View All →
+              Collection →
             </button>
           </div>
 
-          <div className="mt-4 space-y-3">
-            {topPhoneCards.map((card) => (
-              <button
-                key={card.id}
-                onClick={() => setActiveScreen("My Collection")}
-                className="flex w-full items-center justify-between gap-3 rounded-2xl border border-steelBorder bg-white/5 px-3 py-3 text-left"
-              >
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-black text-white">{card.player}</p>
-                  <p className="truncate text-[11px] font-bold uppercase tracking-[0.12em] text-zinc-500">
-                    {card.card} • {card.grade}
-                  </p>
-                </div>
+          <p className="mt-3 text-xs font-medium leading-5 text-zinc-400">
+            Portfolio value, card count, gain/loss, ROI, and key collection movement.
+          </p>
+        </div>
 
-                <p className="shrink-0 text-sm font-black text-emerald-400">
-                  ${card.estimatedValue.toLocaleString()}
-                </p>
+        {/* Mini filter row */}
+        <div className="grid grid-cols-4 overflow-hidden rounded-2xl border border-steelBorder bg-white/5 text-center text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400">
+          <button className="border-r border-steelBorder bg-vaultGold/15 px-2 py-2 text-vaultGold">
+            Day
+          </button>
+          <button className="border-r border-steelBorder px-2 py-2">Month</button>
+          <button className="border-r border-steelBorder px-2 py-2">Qtr</button>
+          <button className="px-2 py-2">2026</button>
+        </div>
+
+        {/* Phone KPI cards */}
+        <div className="grid w-full grid-cols-2 gap-3">
+          {phoneStats.map((stat) => (
+            <div
+              key={stat.label}
+              className="relative min-h-[152px] min-w-0 overflow-hidden rounded-2xl border border-steelBorder bg-black/75 p-4 shadow-[0_16px_36px_rgba(0,0,0,0.48)]"
+            >
+              <div
+                className={`absolute right-3 top-3 h-20 w-1 rounded-full bg-gradient-to-b ${stat.rail}`}
+              />
+
+              <p className="max-w-[115px] text-[10px] font-black uppercase leading-5 tracking-[0.22em] text-zinc-400">
+                {stat.label}
+              </p>
+
+              <p
+                className={`mt-4 break-words text-[clamp(1.55rem,7vw,2rem)] font-black leading-tight tracking-tight ${stat.accent}`}
+              >
+                {stat.value}
+              </p>
+
+              <p className="mt-2 max-w-[125px] text-[11px] font-medium leading-5 text-zinc-400">
+                {stat.sub}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Phone insight cards */}
+        <div className="space-y-3">
+          <div className="rounded-2xl border border-steelBorder bg-black/75 p-4 shadow-[0_16px_36px_rgba(0,0,0,0.45)]">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-black text-white">Collection Trend</h2>
+              <span className="rounded-full border border-vaultGold/30 px-3 py-1 text-xs font-black text-vaultGold">
+                30D
+              </span>
+            </div>
+
+            <div className="mt-5 h-20 rounded-2xl border border-steelBorder bg-gradient-to-r from-vaultGold/10 via-emerald-400/10 to-transparent" />
+
+            <p className="mt-3 text-xs font-medium leading-5 text-zinc-400">
+              Track collection movement as comps, grades, and card values update.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-steelBorder bg-black/75 p-4 shadow-[0_16px_36px_rgba(0,0,0,0.45)]">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-black text-white">Top Cards</h2>
+              <button
+                onClick={() => setActiveScreen("My Collection")}
+                className="text-xs font-black text-vaultGold"
+              >
+                View All →
               </button>
-            ))}
+            </div>
+
+            <div className="mt-4 space-y-3">
+              {topPhoneCards.map((card) => (
+                <button
+                  key={card.id}
+                  onClick={() => setActiveScreen("My Collection")}
+                  className="flex w-full items-center justify-between gap-3 rounded-2xl border border-steelBorder bg-white/5 px-3 py-3 text-left"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-black text-white">
+                      {card.player}
+                    </p>
+                    <p className="truncate text-[11px] font-bold uppercase tracking-[0.12em] text-zinc-500">
+                      {card.card} • {card.grade}
+                    </p>
+                  </div>
+
+                  <p className="shrink-0 text-sm font-black text-emerald-400">
+                    ${card.estimatedValue.toLocaleString()}
+                  </p>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
