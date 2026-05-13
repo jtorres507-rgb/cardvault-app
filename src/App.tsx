@@ -648,7 +648,7 @@ function CardVaultMobileHeader() {
 
         {/* Center Brand */}
         <div className="text-center">
-          <p className="text-[22px] font-black uppercase tracking-[0.42em] text-vaultGold">
+          <p className="text-[18px] font-black uppercase tracking-[0.42em] text-vaultGold">
             CardVault
           </p>
           <p className="-mt-1 text-[10px] font-black uppercase tracking-[0.38em] text-vaultGold/80">
@@ -672,8 +672,8 @@ function CardVaultMobileHeader() {
             className="relative flex h-9 w-9 items-center justify-center text-cyan-100"
             aria-label="Notifications"
           >
-            <span className="text-[24px] leading-none">♢</span>
-            <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.8)]" />
+            <span className="text-xl leading-none">🔔</span>
+            <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.8)]" />
           </button>
         </div>
       </div>
