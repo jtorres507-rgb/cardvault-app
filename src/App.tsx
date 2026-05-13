@@ -2656,9 +2656,9 @@ function MyCollection({
                   onClick={() => openCardDetail(card.id)}
                   className="min-w-[86%] snap-center overflow-hidden rounded-[2rem] border border-vaultGold/25 bg-black/75 text-left shadow-vault first:ml-1 last:mr-5"
                 >
-                /* =========================================================
+                {/* =========================================================
                      MY COLLECTION CARD IMAGE AREA 
-                ========================================================= */
+                ========================================================= */}
                   <div className="relative flex h-[360px] items-center justify-center overflow-hidden bg-gradient-to-b from-zinc-900 via-black to-zinc-950 px-4 py-3">
                     <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(212,175,55,0.16),transparent_45%)]" />
 
@@ -2677,9 +2677,9 @@ function MyCollection({
                       </div>
                     )}
                   </div>
-                   /* =========================================================
+                   {/* =========================================================
                         MY COLLECTION SCREEN LOWER PANEL BELOW CARD IMAGE 
-                   ========================================================= */
+                   ========================================================= */}
                   <div className="border-t border-vaultGold/15 bg-black/95 px-4 py-3">
                     <p className="text-[10px] font-black uppercase tracking-[0.35em] text-zinc-500">
                       {cardYear}
