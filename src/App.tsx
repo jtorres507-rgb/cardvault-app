@@ -2590,7 +2590,7 @@ function MyCollection({
 
       <Panel className="relative overflow-hidden border-vaultGold/25 bg-black/50">
         {/* Phone-only Top Cards watermark */}
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.05] xl:hidden">
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.06] xl:hidden">
           <img
             src={cardgemzLogo}
             alt="CARDGEMZ Top Cards watermark"
@@ -2614,106 +2614,19 @@ function MyCollection({
             </button>
           </div>
 
-          {/* Phone-only swipe showcase with card visual on top and info below */}
-          <div className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 pr-6 xl:hidden">
-            {topCards.map((card) => {
-              const cardData = card as any;
-
-              const cardTitle =
-                cardData.player ||
-                cardData.name ||
-                cardData.itemName ||
-                "Unknown Player";
-
-              const cardDescription =
-                cardData.card ||
-                cardData.cardName ||
-                cardData.cardTitle ||
-                cardData.brand ||
-                "Card details";
-
-              const grade =
-                cardData.grade ||
-                cardData.gradingStatus ||
-                cardData.condition ||
-                "Raw";
-
-              const year =
-                cardData.year ||
-                cardData.season ||
-                cardData.releaseYear ||
-                "CardVault Pro";
-
-              const frontImage =
-                cardData.frontImage ||
-                cardData.frontImageUrl ||
-                cardData.imageUrl ||
-                cardData.image ||
-                cardData.photo ||
-                cardData.frontPhoto;
-
-              return (
-                <button
-                  key={card.id}
-                  type="button"
-                  onClick={() => openCardDetail(card.id)}
-                  className="min-w-[84%] snap-center overflow-hidden rounded-[2rem] border border-vaultGold/25 bg-black/75 text-left shadow-vault first:ml-1 last:mr-6"
-                >
-                  {/* Card image / visual section */}
-                  <div className="relative flex min-h-[330px] items-center justify-center overflow-hidden bg-gradient-to-b from-[#151719] via-black to-[#090a0c]">
-                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(212,175,55,0.18),transparent_42%)]" />
-
-                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.08]">
-                      <img
-                        src={cardgemzLogo}
-                        alt="CARDGEMZ card watermark"
-                        className="h-[300px] w-[300px] object-contain"
-                      />
-                    </div>
-
-                    {frontImage ? (
-                      <img
-                        src={frontImage}
-                        alt={cardTitle}
-                        className="relative z-10 max-h-[290px] max-w-[82%] rounded-2xl object-contain shadow-vault"
-                      />
-                    ) : (
-                      <div className="relative z-10 flex h-[245px] w-[72%] flex-col items-center justify-center rounded-[1.75rem] border border-vaultGold/25 bg-black/55">
-                        <Crown className="h-16 w-16 text-vaultGold/70" />
-                        <p className="mt-4 text-[10px] font-black uppercase tracking-[0.35em] text-zinc-500">
-                          Card Image
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Card info panel below image */}
-                  <div className="border-t border-vaultGold/15 bg-black/95 p-5">
-                    <p className="text-[10px] font-black uppercase tracking-[0.35em] text-zinc-500">
-                      {year}
-                    </p>
-
-                    <h3 className="mt-2 text-2xl font-black uppercase leading-tight text-white">
-                      {cardTitle}
-                    </h3>
-
-                    <p className="mt-2 text-sm font-bold uppercase leading-6 text-zinc-400">
-                      {cardDescription}
-                    </p>
-
-                    <div className="mt-5 flex items-center justify-between gap-3">
-                      <div className="rounded-xl border border-steelBorder bg-black px-4 py-2 text-sm font-black text-white">
-                        {grade}
-                      </div>
-
-                      <p className="text-2xl font-black text-emerald-400">
-                        ${card.estimatedValue.toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
+          {/* Phone-only swipe showcase */}
+          <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 pr-5 xl:hidden">
+            {topCards.map((card) => (
+              <div
+                key={card.id}
+                className="min-w-[86%] snap-center first:ml-1 last:mr-5"
+              >
+                <MobileCollectionShowcaseCard
+                  card={card}
+                  openCardDetail={openCardDetail}
+                />
+              </div>
+            ))}
           </div>
 
           {/* Desktop grid */}
