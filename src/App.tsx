@@ -1875,7 +1875,7 @@ function PhoneDashboard({
   ];
 
   return (
-    <div className="space-y-4 pb-6">
+    <div className="w-full max-w-full overflow-x-hidden space-y-4 pb-6">
       {/* Phone-only compact header */}
       <div className="rounded-[1.7rem] border border-vaultGold/20 bg-gradient-to-br from-black via-[#100b0f] to-black p-4 shadow-[0_18px_45px_rgba(0,0,0,0.6)]">
         <div className="flex items-start justify-between gap-3">
@@ -1912,11 +1912,11 @@ function PhoneDashboard({
       </div>
 
       {/* Phone KPI cards */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid w-full max-w-full grid-cols-2 gap-3">
         {phoneStats.map((stat) => (
           <div
             key={stat.label}
-            className="relative min-h-[142px] overflow-hidden rounded-2xl border border-steelBorder bg-black/75 p-4 shadow-[0_16px_36px_rgba(0,0,0,0.48)]"
+            className="relative min-w-0 min-h-[142px] overflow-hidden rounded-2xl border border-steelBorder bg-black/75 p-4 shadow-[0_16px_36px_rgba(0,0,0,0.48)]"
           >
             <div className={`absolute right-3 top-3 h-20 w-1 rounded-full bg-gradient-to-b ${stat.rail}`} />
 
@@ -1924,7 +1924,7 @@ function PhoneDashboard({
               {stat.label}
             </p>
 
-            <p className={`mt-4 text-2xl font-black tracking-tight ${stat.accent}`}>
+            <p className={`mt-4 break-words text-[1.6rem] font-black leading-tight tracking-tight ${stat.accent}`}>
               {stat.value}
             </p>
 
@@ -2011,16 +2011,16 @@ function Dashboard({
   return (
     <>
       {/* Phone-only Dashboard */}
-      <div className="block sm:hidden">
-        <PhoneDashboard
-          cards={cards}
-          collectionValue={collectionValue}
-          moneyInvested={moneyInvested}
-          netGain={netGain}
-          roi={roi}
-          setActiveScreen={setActiveScreen}
-        />
-      </div>
+<div className="block w-full max-w-full overflow-x-hidden sm:hidden">
+      <PhoneDashboard
+        cards={cards}
+        collectionValue={collectionValue}
+        moneyInvested={moneyInvested}
+        netGain={netGain}
+        roi={roi}
+        setActiveScreen={setActiveScreen}
+       />
+    </div>
 
       {/* Tablet/Desktop Dashboard */}
       <div className="hidden sm:block">
