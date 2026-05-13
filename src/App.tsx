@@ -603,60 +603,78 @@ const emptyForm: AddCardForm = {
 
 function CardVaultMobileHeader() {
   return (
-    <div className="sticky top-0 z-50 xl:hidden">
+    <div className="sticky top-0 z-50 bg-[#020807]/95 px-3 pb-3 pt-3 backdrop-blur-xl xl:hidden">
       {/* Status Row */}
-      <div className="flex h-8 items-center justify-between bg-[#071c1b] px-4 text-[11px] font-black tracking-[0.18em] text-white">
+      <div className="mb-3 flex h-6 items-center justify-between px-2 text-[12px] font-black tracking-[0.18em] text-white/90">
         <span>9:41</span>
 
-        <div className="flex items-center gap-2 text-white/85">
-          <span className="text-[10px] tracking-[0.28em]">▮▮▮</span>
-          <span className="text-[11px]">⌁</span>
-          <span className="flex h-3.5 w-6 items-center rounded-[3px] border border-white/75 p-[1px]">
-            <span className="block h-full w-4 rounded-[2px] bg-white/75" />
+        <div className="flex items-center gap-2 text-white/80">
+          <span className="text-[10px] tracking-[0.4em]">▮▮▮</span>
+          <span className="text-[12px]">⌁</span>
+          <span className="h-3 w-6 rounded-sm border border-white/70">
+            <span className="block h-full w-4 rounded-sm bg-white/70" />
           </span>
         </div>
       </div>
 
-      {/* Main App Bar */}
-      <div className="flex h-[54px] items-center justify-between border-b border-cyan-500/10 bg-[#0a2221] px-4">
-        {/* Left Side */}
-        <div className="flex items-center gap-4 text-vaultGold/80">
-          <button type="button" className="text-xl leading-none">
+      {/* Floating Header Bar */}
+      <div className="flex h-[74px] items-center justify-between rounded-[1.6rem] border border-cyan-400/10 bg-gradient-to-r from-[#031716] via-[#062421] to-[#031716] px-5 shadow-[0_12px_35px_rgba(0,0,0,0.65),inset_0_0_24px_rgba(20,184,166,0.12)]">
+        {/* Left Icons */}
+        <div className="flex items-center gap-5 text-vaultGold">
+          <button
+            type="button"
+            className="text-3xl font-light leading-none text-vaultGold/90"
+          >
             ‹
           </button>
 
-          <button type="button" className="text-[15px] leading-none">
+          <button
+            type="button"
+            className="text-2xl leading-none text-vaultGold/80"
+          >
             ◊
           </button>
 
-          <button type="button" className="grid h-5 w-5 grid-cols-2 gap-[3px]">
-            <span className="border border-vaultGold/70" />
-            <span className="border border-vaultGold/70" />
-            <span className="border border-vaultGold/70" />
-            <span className="border border-vaultGold/70" />
+          <button
+            type="button"
+            className="grid h-7 w-7 grid-cols-2 gap-1"
+          >
+            <span className="rounded-[3px] border border-vaultGold/80" />
+            <span className="rounded-[3px] border border-vaultGold/80" />
+            <span className="rounded-[3px] border border-vaultGold/80" />
+            <span className="rounded-[3px] border border-vaultGold/80" />
           </button>
         </div>
 
-        {/* Center */}
+        {/* Center Brand - slightly larger */}
         <div className="text-center">
-          <p className="text-[11px] font-black uppercase tracking-[0.22em] text-vaultGold">
+          <p className="text-[22px] font-black uppercase tracking-[0.48em] text-vaultGold">
             CardVault
+          </p>
+          <p className="-mt-1 text-[11px] font-black uppercase tracking-[0.45em] text-vaultGold/80">
+            Pro
           </p>
         </div>
 
-        {/* Right Side */}
-        <div className="flex items-center gap-4 text-center">
+        {/* Right Status + Notification Bell */}
+        <div className="flex items-center gap-5 text-center">
           <div>
-            <p className="text-[11px] font-black uppercase tracking-[0.16em] text-cyan-100">
+            <p className="text-[15px] font-black uppercase tracking-[0.2em] text-cyan-100">
               OSS
+            </p>
+            <p className="mt-1 text-[9px] font-black uppercase tracking-[0.18em] text-cyan-300">
+              Online
             </p>
           </div>
 
-          <div>
-            <p className="text-[11px] font-black uppercase tracking-[0.16em] text-cyan-100">
-              S7S
-            </p>
-          </div>
+          <button
+            type="button"
+            className="relative flex h-10 w-10 items-center justify-center rounded-full border border-cyan-400/15 bg-black/20 text-cyan-100 shadow-inner shadow-cyan-950/40"
+            aria-label="Notifications"
+          >
+            <span className="text-xl leading-none">🔔</span>
+            <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.8)]" />
+          </button>
         </div>
       </div>
     </div>
@@ -1605,7 +1623,7 @@ function exportDallasBetaBackup() {
           <TopBar activeScreen={activeScreen} />
         </div>
 
-        <section className="relative z-10 w-full min-w-0 max-w-full overflow-x-hidden px-4 pb-5 pt-4 sm:px-6 xl:p-8">
+        <section className="relative z-10 w-full min-w-0 max-w-full overflow-x-hidden px-0 pb-0 pt-0 sm:px-0 xl:p-8">
           {activeScreen === "Dashboard" && (
             <>
               {/* New phone dashboard layout */}
