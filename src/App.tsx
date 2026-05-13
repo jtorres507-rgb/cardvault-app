@@ -1669,23 +1669,23 @@ function MobileBottomNav({
 
 function TopBar({ activeScreen }: { activeScreen: Screen }) {
   return (
-    <header className="relative z-10 flex items-center justify-between border-b border-steelBorder bg-black/70 px-8 py-4 backdrop-blur">
+    <header className="sticky top-0 z-40 flex items-center justify-between gap-3 border-b border-steelBorder bg-black/85 px-4 py-3 backdrop-blur-xl sm:px-6 xl:px-8">
       {activeScreen === "Reports" ? (
-  <div className="flex w-[520px] items-center">
+    <div className="flex min-w-0 items-center">
     <div className="flex items-center gap-4">
       <img
         src="/vault-logo.png"
         alt="CardVault logo"
-        className="h-14 w-14 object-contain"
+        className="h-10 w-10 object-contain sm:h-12 sm:w-12 xl:h-14 xl:w-14"
       />
 
-      <span className="font-vault-heading text-3xl font-black tracking-tight text-white">
+      <span className="truncate font-vault-heading text-xl font-black tracking-tight text-white sm:text-2xl xl:text-3xl">
         CardVault <span className="text-vaultGold">Pro</span>
       </span>
     </div>
   </div>
 ) : (
-  <div className="flex w-[520px] items-center gap-3 rounded-2xl border border-steelBorder bg-graphite900 px-4 py-3">
+  <div className="hidden h-11 max-w-[520px] flex-1 items-center gap-3 rounded-2xl border border-steelBorder bg-graphite900 px-4 sm:flex">
     <Search size={18} className="text-zinc-500" />
     <input
       className="w-full bg-transparent text-sm text-white outline-none placeholder:text-zinc-500"
@@ -1694,17 +1694,17 @@ function TopBar({ activeScreen }: { activeScreen: Screen }) {
   </div>
 )}
 
-      <div className="flex items-center gap-5">
+      <div className="flex shrink-0 items-center gap-2 sm:gap-4">
         <div className="relative">
-          <Bell size={22} className="text-zinc-300" />
+          <Bell size={20} className="text-zinc-300 sm:size-[22px]" />
           <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-vaultGold text-xs font-black text-black">
             3
           </span>
         </div>
 
-        <div className="flex items-center gap-3 rounded-2xl border border-steelBorder bg-graphite900 px-4 py-2">
-          <UserCircle className="text-vaultGold" size={28} />
-          <div>
+        <div className="flex h-11 items-center gap-2 rounded-2xl border border-steelBorder bg-graphite900 px-3 py-2 sm:gap-3 sm:px-4">
+          <UserCircle className="text-vaultGold" size={24} />
+          <div className="hidden sm:block">
             <p className="text-sm font-bold">Collector</p>
             <p className="text-xs text-vaultGold">Pro Plan</p>
           </div>
