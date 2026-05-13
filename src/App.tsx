@@ -652,7 +652,7 @@ function CardVaultMobileHeader({
 
         {/* Center Brand */}
         <div className="text-center">
-          <p className="text-[15px] font-black uppercase tracking-[0.28em] text-vaultGold">
+          <p className="text-[15px] font-black uppercase tracking-[0.24em] text-vaultGold">
             CardVault
           </p>
           <p className="-mt-1 text-[10px] font-black uppercase tracking-[0.38em] text-vaultGold/80">
@@ -718,6 +718,36 @@ function CardVaultMobileShell({
 function MobileDashboardCommandCenter() {
   return (
     <div className="space-y-0">
+      {/* Collection Overview */}
+      <section className="border-b border-cyan-500/10 bg-[#0a2221] px-4 py-4">
+        <h2 className="mb-3 text-[11px] font-black uppercase tracking-[0.18em] text-cyan-300">
+          Collection Overview
+        </h2>
+
+        <div className="grid grid-cols-2 gap-3">
+          <DashboardMetricCard
+            label="Total Value"
+            value="$12,450"
+            sub="+8.72% vs last 30d"
+          />
+          <DashboardMetricCard
+            label="Total Invested"
+            value="$7,820"
+            sub="+2.18% vs last 30d"
+          />
+          <DashboardMetricCard
+            label="Unrealized Gain"
+            value="+$4,630"
+            sub="+59.23% vs last 30d"
+          />
+          <DashboardMetricCard
+            label="Total Cards"
+            value="148"
+            sub="+12 added this month"
+          />
+        </div>
+      </section>
+
       {/* Vault Intel Main Screen */}
       <section className="border-b border-cyan-500/10 bg-[#081d1c]">
         <div className="relative h-[430px] overflow-hidden bg-[#081d1c]">
@@ -794,36 +824,6 @@ function MobileDashboardCommandCenter() {
               />
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Collection Overview */}
-      <section className="border-b border-cyan-500/10 bg-[#0a2221] px-4 py-4">
-        <h2 className="mb-3 text-[11px] font-black uppercase tracking-[0.18em] text-cyan-300">
-          Collection Overview
-        </h2>
-
-        <div className="grid grid-cols-2 gap-3">
-          <DashboardMetricCard
-            label="Total Value"
-            value="$12,450"
-            sub="+8.72% vs last 30d"
-          />
-          <DashboardMetricCard
-            label="Total Invested"
-            value="$7,820"
-            sub="+2.18% vs last 30d"
-          />
-          <DashboardMetricCard
-            label="Unrealized Gain"
-            value="+$4,630"
-            sub="+59.23% vs last 30d"
-          />
-          <DashboardMetricCard
-            label="Total Cards"
-            value="148"
-            sub="+12 added this month"
-          />
         </div>
       </section>
 
