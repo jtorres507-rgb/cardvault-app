@@ -1249,9 +1249,10 @@ function exportDallasBetaBackup() {
   return (
     <div className="min-h-screen bg-[#0b0c10] text-white">
       <div className="flex min-h-screen">
-        <Sidebar activeScreen={activeScreen} setActiveScreen={setActiveScreen} />
+         <Sidebar activeScreen={activeScreen} setActiveScreen={setActiveScreen} />
+         <MobileBottomNav activeScreen={activeScreen} setActiveScreen={setActiveScreen} />
 
-        <main className="relative flex-1 overflow-hidden bg-[#0b0c10]">
+        <main className="relative flex-1 overflow-hidden bg-[#0b0c10] pb-6 pl-20 sm:pb-24 sm:pl-0 xl:pb-0">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(95,24,18,0.14),transparent_40%)]" />
 
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.04]">
@@ -1264,7 +1265,7 @@ function exportDallasBetaBackup() {
 
           <TopBar activeScreen={activeScreen} />
 
-          <section className="relative z-10 p-8">
+          <section className="relative z-10 px-4 py-5 sm:px-6 lg:p-8">
             {activeScreen === "Dashboard" && (
               <Dashboard
                 cards={cards}
@@ -1440,7 +1441,7 @@ function Sidebar({
   setActiveScreen: (screen: Screen) => void;
 }) {
   return (
-    <aside className="w-72 shrink-0 border-r border-steelBorder bg-gradient-to-b from-black via-black to-graphite950 px-5 py-6">
+    <aside className="hidden lg:flex lg:w-72 lg:shrink-0 lg:flex-col border-r border-steelBorder bg-gradient-to-b from-black via-black to-graphite">
       <div className="mb-10 flex items-center gap-3">
         <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-vaultGold/50 bg-black shadow-vault">
           <img src={cardgemzLogo} alt="CARDGEMZ" className="h-full w-full object-contain" />
@@ -1483,6 +1484,186 @@ function Sidebar({
         </p>
       </div>
     </aside>
+  );
+}
+
+/* =========================================================
+   PHONE MINI SIDEBAR
+   Used only on phone screens.
+   Collapsed icon rail + expandable full menu.
+   Does not change the desktop sidebar design.
+========================================================= */
+function PhoneMiniSidebar({
+  activeScreen,
+  setActiveScreen,
+}: {
+  activeScreen: Screen;
+  setActiveScreen: (screen: Screen) => void;
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const phoneSidebarItems = sidebarItems;
+
+  return (
+    <>
+      {/* Phone overlay when expanded */}
+      {isExpanded && (
+        <button
+          type="button"
+          aria-label="Close phone navigation overlay"
+          onClick={() => setIsExpanded(false)}
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm sm:hidden"
+        />
+      )}
+
+      {/* Phone sidebar */}
+      <aside
+        className={`fixed left-0 top-0 z-50 flex h-screen flex-col border-r border-vaultGold/20 bg-gradient-to-b from-black via-[#050505] to-graphite shadow-[18px_0_40px_rgba(0,0,0,0.75)] transition-all duration-300 sm:hidden ${
+          isExpanded ? "w-72" : "w-20"
+        }`}
+      >
+        {/* Phone Sidebar Header */}
+        <div className="flex h-24 items-center justify-between border-b border-white/10 px-3">
+          <div className="flex items-center gap-3 overflow-hidden">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-vaultGold/40 bg-black">
+              <img
+                src={cardgemzLogo}
+                alt="CARDGEMZ"
+                className="h-full w-full object-contain"
+              />
+            </div>
+
+            {isExpanded && (
+              <div>
+                <p className="text-lg font-black tracking-wide text-white">
+                  CARDGEMZ
+                </p>
+                <p className="-mt-1 text-xs font-bold uppercase tracking-[0.35em] text-vaultGold">
+                  Vault Pro
+                </p>
+              </div>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsExpanded((current) => !current)}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-vaultGold/30 bg-vaultGold/10 text-vaultGold transition hover:bg-vaultGold/20"
+            aria-label={isExpanded ? "Collapse phone sidebar" : "Expand phone sidebar"}
+          >
+            <span className="text-lg font-black">
+              {isExpanded ? "‹" : "›"}
+            </span>
+          </button>
+        </div>
+
+        {/* Phone Sidebar Primary Menu */}
+        <nav className="flex-1 space-y-2 overflow-y-auto px-3 py-5">
+          {phoneSidebarItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeScreen === item.label;
+
+            return (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => {
+                  setActiveScreen(item.label);
+                  setIsExpanded(false);
+                }}
+                className={`group relative flex w-full items-center rounded-xl border text-left transition ${
+                  isExpanded ? "gap-3 px-4 py-3" : "justify-center px-0 py-3"
+                } ${
+                  isActive
+                    ? "border-vaultGold/60 bg-vaultGold/15 text-vaultGold shadow-vault"
+                    : "border-transparent text-zinc-300 hover:border-white/10 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                <Icon size={22} />
+
+                {isExpanded && (
+                  <span className="text-sm font-black tracking-wide">
+                    {item.label}
+                  </span>
+                )}
+
+                {!isExpanded && (
+                  <span className="pointer-events-none absolute left-full ml-3 hidden rounded-lg border border-white/10 bg-white px-3 py-1 text-xs font-black text-black shadow-xl group-hover:block">
+                    {item.label}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Phone Sidebar Footer Label */}
+        <div className="border-t border-white/10 px-3 py-4">
+          {isExpanded ? (
+            <div className="rounded-2xl border border-vaultGold/30 bg-vaultGold/10 p-3">
+              <p className="text-xs font-black uppercase tracking-[0.25em] text-vaultGold">
+                Mobile Field Mode
+              </p>
+              <p className="mt-1 text-[11px] leading-5 text-zinc-400">
+                Phone layout for scanning, reviewing, and card show decisions.
+              </p>
+            </div>
+          ) : (
+            <div className="mx-auto h-2 w-8 rounded-full bg-vaultGold/50" />
+          )}
+        </div>
+      </aside>
+    </>
+  );
+}
+
+function MobileBottomNav({
+  activeScreen,
+  setActiveScreen,
+}: {
+  activeScreen: Screen;
+  setActiveScreen: (screen: Screen) => void;
+}) {
+  const mobileNavItems = sidebarItems.filter((item) =>
+    ["Dashboard", "My Collection", "CardVault Scan", "Scan Review Queue", "Sales Tracker"].includes(
+      item.label
+    )
+  );
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-vaultGold/30 bg-black/95 px-2 py-2 shadow-[0_-12px_30px_rgba(0,0,0,0.65)] backdrop-blur-xl lg:hidden">
+      <div className="grid grid-cols-5 gap-1">
+        {mobileNavItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeScreen === item.label;
+
+          return (
+            <button
+              key={item.label}
+              onClick={() => setActiveScreen(item.label)}
+              className={`flex flex-col items-center justify-center rounded-xl px-1 py-2 text-center transition ${
+                isActive
+                  ? "bg-vaultGold/15 text-vaultGold shadow-vault"
+                  : "text-zinc-400 hover:bg-white/5 hover:text-white"
+              }`}
+            >
+              <Icon size={19} />
+              <span className="mt-1 text-[10px] font-black leading-tight">
+                {item.label === "My Collection"
+                  ? "Collection"
+                  : item.label === "CardVault Scan"
+                  ? "Scan"
+                  : item.label === "Scan Review Queue"
+                  ? "Queue"
+                  : item.label === "Sales Tracker"
+                  ? "Sales"
+                  : item.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </nav>
   );
 }
 
