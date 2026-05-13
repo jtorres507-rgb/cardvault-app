@@ -2616,17 +2616,93 @@ function MyCollection({
 
           {/* Phone-only swipe showcase */}
           <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 pr-5 xl:hidden">
-            {topCards.map((card) => (
-              <div
-                key={card.id}
-                className="min-w-[86%] snap-center first:ml-1 last:mr-5"
-              >
-                <MobileCollectionShowcaseCard
-                  card={card}
-                  openCardDetail={openCardDetail}
-                />
-              </div>
-            ))}
+            {topCards.map((card) => {
+              const cardData = card as any;
+
+              const grade =
+                cardData.grade ||
+                cardData.gradingStatus ||
+                cardData.condition ||
+                "Raw";
+
+              const cardTitle =
+                cardData.player ||
+                cardData.name ||
+                cardData.itemName ||
+                "Unknown Player";
+
+              const cardDescription =
+                cardData.card ||
+                cardData.cardName ||
+                cardData.brand ||
+                cardData.set ||
+                "Card details";
+
+              const cardYear =
+                cardData.year || cardData.season || "CardVault Pro";
+
+              const frontImage =
+                cardData.frontImage ||
+                cardData.frontImageUrl ||
+                cardData.image ||
+                cardData.imageUrl ||
+                cardData.photo ||
+                "";
+
+              return (
+                <button
+                  key={card.id}
+                  type="button"
+                  onClick={() => openCardDetail(card.id)}
+                  className="min-w-[86%] snap-center overflow-hidden rounded-[2rem] border border-vaultGold/25 bg-black/75 text-left shadow-vault first:ml-1 last:mr-5"
+                >
+                  {/* Card Image Area */}
+                  <div className="relative flex h-[430px] items-center justify-center overflow-hidden bg-gradient-to-b from-zinc-900 via-black to-zinc-950 p-4">
+                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(212,175,55,0.16),transparent_45%)]" />
+
+                    {frontImage ? (
+                      <img
+                        src={frontImage}
+                        alt={`${cardTitle} card front`}
+                        className="relative z-10 h-full w-full rounded-2xl object-contain"
+                      />
+                    ) : (
+                      <div className="relative z-10 flex h-full w-full flex-col items-center justify-center rounded-2xl border border-vaultGold/25 bg-black/55 shadow-vault">
+                        <Crown className="h-16 w-16 text-vaultGold/75" />
+                        <p className="mt-5 text-[10px] font-black uppercase tracking-[0.45em] text-zinc-400">
+                          Card Image
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Card Info Panel Below Image */}
+                  <div className="border-t border-vaultGold/15 bg-black/95 p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.35em] text-zinc-500">
+                      {cardYear}
+                    </p>
+
+                    <h3 className="mt-2 text-xl font-black uppercase leading-tight text-white">
+                      {cardTitle}
+                    </h3>
+
+                    <p className="mt-1 line-clamp-1 text-xs font-bold uppercase leading-5 text-zinc-400">
+                      {cardDescription}
+                    </p>
+
+                    <div className="mt-4 flex items-center justify-between gap-3">
+                      <div className="rounded-xl border border-steelBorder bg-black px-4 py-2 text-sm font-black text-white">
+                        {grade}
+                      </div>
+
+                      <p className="text-xl font-black text-emerald-400">
+                        ${card.estimatedValue.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
           </div>
 
           {/* Desktop grid */}
