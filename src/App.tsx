@@ -1669,10 +1669,10 @@ function MobileBottomNav({
 
 function TopBar({ activeScreen }: { activeScreen: Screen }) {
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between gap-3 border-b border-steelBorder bg-black/85 px-4 py-3 backdrop-blur-xl sm:px-6 xl:px-8">
+    <header className="sticky top-0 z-40 flex w-full items-center border-b border-steelBorder bg-black/85 px-4 py-3 backdrop-blur-xl sm:px-6 xl:px-8">
       {activeScreen === "Reports" ? (
     <div className="flex min-w-0 items-center">
-    <div className="flex items-center gap-4">
+    <div className="ml-auto flex items-center gap-3">
       <img
         src="/vault-logo.png"
         alt="CardVault logo"
@@ -2361,6 +2361,31 @@ function MyCollection({
     .sort((a, b) => b.estimatedValue - a.estimatedValue)
     .slice(0, 5);
 
+  const collectionValue = cards.reduce(
+    (total, card) => total + card.estimatedValue,
+    0
+  );
+
+  const gradedCards = cards.filter((card) => {
+    const cardData = card as any;
+    return (
+      cardData.grade ||
+      cardData.gradingStatus === "Graded" ||
+      cardData.condition === "Graded"
+    );
+  }).length;
+
+  const rawCards = cards.length - gradedCards;
+
+  const trackedSets = new Set(
+    cards
+      .map((card) => {
+        const cardData = card as any;
+        return cardData.set || cardData.cardSet || cardData.brand;
+      })
+      .filter(Boolean)
+  ).size;
+
   if (cards.length === 0) {
     return (
       <EmptyVaultState
@@ -2373,17 +2398,51 @@ function MyCollection({
   }
 
   return (
-    <>
-      <VaultCollectionHero
-        cards={cards}
-        title="My Collection"
-        subtitle="Track your full card inventory, market value, grading status, storage, and collection decisions — all in one place."
-        actions={
-          <>
+    <div className="w-full max-w-full space-y-6 overflow-x-hidden">
+      {/* Mobile / Tablet Collection Hero */}
+      <section className="relative overflow-hidden rounded-[2rem] border border-vaultGold/25 bg-black/70 px-5 py-6 shadow-vault xl:hidden">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(212,175,55,0.18),transparent_38%),linear-gradient(135deg,rgba(255,255,255,0.05),transparent_45%)]" />
+
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.08]">
+          <img
+            src={cardgemzLogo}
+            alt="CARDGEMZ watermark"
+            className="h-[360px] w-[360px] object-contain"
+          />
+        </div>
+
+        <div className="relative z-10">
+          <div className="mb-5 flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.45em] text-vaultGold">
+                CardVault Pro
+              </p>
+              <h1 className="mt-3 text-4xl font-black leading-none text-white">
+                My
+                <br />
+                Collection
+              </h1>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setActiveScreen("Dashboard")}
+              className="shrink-0 rounded-full border border-vaultGold/40 bg-vaultGold/10 px-4 py-2 text-xs font-black text-vaultGold shadow-vault"
+            >
+              Dashboard →
+            </button>
+          </div>
+
+          <p className="max-w-md text-base font-bold leading-7 text-zinc-400">
+            Track your full card inventory, market value, grading status,
+            storage, and collection decisions — all in one place.
+          </p>
+
+          <div className="mt-6 grid grid-cols-1 gap-3">
             <button
               type="button"
               onClick={() => setActiveScreen("Add Card")}
-              className="inline-flex items-center gap-2 rounded-xl border border-vaultGold/70 bg-black/60 px-7 py-3 text-sm font-black text-vaultGold shadow-vault transition hover:bg-vaultGold hover:text-black"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-vaultGold/70 bg-black/60 px-5 py-4 text-sm font-black text-vaultGold shadow-vault transition hover:bg-vaultGold hover:text-black"
             >
               <Plus size={18} />
               Add Card
@@ -2392,17 +2451,88 @@ function MyCollection({
             <button
               type="button"
               onClick={openCollectionReport}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-[#fff3a0] via-vaultGold to-[#9b6a10] px-7 py-3 text-sm font-black text-black shadow-vault transition hover:scale-[1.02]"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-b from-[#fff3a0] via-vaultGold to-[#9b6a10] px-5 py-4 text-sm font-black text-black shadow-vault transition hover:scale-[1.02]"
             >
               <Download size={18} />
               Export Collection
             </button>
-          </>
-        }
-      />
+          </div>
+
+          <div className="mt-6 grid grid-cols-2 overflow-hidden rounded-3xl border border-vaultGold/20 bg-black/55">
+            <div className="border-b border-r border-vaultGold/10 p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
+                Total Cards
+              </p>
+              <p className="mt-2 text-2xl font-black text-white">
+                {cards.length}
+              </p>
+            </div>
+
+            <div className="border-b border-vaultGold/10 p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
+                Value
+              </p>
+              <p className="mt-2 text-2xl font-black text-vaultGold">
+                ${collectionValue.toLocaleString()}
+              </p>
+            </div>
+
+            <div className="border-r border-vaultGold/10 p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
+                Graded
+              </p>
+              <p className="mt-2 text-2xl font-black text-white">
+                {gradedCards}
+              </p>
+            </div>
+
+            <div className="p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
+                Raw / Sets
+              </p>
+              <p className="mt-2 text-2xl font-black text-white">
+                {rawCards}
+                <span className="ml-2 text-sm text-zinc-500">
+                  / {trackedSets}
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Desktop Collection Hero */}
+      <div className="hidden xl:block">
+        <VaultCollectionHero
+          cards={cards}
+          title="My Collection"
+          subtitle="Track your full card inventory, market value, grading status, storage, and collection decisions — all in one place."
+          actions={
+            <>
+              <button
+                type="button"
+                onClick={() => setActiveScreen("Add Card")}
+                className="inline-flex items-center gap-2 rounded-xl border border-vaultGold/70 bg-black/60 px-7 py-3 text-sm font-black text-vaultGold shadow-vault transition hover:bg-vaultGold hover:text-black"
+              >
+                <Plus size={18} />
+                Add Card
+              </button>
+
+              <button
+                type="button"
+                onClick={openCollectionReport}
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-[#fff3a0] via-vaultGold to-[#9b6a10] px-7 py-3 text-sm font-black text-black shadow-vault transition hover:scale-[1.02]"
+              >
+                <Download size={18} />
+                Export Collection
+              </button>
+            </>
+          }
+        />
+      </div>
 
       <Panel className="border-vaultGold/25 bg-black/50">
-        <div className="mb-5 flex items-center justify-between">
+        <div className="mb-5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Crown className="h-5 w-5 text-vaultGold" />
             <h2 className="text-2xl font-black">Top Cards</h2>
@@ -2411,13 +2541,13 @@ function MyCollection({
           <button
             type="button"
             onClick={() => setActiveScreen("All Cards")}
-            className="text-sm font-black text-vaultGold hover:text-white"
+            className="shrink-0 text-sm font-black text-vaultGold hover:text-white"
           >
             View All →
           </button>
         </div>
 
-        <div className="grid grid-cols-5 gap-6">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5 xl:gap-6">
           {topCards.map((card) => (
             <CollectionCardTile
               key={card.id}
@@ -2428,7 +2558,7 @@ function MyCollection({
           ))}
         </div>
       </Panel>
-    </>
+    </div>
   );
 }
 
