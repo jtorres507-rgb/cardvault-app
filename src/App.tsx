@@ -1252,7 +1252,7 @@ function exportDallasBetaBackup() {
          <Sidebar activeScreen={activeScreen} setActiveScreen={setActiveScreen} />
          <MobileBottomNav activeScreen={activeScreen} setActiveScreen={setActiveScreen} />
 
-        <main className="relative flex-1 overflow-hidden bg-[#0b0c10] pb-6 pl-20 sm:pb-24 sm:pl-0 xl:pb-0">
+        <main className="relative w-full min-w-0 max-w-full flex-1 overflow-x-hidden bg-[#0b0c10] pb-24 xl:pb-0">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(95,24,18,0.14),transparent_40%)]" />
 
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.04]">
@@ -1265,7 +1265,7 @@ function exportDallasBetaBackup() {
 
           <TopBar activeScreen={activeScreen} />
 
-          <section className="relative z-10 px-4 py-5 sm:px-6 lg:p-8">
+          <section className="relative z-10 w-full min-w-0 max-w-full overflow-x-hidden px-4 py-5 sm:px-6 xl:p-8">
             {activeScreen === "Dashboard" && (
               <Dashboard
                 cards={cards}
@@ -1878,8 +1878,8 @@ function PhoneDashboard({
   ];
 
   return (
-    <div className="relative left-1/2 w-screen max-w-none -translate-x-1/2 overflow-x-hidden px-4 pb-6">
-      <div className="mx-auto w-full max-w-[430px] space-y-4">
+    <div className="relative w-full min-w-0 max-w-full overflow-x-hidden px-4 pb-28">
+      <div className="w-full min-w-0 max-w-full space-y-4">
         {/* Phone-only compact header */}
         <div className="rounded-[1.7rem] border border-vaultGold/20 bg-gradient-to-br from-black via-[#100b0f] to-black p-4 shadow-[0_18px_45px_rgba(0,0,0,0.6)]">
           <div className="flex items-start justify-between gap-3">
@@ -1931,7 +1931,7 @@ function PhoneDashboard({
               </p>
 
               <p
-                className={`mt-4 break-words text-[clamp(1.55rem,7vw,2rem)] font-black leading-tight tracking-tight ${stat.accent}`}
+                className={`mt-4 break-words text-[clamp(1.35rem,6vw,1.85rem)] font-black leading-tight tracking-tight ${stat.accent}`}
               >
                 {stat.value}
               </p>
