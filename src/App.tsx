@@ -717,203 +717,200 @@ function CardVaultMobileShell({
 
 function MobileDashboardCommandCenter() {
   return (
-    <div className="space-y-0">
-      {/* Collection Overview */}
-      <section className="border-b border-cyan-500/10 bg-[#0a2221] px-4 py-4">
-        <h2 className="mb-3 text-[11px] font-black uppercase tracking-[0.18em] text-cyan-300">
-          Collection Overview
-        </h2>
+    <div className="space-y-5">
+      {/* Collection Intelligence Banner */}
+      <section className="rounded-2xl border border-white/5 bg-[#101619] p-5 shadow-xl shadow-black/40">
+        <div className="flex items-center gap-4">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-cyan-500/70 bg-[#10232a] text-3xl text-vaultGold">
+            ★
+          </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <DashboardMetricCard
-            label="Total Value"
-            value="$12,450"
-            sub="+8.72% vs last 30d"
-          />
-          <DashboardMetricCard
-            label="Total Invested"
-            value="$7,820"
-            sub="+2.18% vs last 30d"
-          />
-          <DashboardMetricCard
-            label="Unrealized Gain"
-            value="+$4,630"
-            sub="+59.23% vs last 30d"
-          />
-          <DashboardMetricCard
-            label="Total Cards"
-            value="148"
-            sub="+12 added this month"
-          />
+          <div>
+            <h2 className="text-2xl font-bold tracking-wide text-white">
+              Collection Intelligence
+            </h2>
+            <p className="mt-1 text-sm font-medium leading-6 tracking-wider text-zinc-400">
+              Actionable insights for collection value, card movement, grading
+              strategy, and selling decisions.
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* Vault Intel Main Screen */}
-      <section className="border-b border-cyan-500/10 bg-[#081d1c]">
-        <div className="relative h-[430px] overflow-hidden bg-[#081d1c]">
-          {/* Grid */}
-          <div
-            className="absolute inset-0 opacity-[0.14]"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(94,234,212,.12) 1px, transparent 1px), linear-gradient(90deg, rgba(94,234,212,.12) 1px, transparent 1px)",
-              backgroundSize: "26px 26px",
-            }}
-          />
+      {/* Vault Intel Market-Style Panel */}
+      <section className="rounded-2xl border border-zinc-700/70 bg-[#101619] p-5 shadow-xl shadow-black/50">
+        <h2 className="text-3xl font-bold tracking-wide text-white">
+          Vault Intel
+        </h2>
 
-          {/* Top Label */}
-          <div className="absolute left-4 top-4 z-10 flex items-center gap-2">
-            <h1 className="text-[18px] font-black uppercase tracking-[0.08em] text-white">
-              Vault Intel
-            </h1>
-            <span className="text-sm text-cyan-300/50">⌄</span>
-          </div>
+        {/* Chart Area */}
+        <div className="mt-6 overflow-hidden rounded-xl bg-[#101619]">
+          <div className="relative h-[255px]">
+            {/* Horizontal Chart Lines */}
+            <div className="absolute inset-0">
+              {[18, 48, 78, 108, 138, 168, 198].map((top) => (
+                <div
+                  key={top}
+                  className="absolute left-0 right-0 border-t border-zinc-500/40"
+                  style={{ top }}
+                />
+              ))}
+            </div>
 
-          {/* Simplified Cyan Map Shape */}
-          <div className="absolute left-0 top-12 h-[180px] w-[170px] bg-cyan-300/90 [clip-path:polygon(8%_16%,22%_8%,38%_12%,52%_8%,66%_16%,64%_31%,56%_39%,58%_50%,50%_58%,44%_71%,33%_82%,25%_76%,19%_64%,10%_53%,6%_39%,2%_25%)]" />
-          <div className="absolute left-[128px] top-[8px] h-[55px] w-[42px] bg-cyan-300/90 [clip-path:polygon(30%_0%,100%_8%,84%_100%,0%_78%)]" />
-          <div className="absolute left-[196px] top-[22px] h-[38px] w-[28px] bg-cyan-300/90 [clip-path:polygon(18%_0%,100%_16%,80%_100%,0%_72%)]" />
+            {/* Percentage Labels */}
+            <div className="absolute right-0 top-2 space-y-[18px] text-right text-xs text-zinc-400">
+              <p>1.47%</p>
+              <p>1.07%</p>
+              <p>0.67%</p>
+              <p>0.27%</p>
+              <p>-0.13%</p>
+              <p>-0.53%</p>
+              <p>-0.93%</p>
+            </div>
 
-          {/* Right Data */}
-          <div className="absolute right-5 top-[62px] z-10">
-            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-cyan-300/90">
-              Beta Mode
-            </p>
-
-            <p className="mt-1 text-[28px] font-black leading-none tracking-[0.04em] text-orange-500">
-              206.24
-            </p>
-
-            <p className="mt-1 text-[18px] font-black tracking-[0.16em] text-orange-500">
-              QC607
-            </p>
-          </div>
-
-          {/* Circular Gauge */}
-          <div className="absolute right-4 top-[40px] h-[74px] w-[74px] rounded-full border-[10px] border-orange-500 border-b-[#52525b] border-l-[#52525b]" />
-          <div className="absolute right-[31px] top-[67px] text-sm font-black text-orange-500">
-            ↗
-          </div>
-
-          {/* Trend Line */}
-          <svg
-            className="absolute bottom-[104px] left-0 h-[86px] w-full"
-            viewBox="0 0 390 100"
-            preserveAspectRatio="none"
-          >
-            <polyline
-              points="0,72 36,74 68,63 102,71 138,49 172,38 206,52 242,30 280,16 326,29 390,0"
-              fill="none"
-              stroke="rgba(251,146,60,0.82)"
-              strokeWidth="1.8"
-            />
-            <circle cx="242" cy="30" r="3" fill="rgb(251,146,60)" />
-            <circle cx="280" cy="16" r="3" fill="rgb(251,146,60)" />
-          </svg>
-
-          {/* Bar Chart */}
-          <div className="absolute bottom-0 left-0 right-0 flex h-[120px] items-end gap-[3px] px-2">
-            {[
-              22, 36, 14, 28, 18, 48, 66, 58, 82, 96, 44, 62, 54, 86, 100,
-              72, 50, 34, 42, 68, 80, 44, 30, 54, 66, 90, 78,
-            ].map((height, index) => (
-              <div
-                key={index}
-                className="flex-1 bg-orange-500"
-                style={{ height: `${height}%` }}
+            {/* Multi-Line Chart */}
+            <svg
+              className="absolute inset-0 h-full w-full"
+              viewBox="0 0 360 240"
+              preserveAspectRatio="none"
+            >
+              <polyline
+                points="0,150 25,155 50,130 75,138 100,110 125,118 150,92 175,98 200,70 225,76 250,54 275,62 300,48 330,56 360,42"
+                fill="none"
+                stroke="rgba(229,231,235,0.85)"
+                strokeWidth="2"
               />
-            ))}
+
+              <polyline
+                points="0,160 25,168 50,152 75,154 100,142 125,144 150,126 175,128 200,112 225,110 250,96 275,104 300,92 330,98 360,86"
+                fill="none"
+                stroke="rgba(59,130,246,0.9)"
+                strokeWidth="2"
+              />
+
+              <polyline
+                points="0,178 25,188 50,166 75,170 100,158 125,162 150,148 175,152 200,136 225,140 250,124 275,130 300,118 330,122 360,112"
+                fill="none"
+                stroke="rgba(244,114,182,0.9)"
+                strokeWidth="2"
+              />
+
+              <polyline
+                points="0,185 25,178 50,174 75,180 100,172 125,176 150,168 175,170 200,160 225,164 250,152 275,156 300,146 330,150 360,140"
+                fill="none"
+                stroke="rgba(253,186,116,0.95)"
+                strokeWidth="2"
+              />
+            </svg>
+
+            {/* Time Labels */}
+            <div className="absolute bottom-0 left-0 right-8 flex justify-between text-xs text-zinc-400">
+              <span>09:30</span>
+              <span>10:34</span>
+              <span>11:39</span>
+              <span>12:43</span>
+              <span>13:48</span>
+              <span>14:52</span>
+              <span>15:57</span>
+            </div>
           </div>
         </div>
-      </section>
 
-      {/* AI Scan Queue */}
-      <section className="border-b border-cyan-500/10 bg-[#0a2221] px-4 py-4">
-        <h2 className="mb-3 text-[11px] font-black uppercase tracking-[0.18em] text-cyan-300">
-          AI Scan Review Queue
-        </h2>
-
-        <div className="grid grid-cols-4 gap-2 text-center">
-          <SmallMetric label="Temp Scans" value="24" />
-          <SmallMetric label="Storage" value="68%" />
-          <SmallMetric label="Buy / Watch" value="18" />
-          <SmallMetric label="Waiting" value="6" />
-        </div>
-
-        <div className="mt-4 grid grid-cols-1 gap-2">
-          <button className="border border-cyan-400/25 bg-[#0c2a29] px-4 py-3 text-[11px] font-black uppercase tracking-[0.14em] text-cyan-200">
-            Open Queue
+        {/* Time Range Tabs */}
+        <div className="mt-6 grid grid-cols-4 overflow-hidden rounded-xl border border-slate-500/70 text-center text-lg font-semibold text-white">
+          <button className="bg-cyan-950/60 px-4 py-4">1 Day</button>
+          <button className="border-l border-slate-500/70 px-4 py-4">
+            5 Day
           </button>
-
-          <button className="border border-cyan-400/25 bg-[#0c2a29] px-4 py-3 text-[11px] font-black uppercase tracking-[0.14em] text-cyan-200">
-            Create From Images
+          <button className="border-l border-slate-500/70 px-4 py-4">
+            1 Mo...
           </button>
-
-          <button className="border border-cyan-400/25 bg-[#0c2a29] px-4 py-3 text-[11px] font-black uppercase tracking-[0.14em] text-cyan-200">
-            Export Backup
+          <button className="border-l border-slate-500/70 px-4 py-4">
+            1 Year
           </button>
         </div>
-      </section>
 
-      {/* Dallas Beta */}
-      <section className="border-b border-orange-500/15 bg-[#161007] px-4 py-4">
-        <h2 className="mb-3 text-[11px] font-black uppercase tracking-[0.18em] text-orange-400">
-          Dallas Card Show Beta
-        </h2>
+        {/* Collection Detail Rows */}
+        <div className="mt-7 divide-y divide-zinc-700/70">
+          <VaultIntelRow
+            dotColor="bg-orange-300"
+            label="Total Value"
+            description="Current collection value"
+            value="$12,450"
+            change="+8.72%"
+          />
 
-        <div className="grid grid-cols-3 gap-3 text-center">
-          <SmallMetric label="Dealer Notes" value="32" orange />
-          <SmallMetric label="Buy" value="12" orange />
-          <SmallMetric label="Watch" value="9" orange />
-          <SmallMetric label="Pass" value="11" orange />
-          <SmallMetric label="Asking" value="$6,420" orange />
-          <SmallMetric label="Targets" value="$4,860" orange />
+          <VaultIntelRow
+            dotColor="bg-zinc-300"
+            label="Total Invested"
+            description="Cost basis tracked"
+            value="$7,820"
+            change="+2.18%"
+          />
+
+          <VaultIntelRow
+            dotColor="bg-blue-500"
+            label="Unrealized Gain"
+            description="Estimated profit position"
+            value="+$4,630"
+            change="+59.23%"
+          />
+
+          <VaultIntelRow
+            dotColor="bg-fuchsia-500"
+            label="Total Cards"
+            description="Cards currently in vault"
+            value="148"
+            change="+12"
+          />
         </div>
 
-        <button className="mt-4 w-full border border-orange-500/25 bg-[#1b1409] px-4 py-3 text-[11px] font-black uppercase tracking-[0.14em] text-vaultGold">
-          Open Beta Field Notes
+        <button className="mt-7 w-full rounded-xl px-4 py-4 text-center text-lg font-black uppercase tracking-[0.18em] text-cyan-400">
+          View More Collection Intel
         </button>
       </section>
+    </div>
+  );
+}
 
-      {/* Sales Intelligence */}
-      <section className="bg-[#0a2221] px-4 py-4">
-        <h2 className="mb-3 text-[11px] font-black uppercase tracking-[0.18em] text-cyan-300">
-          Sales Hub Intelligence
-        </h2>
+function VaultIntelRow({
+  dotColor,
+  label,
+  description,
+  value,
+  change,
+}: {
+  dotColor: string;
+  label: string;
+  description: string;
+  value: string;
+  change: string;
+}) {
+  return (
+    <div className="grid grid-cols-[1fr_auto] gap-4 py-4">
+      <div className="flex items-start gap-4">
+        <span className={`mt-2 h-4 w-4 rounded-full ${dotColor}`} />
 
-        <div className="grid grid-cols-2 gap-3">
-          <DashboardMetricCard
-            label="Total Sold"
-            value="37"
-            sub="Completed sales"
-          />
-          <DashboardMetricCard
-            label="Revenue"
-            value="$5,870"
-            sub="All platforms"
-          />
-          <DashboardMetricCard
-            label="Profit"
-            value="$1,942"
-            sub="Net gain"
-          />
-          <DashboardMetricCard
-            label="Best Platform"
-            value="eBay"
-            sub="Top performer"
-          />
+        <div>
+          <p className="text-xl font-semibold tracking-[0.18em] text-white">
+            {label}
+          </p>
+
+          <p className="mt-1 text-sm text-zinc-400">
+            {description}
+          </p>
         </div>
+      </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-2">
-          <button className="border border-cyan-400/25 bg-[#0c2a29] px-4 py-3 text-[11px] font-black uppercase tracking-[0.14em] text-cyan-200">
-            Open Sales Tracker
-          </button>
+      <div className="text-right">
+        <p className="text-xl font-semibold text-white">
+          {value}
+        </p>
 
-          <button className="border border-cyan-400/25 bg-[#0c2a29] px-4 py-3 text-[11px] font-black uppercase tracking-[0.14em] text-cyan-200">
-            View Sales Report
-          </button>
-        </div>
-      </section>
+        <p className="mt-1 text-lg font-semibold text-emerald-400">
+          {change}
+        </p>
+      </div>
     </div>
   );
 }
