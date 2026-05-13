@@ -2656,15 +2656,17 @@ function MyCollection({
                   onClick={() => openCardDetail(card.id)}
                   className="min-w-[86%] snap-center overflow-hidden rounded-[2rem] border border-vaultGold/25 bg-black/75 text-left shadow-vault first:ml-1 last:mr-5"
                 >
-                  {/* Card Image Area */}
-                  <div className="relative flex h-[430px] items-center justify-center overflow-hidden bg-gradient-to-b from-zinc-900 via-black to-zinc-950 p-4">
+                /* =========================================================
+                     MY COLLECTION CARD IMAGE AREA 
+                ========================================================= */
+                  <div className="relative flex h-[360px] items-center justify-center overflow-hidden bg-gradient-to-b from-zinc-900 via-black to-zinc-950 px-4 py-3">
                     <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(212,175,55,0.16),transparent_45%)]" />
 
                     {frontImage ? (
                       <img
-                        src={frontImage}
+                        src={card.frontImage}
                         alt={`${cardTitle} card front`}
-                        className="relative z-10 h-full w-full rounded-2xl object-contain"
+                        className="relative z-10 max-h-full w-full rounded-2xl object-contain"
                       />
                     ) : (
                       <div className="relative z-10 flex h-full w-full flex-col items-center justify-center rounded-2xl border border-vaultGold/25 bg-black/55 shadow-vault">
@@ -2675,9 +2677,10 @@ function MyCollection({
                       </div>
                     )}
                   </div>
-
-                  {/* Card Info Panel Below Image */}
-                  <div className="border-t border-vaultGold/15 bg-black/95 p-4">
+                   /* =========================================================
+                        MY COLLECTION SCREEN LOWER PANEL BELOW CARD IMAGE 
+                   ========================================================= */
+                  <div className="border-t border-vaultGold/15 bg-black/95 px-4 py-3">
                     <p className="text-[10px] font-black uppercase tracking-[0.35em] text-zinc-500">
                       {cardYear}
                     </p>
