@@ -603,73 +603,58 @@ const emptyForm: AddCardForm = {
 
 function CardVaultMobileHeader() {
   return (
-    <div className="sticky top-0 z-50 bg-[#020807]/95 px-3 pb-3 pt-3 backdrop-blur-xl xl:hidden">
+    <div className="sticky top-0 z-50 xl:hidden">
       {/* Status Row */}
-      <div className="mb-3 flex h-6 items-center justify-between px-2 text-[12px] font-black tracking-[0.18em] text-white/90">
+      <div className="flex h-8 items-center justify-between bg-[#071c1b] px-4 text-[11px] font-black tracking-[0.18em] text-white">
         <span>9:41</span>
 
-        <div className="flex items-center gap-2 text-white/80">
-          <span className="text-[10px] tracking-[0.4em]">▮▮▮</span>
-          <span className="text-[12px]">⌁</span>
-          <span className="flex h-3 w-6 items-center rounded-sm border border-white/70 p-[1px]">
-            <span className="block h-full w-4 rounded-[2px] bg-white/70" />
+        <div className="flex items-center gap-2 text-white/85">
+          <span className="text-[10px] tracking-[0.28em]">▮▮▮</span>
+          <span className="text-[11px]">⌁</span>
+          <span className="flex h-3.5 w-6 items-center rounded-[3px] border border-white/75 p-[1px]">
+            <span className="block h-full w-4 rounded-[2px] bg-white/75" />
           </span>
         </div>
       </div>
 
-      {/* Floating Mobile App Header Bar */}
-      <div className="flex h-[74px] items-center justify-between rounded-[1.6rem] border border-cyan-400/10 bg-gradient-to-r from-[#031716] via-[#062421] to-[#031716] px-5 shadow-[0_12px_35px_rgba(0,0,0,0.65),inset_0_0_24px_rgba(20,184,166,0.12)]">
-        {/* Left Icons */}
-        <div className="flex items-center gap-5 text-vaultGold">
-          <button
-            type="button"
-            className="text-3xl font-light leading-none text-vaultGold/90"
-          >
+      {/* Main App Bar */}
+      <div className="flex h-[54px] items-center justify-between border-b border-cyan-500/10 bg-[#0a2221] px-4">
+        {/* Left Side */}
+        <div className="flex items-center gap-4 text-vaultGold/80">
+          <button type="button" className="text-xl leading-none">
             ‹
           </button>
 
-          <button
-            type="button"
-            className="text-2xl leading-none text-vaultGold/80"
-          >
+          <button type="button" className="text-[15px] leading-none">
             ◊
           </button>
 
-          <button type="button" className="grid h-7 w-7 grid-cols-2 gap-1">
-            <span className="rounded-[3px] border border-vaultGold/80" />
-            <span className="rounded-[3px] border border-vaultGold/80" />
-            <span className="rounded-[3px] border border-vaultGold/80" />
-            <span className="rounded-[3px] border border-vaultGold/80" />
+          <button type="button" className="grid h-5 w-5 grid-cols-2 gap-[3px]">
+            <span className="border border-vaultGold/70" />
+            <span className="border border-vaultGold/70" />
+            <span className="border border-vaultGold/70" />
+            <span className="border border-vaultGold/70" />
           </button>
         </div>
 
-        {/* Center Brand */}
+        {/* Center */}
         <div className="text-center">
-          <p className="text-[20px] font-black uppercase tracking-[0.45em] text-vaultGold">
+          <p className="text-[11px] font-black uppercase tracking-[0.22em] text-vaultGold">
             CardVault
-          </p>
-          <p className="-mt-1 text-[11px] font-black uppercase tracking-[0.42em] text-vaultGold/80">
-            Pro
           </p>
         </div>
 
-        {/* Right Status */}
-        <div className="flex items-center gap-6 text-center">
+        {/* Right Side */}
+        <div className="flex items-center gap-4 text-center">
           <div>
-            <p className="text-[15px] font-black uppercase tracking-[0.2em] text-cyan-100">
+            <p className="text-[11px] font-black uppercase tracking-[0.16em] text-cyan-100">
               OSS
-            </p>
-            <p className="mt-1 text-[9px] font-black uppercase tracking-[0.18em] text-cyan-300">
-              Online
             </p>
           </div>
 
           <div>
-            <p className="text-[15px] font-black uppercase tracking-[0.2em] text-cyan-100">
+            <p className="text-[11px] font-black uppercase tracking-[0.16em] text-cyan-100">
               S7S
-            </p>
-            <p className="mt-1 text-[9px] font-black uppercase tracking-[0.18em] text-cyan-300">
-              Sync
             </p>
           </div>
         </div>
@@ -695,83 +680,79 @@ function CardVaultMobileShell({ children }: { children: React.ReactNode }) {
 
 function MobileDashboardCommandCenter() {
   return (
-    <div className="space-y-4">
-      {/* Vault Intel Hero */}
-      <section className="overflow-hidden rounded-[2rem] border border-cyan-400/10 bg-[#031211] shadow-2xl shadow-black/50">
-        <div className="relative h-[470px] overflow-hidden bg-[#031716]">
+    <div className="space-y-0">
+      {/* Vault Intel Main Screen */}
+      <section className="border-b border-cyan-500/10 bg-[#081d1c]">
+        <div className="relative h-[430px] overflow-hidden bg-[#081d1c]">
           {/* Grid */}
           <div
-            className="absolute inset-0 opacity-20"
+            className="absolute inset-0 opacity-[0.14]"
             style={{
               backgroundImage:
-                "linear-gradient(rgba(94,234,212,.16) 1px, transparent 1px), linear-gradient(90deg, rgba(94,234,212,.16) 1px, transparent 1px)",
-              backgroundSize: "28px 28px",
+                "linear-gradient(rgba(94,234,212,.12) 1px, transparent 1px), linear-gradient(90deg, rgba(94,234,212,.12) 1px, transparent 1px)",
+              backgroundSize: "26px 26px",
             }}
           />
 
-          {/* Soft Glow */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_30%,rgba(34,211,238,0.18),transparent_35%),radial-gradient(circle_at_78%_35%,rgba(249,115,22,0.14),transparent_32%)]" />
-
-          {/* Title */}
-          <div className="absolute left-5 top-5 z-10">
-            <div className="flex items-center gap-3">
-              <h1 className="text-[28px] font-black uppercase tracking-[0.16em] text-white">
-                Vault Intel
-              </h1>
-              <span className="text-lg text-cyan-300/50">⌄</span>
-            </div>
+          {/* Top Label */}
+          <div className="absolute left-4 top-4 z-10 flex items-center gap-2">
+            <h1 className="text-[18px] font-black uppercase tracking-[0.08em] text-white">
+              Vault Intel
+            </h1>
+            <span className="text-sm text-cyan-300/50">⌄</span>
           </div>
 
-          {/* Cyan Map Style Graphic */}
-          <div className="absolute -left-24 top-24 h-56 w-80 rotate-[-7deg] rounded-[55%_45%_48%_52%] bg-cyan-300/55 shadow-[0_0_45px_rgba(34,211,238,.35)]" />
-          <div className="absolute left-16 top-32 h-14 w-20 rotate-12 rounded-[45%_55%_52%_48%] bg-[#031716]" />
-          <div className="absolute left-28 top-18 h-28 w-20 rotate-[-18deg] rounded-[50%] bg-cyan-300/45" />
-          <div className="absolute left-[168px] top-40 h-18 w-14 rotate-12 rounded-[40%_60%_60%_40%] bg-cyan-300/45" />
+          {/* Simplified Cyan Map Shape */}
+          <div className="absolute left-0 top-12 h-[180px] w-[170px] bg-cyan-300/90 [clip-path:polygon(8%_16%,22%_8%,38%_12%,52%_8%,66%_16%,64%_31%,56%_39%,58%_50%,50%_58%,44%_71%,33%_82%,25%_76%,19%_64%,10%_53%,6%_39%,2%_25%)]" />
+          <div className="absolute left-[128px] top-[8px] h-[55px] w-[42px] bg-cyan-300/90 [clip-path:polygon(30%_0%,100%_8%,84%_100%,0%_78%)]" />
+          <div className="absolute left-[196px] top-[22px] h-[38px] w-[28px] bg-cyan-300/90 [clip-path:polygon(18%_0%,100%_16%,80%_100%,0%_72%)]" />
 
-          {/* Data Block */}
-          <div className="absolute right-8 top-28 z-10">
-            <p className="text-[13px] font-black uppercase tracking-[0.35em] text-cyan-300">
+          {/* Right Data */}
+          <div className="absolute right-5 top-[62px] z-10">
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-cyan-300/90">
               Beta Mode
             </p>
-            <p className="mt-3 text-[54px] font-black leading-none tracking-wider text-orange-500">
+
+            <p className="mt-1 text-[28px] font-black leading-none tracking-[0.04em] text-orange-500">
               206.24
             </p>
-            <p className="mt-4 text-[29px] font-black leading-none tracking-[0.28em] text-orange-500">
+
+            <p className="mt-1 text-[18px] font-black tracking-[0.16em] text-orange-500">
               QC607
             </p>
           </div>
 
-          {/* Orange Gauge */}
-          <div className="absolute right-6 top-24 h-32 w-32 rounded-full border-[18px] border-orange-500 border-b-zinc-800 border-l-zinc-800 shadow-[0_0_30px_rgba(249,115,22,.25)]" />
-          <div className="absolute right-[68px] top-[143px] text-3xl font-black text-orange-500">
+          {/* Circular Gauge */}
+          <div className="absolute right-4 top-[40px] h-[74px] w-[74px] rounded-full border-[10px] border-orange-500 border-b-[#52525b] border-l-[#52525b]" />
+          <div className="absolute right-[31px] top-[67px] text-sm font-black text-orange-500">
             ↗
           </div>
 
           {/* Trend Line */}
           <svg
-            className="absolute bottom-32 left-0 h-32 w-full"
-            viewBox="0 0 390 120"
+            className="absolute bottom-[104px] left-0 h-[86px] w-full"
+            viewBox="0 0 390 100"
             preserveAspectRatio="none"
           >
             <polyline
-              points="0,92 42,96 85,83 125,91 164,68 202,54 240,70 276,45 320,25 360,44 390,15"
+              points="0,72 36,74 68,63 102,71 138,49 172,38 206,52 242,30 280,16 326,29 390,0"
               fill="none"
-              stroke="rgba(249,115,22,.72)"
-              strokeWidth="2"
+              stroke="rgba(251,146,60,0.82)"
+              strokeWidth="1.8"
             />
-            <circle cx="278" cy="45" r="4" fill="rgb(251,146,60)" />
-            <circle cx="320" cy="25" r="4" fill="rgb(251,146,60)" />
+            <circle cx="242" cy="30" r="3" fill="rgb(251,146,60)" />
+            <circle cx="280" cy="16" r="3" fill="rgb(251,146,60)" />
           </svg>
 
           {/* Bar Chart */}
-          <div className="absolute bottom-0 left-0 right-0 flex h-[185px] items-end gap-[4px] px-3">
+          <div className="absolute bottom-0 left-0 right-0 flex h-[120px] items-end gap-[3px] px-2">
             {[
-              28, 40, 22, 34, 26, 50, 62, 56, 72, 90, 48, 68, 60, 88, 100,
-              76, 58, 44, 52, 70, 82, 48, 38, 60, 72, 94, 86,
+              22, 36, 14, 28, 18, 48, 66, 58, 82, 96, 44, 62, 54, 86, 100,
+              72, 50, 34, 42, 68, 80, 44, 30, 54, 66, 90, 78,
             ].map((height, index) => (
               <div
                 key={index}
-                className="flex-1 rounded-t-sm bg-gradient-to-t from-orange-900/80 via-orange-600/80 to-orange-300/90 shadow-[0_0_14px_rgba(249,115,22,.18)]"
+                className="flex-1 bg-orange-500"
                 style={{ height: `${height}%` }}
               />
             ))}
@@ -780,8 +761,8 @@ function MobileDashboardCommandCenter() {
       </section>
 
       {/* Collection Overview */}
-      <section className="rounded-3xl border border-cyan-400/10 bg-[#041817] p-4 shadow-xl shadow-black/40">
-        <h2 className="mb-4 text-sm font-black uppercase tracking-[0.2em] text-cyan-300">
+      <section className="border-b border-cyan-500/10 bg-[#0a2221] px-4 py-4">
+        <h2 className="mb-3 text-[11px] font-black uppercase tracking-[0.18em] text-cyan-300">
           Collection Overview
         </h2>
 
@@ -810,8 +791,8 @@ function MobileDashboardCommandCenter() {
       </section>
 
       {/* AI Scan Queue */}
-      <section className="rounded-3xl border border-cyan-400/10 bg-[#041817] p-4 shadow-xl shadow-black/40">
-        <h2 className="mb-4 text-sm font-black uppercase tracking-[0.2em] text-cyan-300">
+      <section className="border-b border-cyan-500/10 bg-[#0a2221] px-4 py-4">
+        <h2 className="mb-3 text-[11px] font-black uppercase tracking-[0.18em] text-cyan-300">
           AI Scan Review Queue
         </h2>
 
@@ -822,25 +803,25 @@ function MobileDashboardCommandCenter() {
           <SmallMetric label="Waiting" value="6" />
         </div>
 
-        <div className="mt-5 grid grid-cols-1 gap-3">
-          <button className="rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-3 text-sm font-black uppercase tracking-widest text-white shadow-lg shadow-cyan-950/50">
-            Open Queue →
+        <div className="mt-4 grid grid-cols-1 gap-2">
+          <button className="border border-cyan-400/25 bg-[#0c2a29] px-4 py-3 text-[11px] font-black uppercase tracking-[0.14em] text-cyan-200">
+            Open Queue
           </button>
 
-          <button className="rounded-2xl border border-cyan-400/40 px-4 py-3 text-sm font-black uppercase tracking-widest text-cyan-200">
+          <button className="border border-cyan-400/25 bg-[#0c2a29] px-4 py-3 text-[11px] font-black uppercase tracking-[0.14em] text-cyan-200">
             Create From Images
           </button>
 
-          <button className="rounded-2xl border border-cyan-400/40 px-4 py-3 text-sm font-black uppercase tracking-widest text-cyan-200">
+          <button className="border border-cyan-400/25 bg-[#0c2a29] px-4 py-3 text-[11px] font-black uppercase tracking-[0.14em] text-cyan-200">
             Export Backup
           </button>
         </div>
       </section>
 
       {/* Dallas Beta */}
-      <section className="rounded-3xl border border-orange-500/25 bg-[#130d05] p-4 shadow-xl shadow-black/40">
-        <h2 className="mb-4 text-sm font-black uppercase tracking-[0.2em] text-orange-400">
-          Dallas Card Show Beta ⚙
+      <section className="border-b border-orange-500/15 bg-[#161007] px-4 py-4">
+        <h2 className="mb-3 text-[11px] font-black uppercase tracking-[0.18em] text-orange-400">
+          Dallas Card Show Beta
         </h2>
 
         <div className="grid grid-cols-3 gap-3 text-center">
@@ -852,14 +833,14 @@ function MobileDashboardCommandCenter() {
           <SmallMetric label="Targets" value="$4,860" orange />
         </div>
 
-        <button className="mt-5 w-full rounded-2xl border border-orange-500/40 px-4 py-3 text-sm font-black uppercase tracking-widest text-vaultGold">
-          Open Beta Field Notes →
+        <button className="mt-4 w-full border border-orange-500/25 bg-[#1b1409] px-4 py-3 text-[11px] font-black uppercase tracking-[0.14em] text-vaultGold">
+          Open Beta Field Notes
         </button>
       </section>
 
       {/* Sales Intelligence */}
-      <section className="rounded-3xl border border-cyan-400/10 bg-[#041817] p-4 shadow-xl shadow-black/40">
-        <h2 className="mb-4 text-sm font-black uppercase tracking-[0.2em] text-cyan-300">
+      <section className="bg-[#0a2221] px-4 py-4">
+        <h2 className="mb-3 text-[11px] font-black uppercase tracking-[0.18em] text-cyan-300">
           Sales Hub Intelligence
         </h2>
 
@@ -886,13 +867,13 @@ function MobileDashboardCommandCenter() {
           />
         </div>
 
-        <div className="mt-5 grid grid-cols-1 gap-3">
-          <button className="rounded-2xl border border-cyan-400/40 px-4 py-3 text-sm font-black uppercase tracking-widest text-cyan-200">
-            Open Sales Tracker →
+        <div className="mt-4 grid grid-cols-1 gap-2">
+          <button className="border border-cyan-400/25 bg-[#0c2a29] px-4 py-3 text-[11px] font-black uppercase tracking-[0.14em] text-cyan-200">
+            Open Sales Tracker
           </button>
 
-          <button className="rounded-2xl border border-cyan-400/40 px-4 py-3 text-sm font-black uppercase tracking-widest text-cyan-200">
-            View Sales Report →
+          <button className="border border-cyan-400/25 bg-[#0c2a29] px-4 py-3 text-[11px] font-black uppercase tracking-[0.14em] text-cyan-200">
+            View Sales Report
           </button>
         </div>
       </section>
@@ -934,15 +915,15 @@ function SmallMetric({
   orange?: boolean;
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
+    <div className="border border-white/8 bg-black/12 p-3">
       <p
-        className={`text-xl font-black ${
+        className={`text-[18px] font-black ${
           orange ? "text-orange-400" : "text-cyan-200"
         }`}
       >
         {value}
       </p>
-      <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-white/60">
+      <p className="mt-1 text-[8px] font-black uppercase tracking-[0.12em] text-white/55">
         {label}
       </p>
     </div>
@@ -1624,7 +1605,7 @@ function exportDallasBetaBackup() {
           <TopBar activeScreen={activeScreen} />
         </div>
 
-        <section className="relative z-10 w-full min-w-0 max-w-full overflow-x-hidden px-4 py-5 sm:px-6 xl:p-8">
+        <section className="relative z-10 w-full min-w-0 max-w-full overflow-x-hidden px-4 pb-5 pt-4 sm:px-6 xl:p-8">
           {activeScreen === "Dashboard" && (
             <>
               {/* New phone dashboard layout */}
