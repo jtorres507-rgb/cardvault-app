@@ -601,7 +601,11 @@ const emptyForm: AddCardForm = {
   storageLocation: "Vault A-01",
 };
 
-function CardVaultMobileHeader() {
+function CardVaultMobileHeader({
+  setActiveScreen,
+}: {
+  setActiveScreen: React.Dispatch<React.SetStateAction<Screen>>;
+}) {
   return (
     <div className="sticky top-0 z-50 bg-[#020807] px-4 pb-4 pt-3 xl:hidden">
       {/* Status Row */}
@@ -648,7 +652,7 @@ function CardVaultMobileHeader() {
 
         {/* Center Brand */}
         <div className="text-center">
-          <p className="text-[18px] font-black uppercase tracking-[0.42em] text-vaultGold">
+          <p className="text-[23px] font-black uppercase tracking-[0.28em] text-vaultGold">
             CardVault
           </p>
           <p className="-mt-1 text-[10px] font-black uppercase tracking-[0.38em] text-vaultGold/80">
@@ -656,44 +660,60 @@ function CardVaultMobileHeader() {
           </p>
         </div>
 
-        {/* Right Status + Bell */}
+        {/* Right Settings Gear + Notification Bell */}
         <div className="flex items-center justify-end gap-4">
-          <div className="text-center">
-            <p className="text-[15px] font-black uppercase tracking-[0.2em] text-cyan-100">
-              OSS
-            </p>
-            <p className="mt-1 text-[9px] font-black uppercase tracking-[0.18em] text-cyan-300">
-              Online
-            </p>
-          </div>
+          <button
+  type="button"
+  onClick={() => setActiveScreen("Settings")}
+  className="flex h-11 w-11 items-center justify-center text-cyan-100 transition hover:text-vaultGold"
+  aria-label="Open Settings"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-9 w-9"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.7"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="12" cy="12" r="3.25" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.04.04a2 2 0 1 1-2.83 2.83l-.04-.04A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 1.52V21a2 2 0 1 1-4 0v-.08a1.65 1.65 0 0 0-1-1.52 1.65 1.65 0 0 0-1.82.33l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.52-1H3a2 2 0 1 1 0-4h.08A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.04-.04a2 2 0 1 1 2.83-2.83l.04.04A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.52V3a2 2 0 1 1 4 0v.08a1.65 1.65 0 0 0 1 1.52 1.65 1.65 0 0 0 1.82-.33l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04A1.65 1.65 0 0 0 19.4 9c.14.35.5.6.92.6H21a2 2 0 1 1 0 4h-.68c-.42 0-.78.25-.92.6Z" />
+  </svg>
+</button>
 
           <button
             type="button"
-            className="relative flex h-9 w-9 items-center justify-center text-cyan-100"
+            className="relative flex h-10 w-10 items-center justify-center text-vaultGold"
             aria-label="Notifications"
           >
-            <span className="text-xl leading-none">🔔</span>
-            <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.8)]" />
+            <span className="text-[24px] leading-none">🔔</span>
+            <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.8)]" />
           </button>
         </div>
       </div>
     </div>
   );
 }
-function CardVaultMobileShell({ children }: { children: React.ReactNode }) {
+
+function CardVaultMobileShell({
+  children,
+  setActiveScreen,
+}: {
+  children: React.ReactNode;
+  setActiveScreen: React.Dispatch<React.SetStateAction<Screen>>;
+}) {
   return (
     <div className="min-h-screen bg-[#020807] text-white">
       <div className="mx-auto min-h-screen w-full max-w-[430px] overflow-hidden bg-gradient-to-b from-[#031413] via-[#041b18] to-black shadow-2xl shadow-black">
-        <CardVaultMobileHeader />
+        <CardVaultMobileHeader setActiveScreen={setActiveScreen} />
 
-        <main className="px-3 pb-8 pt-3">
-          {children}
-        </main>
+        <main className="px-3 pb-8 pt-3">{children}</main>
       </div>
     </div>
   );
 }
-
 
 function MobileDashboardCommandCenter() {
   return (
@@ -1614,7 +1634,7 @@ function exportDallasBetaBackup() {
 
         {/* Mobile premium app header throughout the app */}
         <div className="relative z-20 xl:hidden">
-          <CardVaultMobileHeader />
+          <CardVaultMobileHeader setActiveScreen={setActiveScreen} />
         </div>
 
         {/* Desktop top bar stays for desktop/tablet-wide layout */}
