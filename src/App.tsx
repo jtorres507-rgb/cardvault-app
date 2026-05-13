@@ -1806,6 +1806,189 @@ function HeroButton({
   );
 }
 
+function PhoneDashboard({
+  cards,
+  collectionValue,
+  moneyInvested,
+  netGain,
+  roi,
+  setActiveScreen,
+}: {
+  cards: CardRecord[];
+  collectionValue: number;
+  moneyInvested: number;
+  netGain: number;
+  roi: number;
+  setActiveScreen: (screen: Screen) => void;
+}) {
+  const totalCards = cards.length;
+  const gradedCards = cards.filter((card) => card.grade && card.grade !== "Raw").length;
+  const rawCards = cards.filter((card) => !card.grade || card.grade === "Raw").length;
+
+  const topPhoneCards = [...cards]
+    .sort((a, b) => b.estimatedValue - a.estimatedValue)
+    .slice(0, 3);
+
+  const phoneStats = [
+    {
+      label: "Collection Value",
+      value: `$${collectionValue.toLocaleString()}`,
+      sub: "Estimated market value",
+      accent: "text-vaultGold",
+      rail: "from-vaultGold via-vaultGold/40 to-transparent",
+    },
+    {
+      label: "Money Invested",
+      value: `$${moneyInvested.toLocaleString()}`,
+      sub: "Total cost basis",
+      accent: "text-sky-400",
+      rail: "from-sky-400 via-sky-400/40 to-transparent",
+    },
+    {
+      label: "Net Gain / Loss",
+      value: `$${netGain.toLocaleString()}`,
+      sub: `${roi.toFixed(1)}% ROI`,
+      accent: netGain >= 0 ? "text-emerald-400" : "text-red-400",
+      rail: netGain >= 0 ? "from-emerald-400 via-emerald-400/40 to-transparent" : "from-red-400 via-red-400/40 to-transparent",
+    },
+    {
+      label: "Cards Owned",
+      value: totalCards.toString(),
+      sub: "Across collection",
+      accent: "text-white",
+      rail: "from-white via-white/30 to-transparent",
+    },
+    {
+      label: "Graded",
+      value: gradedCards.toString(),
+      sub: "Protected assets",
+      accent: "text-vaultGold",
+      rail: "from-vaultGold via-vaultGold/40 to-transparent",
+    },
+    {
+      label: "Raw",
+      value: rawCards.toString(),
+      sub: "Review candidates",
+      accent: "text-zinc-100",
+      rail: "from-zinc-300 via-zinc-300/30 to-transparent",
+    },
+  ];
+
+  return (
+    <div className="space-y-4 pb-6">
+      {/* Phone-only compact header */}
+      <div className="rounded-[1.7rem] border border-vaultGold/20 bg-gradient-to-br from-black via-[#100b0f] to-black p-4 shadow-[0_18px_45px_rgba(0,0,0,0.6)]">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.28em] text-vaultGold">
+              CardVault Pro
+            </p>
+            <h1 className="mt-1 text-2xl font-black tracking-tight text-white">
+              Dashboard
+            </h1>
+          </div>
+
+          <button
+            onClick={() => setActiveScreen("My Collection")}
+            className="rounded-2xl border border-vaultGold/40 bg-vaultGold/10 px-3 py-2 text-xs font-black text-vaultGold shadow-vault"
+          >
+            Collection →
+          </button>
+        </div>
+
+        <p className="mt-3 max-w-[280px] text-xs font-medium leading-5 text-zinc-400">
+          Portfolio value, card count, gain/loss, ROI, and key collection movement.
+        </p>
+      </div>
+
+      {/* Mini filter row like your example */}
+      <div className="grid grid-cols-4 overflow-hidden rounded-2xl border border-steelBorder bg-white/5 text-center text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400">
+        <button className="border-r border-steelBorder bg-vaultGold/15 px-2 py-2 text-vaultGold">
+          Day
+        </button>
+        <button className="border-r border-steelBorder px-2 py-2">Month</button>
+        <button className="border-r border-steelBorder px-2 py-2">Qtr</button>
+        <button className="px-2 py-2">2026</button>
+      </div>
+
+      {/* Phone KPI cards */}
+      <div className="grid grid-cols-2 gap-3">
+        {phoneStats.map((stat) => (
+          <div
+            key={stat.label}
+            className="relative min-h-[142px] overflow-hidden rounded-2xl border border-steelBorder bg-black/75 p-4 shadow-[0_16px_36px_rgba(0,0,0,0.48)]"
+          >
+            <div className={`absolute right-3 top-3 h-20 w-1 rounded-full bg-gradient-to-b ${stat.rail}`} />
+
+            <p className="max-w-[110px] text-[10px] font-black uppercase leading-5 tracking-[0.22em] text-zinc-400">
+              {stat.label}
+            </p>
+
+            <p className={`mt-4 text-2xl font-black tracking-tight ${stat.accent}`}>
+              {stat.value}
+            </p>
+
+            <p className="mt-2 max-w-[115px] text-[11px] font-medium leading-5 text-zinc-400">
+              {stat.sub}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Phone insight cards */}
+      <div className="space-y-3">
+        <div className="rounded-2xl border border-steelBorder bg-black/75 p-4 shadow-[0_16px_36px_rgba(0,0,0,0.45)]">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-black text-white">Collection Trend</h2>
+            <span className="rounded-full border border-vaultGold/30 px-3 py-1 text-xs font-black text-vaultGold">
+              30D
+            </span>
+          </div>
+
+          <div className="mt-5 h-20 rounded-2xl border border-steelBorder bg-gradient-to-r from-vaultGold/10 via-emerald-400/10 to-transparent" />
+
+          <p className="mt-3 text-xs font-medium leading-5 text-zinc-400">
+            Track collection movement as comps, grades, and card values update.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-steelBorder bg-black/75 p-4 shadow-[0_16px_36px_rgba(0,0,0,0.45)]">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-black text-white">Top Cards</h2>
+            <button
+              onClick={() => setActiveScreen("My Collection")}
+              className="text-xs font-black text-vaultGold"
+            >
+              View All →
+            </button>
+          </div>
+
+          <div className="mt-4 space-y-3">
+            {topPhoneCards.map((card) => (
+              <button
+                key={card.id}
+                onClick={() => setActiveScreen("My Collection")}
+                className="flex w-full items-center justify-between gap-3 rounded-2xl border border-steelBorder bg-white/5 px-3 py-3 text-left"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-black text-white">{card.player}</p>
+                  <p className="truncate text-[11px] font-bold uppercase tracking-[0.12em] text-zinc-500">
+                    {card.card} • {card.grade}
+                  </p>
+                </div>
+
+                <p className="shrink-0 text-sm font-black text-emerald-400">
+                  ${card.estimatedValue.toLocaleString()}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Dashboard({
   cards,
   collectionValue,
@@ -1821,101 +2004,160 @@ function Dashboard({
   roi: number;
   setActiveScreen: (screen: Screen) => void;
 }) {
-  const topCards = [...cards].sort((a, b) => b.estimatedValue - a.estimatedValue).slice(0, 4);
+  const topCards = [...cards]
+    .sort((a, b) => b.estimatedValue - a.estimatedValue)
+    .slice(0, 4);
 
   return (
     <>
-      <PageHero
-        title="Dashboard"
-        subtitle="High-level portfolio performance, collection value, gain/loss, ROI, and key card insights."
-        actions={
-          <>
-        <HeroButton variant="gold" onClick={() => setActiveScreen("Add Card")}>
-          Add New Card
-        </HeroButton>
-      </>
-     }
-    />
-
-      <div className="grid grid-cols-4 gap-5">
-        <KpiCard label="Collection Value" value={money(collectionValue)} sub="Estimated market value" color="text-vaultGold" />
-        <KpiCard label="Money Invested" value={money(moneyInvested)} sub="Total cost basis" color="text-dataCyan" />
-        <KpiCard label="Net Gain / Loss" value={money(netGain)} sub={`${roi.toFixed(1)}% ROI`} color="text-profitGreen" />
-        <KpiCard label="Cards Owned" value={String(cards.length)} sub="Across all categories" color="text-white" />
+      {/* Phone-only Dashboard */}
+      <div className="block sm:hidden">
+        <PhoneDashboard
+          cards={cards}
+          collectionValue={collectionValue}
+          moneyInvested={moneyInvested}
+          netGain={netGain}
+          roi={roi}
+          setActiveScreen={setActiveScreen}
+        />
       </div>
 
-      <div className="mt-6 grid grid-cols-12 gap-6">
-        <Panel className="col-span-7">
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-lg font-black">Collection Value Trend</h2>
-            <span className="rounded-full border border-vaultGold/40 px-3 py-1 text-xs font-bold text-vaultGold">30D</span>
-          </div>
+      {/* Tablet/Desktop Dashboard */}
+      <div className="hidden sm:block">
+        <PageHero
+          title="Dashboard"
+          subtitle="High-level portfolio performance, collection value, gain/loss, ROI, and key card insights."
+          actions={
+            <>
+              <HeroButton variant="gold" onClick={() => setActiveScreen("Add Card")}>
+                Add New Card
+              </HeroButton>
+            </>
+          }
+        />
 
-          <div className="flex h-72 items-end gap-3 border-b border-l border-steelBorder px-4 pb-4">
-            {[35, 42, 48, 45, 55, 58, 63, 60, 68, 72, 79, 88].map((height, index) => (
-              <div key={index} className="flex flex-1 flex-col items-center gap-2">
+        <div className="grid grid-cols-4 gap-5">
+          <KpiCard
+            label="Collection Value"
+            value={money(collectionValue)}
+            sub="Estimated market value"
+            color="text-vaultGold"
+          />
+          <KpiCard
+            label="Money Invested"
+            value={money(moneyInvested)}
+            sub="Total cost basis"
+            color="text-dataCyan"
+          />
+          <KpiCard
+            label="Net Gain / Loss"
+            value={money(netGain)}
+            sub={`${roi.toFixed(1)}% ROI`}
+            color="text-profitGreen"
+          />
+          <KpiCard
+            label="Cards Owned"
+            value={String(cards.length)}
+            sub="Across all categories"
+            color="text-white"
+          />
+        </div>
+
+        <div className="mt-6 grid grid-cols-12 gap-6">
+          <Panel className="col-span-7">
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="text-lg font-black">Collection Value Trend</h2>
+              <span className="rounded-full border border-vaultGold/40 px-3 py-1 text-xs font-bold text-vaultGold">
+                30D
+              </span>
+            </div>
+
+            <div className="flex h-72 items-end gap-3 border-b border-l border-steelBorder px-4 pb-4">
+              {[35, 42, 48, 45, 55, 58, 63, 60, 68, 72, 79, 88].map(
+                (height, index) => (
+                  <div key={index} className="flex flex-1 flex-col items-center gap-2">
+                    <div
+                      className="w-full rounded-t-lg bg-gradient-to-t from-vaultGold/30 to-vaultGold shadow-vault"
+                      style={{ height: `${height}%` }}
+                    />
+                    <span className="text-[10px] text-zinc-500">{index + 1}</span>
+                  </div>
+                )
+              )}
+            </div>
+          </Panel>
+
+          <Panel className="col-span-5">
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="text-lg font-black">Top Cards</h2>
+              <span className="text-sm font-bold text-vaultGold">View All</span>
+            </div>
+
+            <div className="space-y-4">
+              {topCards.map((card, index) => (
                 <div
-                  className="w-full rounded-t-lg bg-gradient-to-t from-vaultGold/30 to-vaultGold shadow-vault"
-                  style={{ height: `${height}%` }}
-                />
-                <span className="text-[10px] text-zinc-500">{index + 1}</span>
-              </div>
-            ))}
-          </div>
-        </Panel>
-
-        <Panel className="col-span-5">
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-lg font-black">Top Cards</h2>
-            <span className="text-sm font-bold text-vaultGold">View All</span>
-          </div>
-
-          <div className="space-y-4">
-            {topCards.map((card, index) => (
-              <div key={card.id} className="flex items-center justify-between rounded-xl border border-steelBorder bg-black/40 p-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-vaultGold/10 text-sm font-black text-vaultGold">
-                    {index + 1}
+                  key={card.id}
+                  className="flex items-center justify-between rounded-xl border border-steelBorder bg-black/40 p-4"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-vaultGold/10 text-sm font-black text-vaultGold">
+                      {index + 1}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold">{card.card}</p>
+                      <p className="text-xs text-zinc-400">
+                        {card.player} • {card.grade}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-bold">{card.card}</p>
-                    <p className="text-xs text-zinc-400">
-                      {card.player} • {card.grade}
-                    </p>
-                  </div>
+                  <p className="font-black text-profitGreen">
+                    {money(card.estimatedValue)}
+                  </p>
                 </div>
-                <p className="font-black text-profitGreen">{money(card.estimatedValue)}</p>
-              </div>
-            ))}
-          </div>
-        </Panel>
-      </div>
+              ))}
+            </div>
+          </Panel>
+        </div>
 
-      <div className="mt-6 grid grid-cols-12 gap-6">
-        <Panel className="col-span-6">
-          <h2 className="mb-5 text-lg font-black">Recent Activity</h2>
-          <div className="space-y-3">
-            {[
-              "Victor Wembanyama collection report generated",
-              "Quinyon Mitchell card analysis updated",
-              "New grading candidate added",
-              "Market comps refreshed for 12 cards",
-            ].map((item) => (
-              <div key={item} className="rounded-xl border border-steelBorder bg-black/40 px-4 py-3 text-sm text-zinc-300">
-                {item}
-              </div>
-            ))}
-          </div>
-        </Panel>
+        <div className="mt-6 grid grid-cols-12 gap-6">
+          <Panel className="col-span-6">
+            <h2 className="mb-5 text-lg font-black">Recent Activity</h2>
+            <div className="space-y-3">
+              {[
+                "Victor Wembanyama collection report generated",
+                "Quinyon Mitchell card analysis updated",
+                "New grading candidate added",
+                "Market comps refreshed for 12 cards",
+              ].map((item) => (
+                <div
+                  key={item}
+                  className="rounded-xl border border-steelBorder bg-black/40 px-4 py-3 text-sm text-zinc-300"
+                >
+                  {item}
+                </div>
+              ))}
+            </div>
+          </Panel>
 
-        <Panel className="col-span-6 border-vaultGold/30 bg-vaultGold/10">
-          <h2 className="mb-5 text-lg font-black text-vaultGold">Dashboard Snapshot</h2>
-          <div className="grid grid-cols-3 gap-4">
-            <MiniStat label="For Sale" value={String(cards.filter((card) => card.status === "For Sale").length)} />
-            <MiniStat label="Grade Candidates" value={String(cards.filter((card) => card.status === "Grade Candidate").length)} />
-            <MiniStat label="ROI" value={`+${roi.toFixed(1)}%`} />
-          </div>
-        </Panel>
+          <Panel className="col-span-6 border-vaultGold/30 bg-vaultGold/10">
+            <h2 className="mb-5 text-lg font-black text-vaultGold">
+              Dashboard Snapshot
+            </h2>
+            <div className="grid grid-cols-3 gap-4">
+              <MiniStat
+                label="For Sale"
+                value={String(cards.filter((card) => card.status === "For Sale").length)}
+              />
+              <MiniStat
+                label="Grade Candidates"
+                value={String(
+                  cards.filter((card) => card.status === "Grade Candidate").length
+                )}
+              />
+              <MiniStat label="ROI" value={`+${roi.toFixed(1)}%`} />
+            </div>
+          </Panel>
+        </div>
       </div>
     </>
   );
