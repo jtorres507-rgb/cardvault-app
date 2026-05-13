@@ -1726,33 +1726,58 @@ function PageHero({
   actions?: React.ReactNode;
 }) {
   return (
-    <div className="mb-8 relative flex items-center justify-center gap-12 text-center">
-      <div className="relative h-48 w-48 shrink-0">
+    <div className="relative mb-6 w-full max-w-full overflow-hidden rounded-[2rem] border border-vaultGold/20 bg-gradient-to-br from-black via-[#100b0f] to-black px-4 py-8 text-center shadow-[0_24px_80px_rgba(0,0,0,0.65)] sm:px-6 sm:py-10 xl:mb-8 xl:px-10 xl:py-12">
+      {/* Responsive Watermark Background */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden">
         <img
           src={logoSrc}
-          alt="CARDGEMZ logo"
-          className="h-full w-full object-contain drop-shadow-[0_26px_44px_rgba(0,0,0,0.95)] [filter:drop-shadow(0_0_30px_rgba(245,196,81,0.26))]"
+          alt=""
+          aria-hidden="true"
+          className="h-[300px] w-[300px] object-contain opacity-[0.035] blur-[0.2px] sm:h-[420px] sm:w-[420px] sm:opacity-[0.04] xl:h-[620px] xl:w-[620px] xl:opacity-[0.045]"
         />
-
-        <div className="pointer-events-none absolute inset-0 rounded-full shadow-[0_0_34px_rgba(245,196,81,0.18)]" />
       </div>
 
-      <div>
-        <div className="relative inline-block">
-          <h1 className="font-vault-heading text-6xl font-black tracking-[-0.04em] text-white drop-shadow-[0_10px_24px_rgba(0,0,0,0.65)]">
-            {title}
-          </h1>
+      {/* Soft Gold Glow Behind Watermark */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(245,196,81,0.13),transparent_42%)]" />
 
-          <div className="mx-auto mt-4 h-px w-72 bg-gradient-to-r from-transparent via-vaultGold/70 to-transparent" />
+      {/* Dark Overlay To Keep Text Readable */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-black/40" />
+
+      {/* Main Hero Content */}
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col items-center justify-center gap-6 xl:flex-row xl:gap-12">
+        {/* Main Logo */}
+        <div className="relative h-36 w-36 shrink-0 sm:h-44 sm:w-44 xl:h-48 xl:w-48">
+          <img
+            src={logoSrc}
+            alt="CARDGEMZ logo"
+            className="h-full w-full object-contain drop-shadow-[0_26px_44px_rgba(0,0,0,0.95)] [filter:drop-shadow(0_0_20px_rgba(245,196,81,0.14))]"
+          />
+
+          <div className="pointer-events-none absolute inset-0 rounded-full shadow-[0_0_34px_rgba(245,196,81,0.18)]" />
         </div>
 
-        {subtitle && (
-          <p className="mx-auto mt-4 max-w-2xl text-sm font-medium text-zinc-400">
-            {subtitle}
-          </p>
-        )}
+        {/* Text Content */}
+        <div className="w-full max-w-3xl">
+          <div className="relative inline-block">
+            <h1 className="font-vault-heading text-4xl font-black tracking-[-0.04em] text-white drop-shadow-[0_10px_24px_rgba(0,0,0,0.85)] sm:text-5xl xl:text-6xl">
+              {title}
+            </h1>
+          </div>
 
-        {actions && <div className="mt-8 flex justify-center gap-5">{actions}</div>}
+          <div className="mx-auto mt-4 h-px w-32 bg-gradient-to-r from-transparent via-vaultGold/70 to-transparent sm:w-72" />
+
+          {subtitle && (
+            <p className="mx-auto mt-4 max-w-xl text-sm font-medium leading-7 text-zinc-400 sm:text-base">
+              {subtitle}
+            </p>
+          )}
+
+          {actions && (
+            <div className="mx-auto mt-6 flex w-full max-w-sm flex-col justify-center gap-3 sm:max-w-none sm:flex-row sm:gap-5">
+              {actions}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
