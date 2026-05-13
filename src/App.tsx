@@ -2297,6 +2297,74 @@ function CollectionCardTile({
   );
 }
 
+function MobileCollectionShowcaseCard({
+  card,
+  openCardDetail,
+}: {
+  card: CardRecord;
+  openCardDetail: (cardId: number) => void;
+}) {
+  const gradeLabel =
+    card.grade && card.grade.trim().length > 0
+      ? card.grade === "Raw"
+        ? "RAW"
+        : card.grade
+      : "RAW";
+
+  return (
+    <button
+      type="button"
+      onClick={() => openCardDetail(card.id)}
+      className="group relative block h-[430px] w-full overflow-hidden rounded-[1.75rem] border border-vaultGold/35 bg-black text-left shadow-[0_0_28px_rgba(0,0,0,0.75)] transition active:scale-[0.98]"
+    >
+      {card.frontImage ? (
+        <img
+          src={card.frontImage}
+          alt={`${card.player} ${card.card}`}
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+        />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-black via-graphite900 to-black">
+          <div className="text-center">
+            <Crown className="mx-auto h-16 w-16 text-vaultGold/70" />
+            <p className="mt-3 text-xs font-black uppercase tracking-[0.28em] text-vaultGold">
+              CARDGEMZ
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/75" />
+
+      <div className="absolute inset-x-4 bottom-4 overflow-hidden rounded-2xl border border-white/10 bg-black/55 shadow-[0_0_24px_rgba(0,0,0,0.75)] backdrop-blur-md">
+        <div className="border-b border-white/10 px-4 py-3">
+          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-300">
+            {card.year} {card.brand}
+          </p>
+
+          <h3 className="mt-1 text-xl font-black uppercase leading-tight tracking-wide text-white">
+            {card.player}
+          </h3>
+
+          <p className="mt-1 text-xs font-bold uppercase tracking-wide text-zinc-300">
+            {card.card}
+          </p>
+        </div>
+
+        <div className="flex items-center justify-between px-4 py-3">
+          <span className="rounded-lg border border-white/20 bg-black/60 px-3 py-1.5 text-xs font-black uppercase text-white">
+            {gradeLabel}
+          </span>
+
+          <span className="text-lg font-black text-profitGreen">
+            {money(card.estimatedValue)}
+          </span>
+        </div>
+      </div>
+    </button>
+  );
+}
+
 function VaultCollectionHero({
   cards,
   title,
@@ -2470,7 +2538,6 @@ function MyCollection({
     </p>
     <p className="mt-2 text-2xl font-black text-white">{gradedCards}</p>
   </div>
-
   <div className="flex min-h-[88px] flex-col items-center justify-center p-3 text-center">
     <p className="text-[9px] font-black uppercase tracking-[0.26em] text-zinc-500">
       Raw / Sets
@@ -2514,33 +2581,60 @@ function MyCollection({
         />
       </div>
 
-      <Panel className="border-vaultGold/25 bg-black/50">
-        <div className="mb-5 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Crown className="h-5 w-5 text-vaultGold" />
-            <h2 className="text-2xl font-black">Top Cards</h2>
-          </div>
+      <Panel className="relative overflow-hidden border-vaultGold/25 bg-black/50">
+  {/* Phone-only Top Cards watermark */}
+  <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.06] xl:hidden">
+    <img
+      src={cardgemzLogo}
+      alt="CARDGEMZ Top Cards watermark"
+      className="h-[430px] w-[430px] object-contain"
+    />
+  </div>
 
-          <button
-            type="button"
-            onClick={() => setActiveScreen("All Cards")}
-            className="shrink-0 text-sm font-black text-vaultGold hover:text-white"
-          >
-            View All →
-          </button>
-        </div>
+  <div className="relative z-10">
+    <div className="mb-5 flex items-center justify-between gap-4">
+      <div className="flex items-center gap-3">
+        <Crown className="h-5 w-5 text-vaultGold" />
+        <h2 className="text-2xl font-black">Top Cards</h2>
+      </div>
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5 xl:gap-6">
-          {topCards.map((card) => (
-            <CollectionCardTile
-              key={card.id}
-              card={card}
-              openCardDetail={openCardDetail}
-              compact
-            />
-          ))}
+      <button
+        type="button"
+        onClick={() => setActiveScreen("All Cards")}
+        className="shrink-0 text-sm font-black text-vaultGold hover:text-white"
+      >
+        View All →
+      </button>
+    </div>
+
+    {/* Phone-only swipe showcase */}
+    <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 pr-6 xl:hidden">
+      {topCards.map((card) => (
+        <div
+          key={card.id}
+          className="min-w-[82%] snap-center first:ml-1 last:mr-6"
+        >
+          <MobileCollectionShowcaseCard
+            card={card}
+            openCardDetail={openCardDetail}
+          />
         </div>
-      </Panel>
+      ))}
+    </div>
+
+    {/* Desktop grid */}
+    <div className="hidden xl:grid xl:grid-cols-5 xl:gap-6">
+      {topCards.map((card) => (
+        <CollectionCardTile
+          key={card.id}
+          card={card}
+          openCardDetail={openCardDetail}
+          compact
+        />
+      ))}
+    </div>
+  </div>
+</Panel>
     </div>
   );
 }
