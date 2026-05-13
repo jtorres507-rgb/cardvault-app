@@ -601,6 +601,320 @@ const emptyForm: AddCardForm = {
   storageLocation: "Vault A-01",
 };
 
+function CardVaultMobileHeader() {
+  return (
+    <div className="sticky top-0 z-50 overflow-hidden rounded-b-3xl border-b border-cyan-400/20 bg-[#041817]/95 shadow-2xl shadow-black/60 backdrop-blur-xl">
+      {/* Phone Status Bar */}
+      <div className="flex h-9 items-center justify-between px-5 text-[11px] font-black tracking-widest text-white/90">
+        <span>9:41</span>
+
+        <div className="flex items-center gap-1.5 text-white/90">
+          <span className="text-[10px]">▮▮▮</span>
+          <span className="text-[12px]">⌁</span>
+          <span className="rounded-[3px] border border-white/80 px-1 text-[9px] leading-3">
+            ▬
+          </span>
+        </div>
+      </div>
+
+      {/* App Header Row */}
+      <div className="mx-3 mb-3 flex h-16 items-center justify-between rounded-2xl border border-cyan-400/10 bg-gradient-to-r from-[#062421] via-[#082b27] to-[#062421] px-4 shadow-inner shadow-cyan-950/40">
+        <div className="flex items-center gap-4 text-vaultGold">
+          <button className="text-2xl leading-none">‹</button>
+          <button className="text-xl leading-none">♢</button>
+          <button className="grid h-6 w-6 grid-cols-2 gap-1">
+            <span className="rounded-sm border border-vaultGold/80" />
+            <span className="rounded-sm border border-vaultGold/80" />
+            <span className="rounded-sm border border-vaultGold/80" />
+            <span className="rounded-sm border border-vaultGold/80" />
+          </button>
+        </div>
+
+        <div className="text-center">
+          <p className="text-[17px] font-black uppercase tracking-[0.38em] text-vaultGold">
+            CardVault
+          </p>
+          <p className="-mt-1 text-[10px] font-black uppercase tracking-[0.32em] text-vaultGold/80">
+            Pro
+          </p>
+        </div>
+
+        <div className="flex items-center gap-5 text-center">
+          <div>
+            <p className="text-[13px] font-black uppercase tracking-[0.18em] text-cyan-200">
+              OSS
+            </p>
+            <p className="text-[9px] font-black uppercase tracking-widest text-cyan-300">
+              Online
+            </p>
+          </div>
+
+          <div>
+            <p className="text-[13px] font-black uppercase tracking-[0.18em] text-cyan-200">
+              S7S
+            </p>
+            <p className="text-[9px] font-black uppercase tracking-widest text-cyan-300">
+              Sync
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CardVaultMobileShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen bg-[#020807] text-white">
+      <div className="mx-auto min-h-screen w-full max-w-[430px] overflow-hidden bg-gradient-to-b from-[#031413] via-[#041b18] to-black shadow-2xl shadow-black">
+        <CardVaultMobileHeader />
+
+        <main className="px-3 pb-8 pt-3">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+
+function MobileDashboardCommandCenter() {
+  return (
+    <div className="space-y-4">
+      {/* Vault Intel Hero */}
+      <section className="overflow-hidden rounded-3xl border border-cyan-400/10 bg-[#031211] shadow-2xl shadow-black/50">
+        <div className="relative h-[470px] overflow-hidden bg-[#031716]">
+          {/* Grid */}
+          <div
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(94,234,212,.16) 1px, transparent 1px), linear-gradient(90deg, rgba(94,234,212,.16) 1px, transparent 1px)",
+              backgroundSize: "28px 28px",
+            }}
+          />
+
+          {/* Title */}
+          <div className="absolute left-4 top-4 z-10">
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-black uppercase tracking-wide text-white">
+                Vault Intel
+              </h1>
+              <span className="text-cyan-300/50">⌄</span>
+            </div>
+          </div>
+
+          {/* Cyan Map Style Graphic */}
+          <div className="absolute -left-16 top-20 h-52 w-64 rotate-[-7deg] rounded-[55%_45%_48%_52%] bg-cyan-300/90 shadow-[0_0_45px_rgba(34,211,238,.45)]" />
+          <div className="absolute left-16 top-28 h-14 w-16 rotate-12 rounded-[45%_55%_52%_48%] bg-[#031716]" />
+          <div className="absolute left-28 top-16 h-24 w-16 rotate-[-18deg] rounded-[50%] bg-cyan-300/90" />
+          <div className="absolute left-[160px] top-36 h-16 w-12 rotate-12 rounded-[40%_60%_60%_40%] bg-cyan-300/90" />
+
+          {/* Data Block */}
+          <div className="absolute right-7 top-24 z-10">
+            <p className="text-[13px] font-black uppercase tracking-[0.2em] text-cyan-300">
+              Beta Mode
+            </p>
+            <p className="mt-2 text-4xl font-black tracking-wider text-orange-500">
+              206.24
+            </p>
+            <p className="mt-1 text-2xl font-black tracking-[0.18em] text-orange-500">
+              QC607
+            </p>
+          </div>
+
+          {/* Orange Gauge */}
+          <div className="absolute right-6 top-20 h-28 w-28 rounded-full border-[18px] border-orange-500 border-b-zinc-900 border-l-zinc-900 shadow-[0_0_30px_rgba(249,115,22,.25)]" />
+          <div className="absolute right-[60px] top-[124px] text-3xl font-black text-orange-500">
+            ↗
+          </div>
+
+          {/* Trend Line */}
+          <svg
+            className="absolute bottom-28 left-0 h-32 w-full"
+            viewBox="0 0 390 120"
+            preserveAspectRatio="none"
+          >
+            <polyline
+              points="0,92 42,96 85,83 125,91 164,68 202,54 240,70 276,45 320,25 360,44 390,15"
+              fill="none"
+              stroke="rgba(249,115,22,.72)"
+              strokeWidth="2"
+            />
+            <circle cx="278" cy="45" r="4" fill="rgb(251,146,60)" />
+            <circle cx="320" cy="25" r="4" fill="rgb(251,146,60)" />
+          </svg>
+
+          {/* Bar Chart */}
+          <div className="absolute bottom-0 left-0 right-0 flex h-[170px] items-end gap-[4px] px-3">
+            {[
+              28, 40, 22, 34, 26, 50, 62, 56, 72, 90, 48, 68, 60, 88, 100,
+              76, 58, 44, 52, 70, 82, 48, 38, 60, 72, 94, 86,
+            ].map((height, index) => (
+              <div
+                key={index}
+                className="flex-1 rounded-t-sm bg-gradient-to-t from-orange-700 via-orange-500 to-orange-300 shadow-[0_0_14px_rgba(249,115,22,.2)]"
+                style={{ height: `${height}%` }}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Collection Overview */}
+      <section className="rounded-3xl border border-cyan-400/10 bg-[#041817] p-4 shadow-xl shadow-black/40">
+        <h2 className="mb-4 text-sm font-black uppercase tracking-[0.2em] text-cyan-300">
+          Collection Overview
+        </h2>
+
+        <div className="grid grid-cols-2 gap-3">
+          <DashboardMetricCard
+            label="Total Value"
+            value="$12,450"
+            sub="+8.72% vs last 30d"
+          />
+          <DashboardMetricCard
+            label="Total Invested"
+            value="$7,820"
+            sub="+2.18% vs last 30d"
+          />
+          <DashboardMetricCard
+            label="Unrealized Gain"
+            value="+$4,630"
+            sub="+59.23% vs last 30d"
+          />
+          <DashboardMetricCard
+            label="Total Cards"
+            value="148"
+            sub="+12 added this month"
+          />
+        </div>
+      </section>
+
+      {/* AI Scan Queue */}
+      <section className="rounded-3xl border border-cyan-400/10 bg-[#041817] p-4 shadow-xl shadow-black/40">
+        <h2 className="mb-4 text-sm font-black uppercase tracking-[0.2em] text-cyan-300">
+          AI Scan Review Queue
+        </h2>
+
+        <div className="grid grid-cols-4 gap-2 text-center">
+          <SmallMetric label="Temp Scans" value="24" />
+          <SmallMetric label="Storage" value="68%" />
+          <SmallMetric label="Buy / Watch" value="18" />
+          <SmallMetric label="Waiting" value="6" />
+        </div>
+
+        <div className="mt-5 grid grid-cols-1 gap-3">
+          <button className="rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-3 text-sm font-black uppercase tracking-widest text-white shadow-lg shadow-cyan-950/50">
+            Open Queue →
+          </button>
+
+          <button className="rounded-2xl border border-cyan-400/40 px-4 py-3 text-sm font-black uppercase tracking-widest text-cyan-200">
+            Create From Images
+          </button>
+
+          <button className="rounded-2xl border border-cyan-400/40 px-4 py-3 text-sm font-black uppercase tracking-widest text-cyan-200">
+            Export Backup
+          </button>
+        </div>
+      </section>
+
+      {/* Dallas Beta */}
+      <section className="rounded-3xl border border-orange-500/25 bg-[#130d05] p-4 shadow-xl shadow-black/40">
+        <h2 className="mb-4 text-sm font-black uppercase tracking-[0.2em] text-orange-400">
+          Dallas Card Show Beta ⚙
+        </h2>
+
+        <div className="grid grid-cols-3 gap-3 text-center">
+          <SmallMetric label="Dealer Notes" value="32" orange />
+          <SmallMetric label="Buy" value="12" orange />
+          <SmallMetric label="Watch" value="9" orange />
+          <SmallMetric label="Pass" value="11" orange />
+          <SmallMetric label="Asking" value="$6,420" orange />
+          <SmallMetric label="Targets" value="$4,860" orange />
+        </div>
+
+        <button className="mt-5 w-full rounded-2xl border border-orange-500/40 px-4 py-3 text-sm font-black uppercase tracking-widest text-vaultGold">
+          Open Beta Field Notes →
+        </button>
+      </section>
+
+      {/* Sales Intelligence */}
+      <section className="rounded-3xl border border-cyan-400/10 bg-[#041817] p-4 shadow-xl shadow-black/40">
+        <h2 className="mb-4 text-sm font-black uppercase tracking-[0.2em] text-cyan-300">
+          Sales Hub Intelligence
+        </h2>
+
+        <div className="grid grid-cols-2 gap-3">
+          <DashboardMetricCard label="Total Sold" value="37" sub="Completed sales" />
+          <DashboardMetricCard label="Revenue" value="$5,870" sub="All platforms" />
+          <DashboardMetricCard label="Profit" value="$1,942" sub="Net gain" />
+          <DashboardMetricCard label="Best Platform" value="eBay" sub="Top performer" />
+        </div>
+
+        <div className="mt-5 grid grid-cols-1 gap-3">
+          <button className="rounded-2xl border border-cyan-400/40 px-4 py-3 text-sm font-black uppercase tracking-widest text-cyan-200">
+            Open Sales Tracker →
+          </button>
+
+          <button className="rounded-2xl border border-cyan-400/40 px-4 py-3 text-sm font-black uppercase tracking-widest text-cyan-200">
+            View Sales Report →
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function DashboardMetricCard({
+  label,
+  value,
+  sub,
+}: {
+  label: string;
+  value: string;
+  sub: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-cyan-400/10 bg-black/25 p-4 shadow-inner shadow-black/50">
+      <p className="text-[10px] font-black uppercase tracking-widest text-white/70">
+        {label}
+      </p>
+      <p className="mt-3 text-2xl font-black tracking-wide text-cyan-300">
+        {value}
+      </p>
+      <p className="mt-2 text-[10px] font-bold text-emerald-400">
+        {sub}
+      </p>
+    </div>
+  );
+}
+
+function SmallMetric({
+  label,
+  value,
+  orange = false,
+}: {
+  label: string;
+  value: string;
+  orange?: boolean;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
+      <p
+        className={`text-xl font-black ${
+          orange ? "text-orange-400" : "text-cyan-200"
+        }`}
+      >
+        {value}
+      </p>
+      <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-white/60">
+        {label}
+      </p>
+    </div>
+  );
+}
+
 function App() {
   const [activeScreen, setActiveScreen] = useState<Screen>("Dashboard");
 
@@ -1246,192 +1560,208 @@ function exportDallasBetaBackup() {
     setActiveScreen("Dashboard");
   }
 
-  return (
-    <div className="min-h-screen bg-[#0b0c10] text-white">
-      <div className="flex min-h-screen">
-         <Sidebar activeScreen={activeScreen} setActiveScreen={setActiveScreen} />
-         <MobileBottomNav activeScreen={activeScreen} setActiveScreen={setActiveScreen} />
+ return (
+  <div className="min-h-screen bg-[#0b0c10] text-white">
+    <div className="flex min-h-screen">
+      <Sidebar activeScreen={activeScreen} setActiveScreen={setActiveScreen} />
+      <MobileBottomNav
+        activeScreen={activeScreen}
+        setActiveScreen={setActiveScreen}
+      />
 
-        <main className="relative w-full min-w-0 max-w-full flex-1 overflow-x-hidden bg-[#0b0c10] pb-24 xl:pb-0">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(95,24,18,0.14),transparent_40%)]" />
+      <main className="relative w-full min-w-0 max-w-full flex-1 overflow-x-hidden bg-[#0b0c10] pb-24 xl:pb-0">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(95,24,18,0.14),transparent_40%)]" />
 
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.04]">
-            <img
-              src="/cardgemz-main-logo.png"
-              alt="CARDGEMZ background watermark"
-              className="max-h-[780px] max-w-[780px] object-contain"
-            />
-          </div>
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.04]">
+          <img
+            src="/cardgemz-main-logo.png"
+            alt="CARDGEMZ background watermark"
+            className="max-h-[780px] max-w-[780px] object-contain"
+          />
+        </div>
 
+        {/* Mobile premium app header throughout the app */}
+        <div className="relative z-20 xl:hidden">
+          <CardVaultMobileHeader />
+        </div>
+
+        {/* Desktop top bar stays for desktop/tablet-wide layout */}
+        <div className="hidden xl:block">
           <TopBar activeScreen={activeScreen} />
+        </div>
 
-          <section className="relative z-10 w-full min-w-0 max-w-full overflow-x-hidden px-4 py-5 sm:px-6 xl:p-8">
-            {activeScreen === "Dashboard" && (
-              <Dashboard
-                cards={cards}
-                collectionValue={collectionValue}
-                moneyInvested={moneyInvested}
-                netGain={netGain}
-                roi={roi}
-                setActiveScreen={setActiveScreen}
-              />
-            )}
+        <section className="relative z-10 w-full min-w-0 max-w-full overflow-x-hidden px-4 py-5 sm:px-6 xl:p-8">
+          {activeScreen === "Dashboard" && (
+            <>
+              {/* New phone dashboard layout */}
+              <div className="xl:hidden">
+                <MobileDashboardCommandCenter />
+              </div>
 
-            {activeScreen === "My Collection" && (
-              <MyCollection
-                cards={cards}
-                openCardDetail={openCardDetail}
-                setActiveScreen={setActiveScreen}
-                openCollectionReport={() => {
-                  setDefaultReport("myCollection");
-                  setActiveScreen("Reports");
-                }}
-              />
-            )}
-
-            {activeScreen === "All Cards" && (
-              <AllCards
-                cards={cards}
-                openCardDetail={openCardDetail}
-                setActiveScreen={setActiveScreen}
-                openCollectionReport={() => {
-                  setDefaultReport("myCollection");
-                  setActiveScreen("Reports");
-                }}
-              />
-            )}
-
-            {activeScreen === "Memorabilia" && (
-              <MemorabiliaPage memorabilia={memorabilia} />
-            )}
-
-            {activeScreen === "Add Card" && (
-              <AddCard onSave={saveCardFromForm} />
-            )}
-
-            {activeScreen === "Card Detail" &&
-              (selectedCard ? (
-                <CardDetail
-                  card={selectedCard}
-                  deleteCard={requestDeleteCard}
-                  updateCard={updateCard}
+              {/* Existing desktop dashboard layout */}
+              <div className="hidden xl:block">
+                <Dashboard
+                  cards={cards}
+                  collectionValue={collectionValue}
+                  moneyInvested={moneyInvested}
+                  netGain={netGain}
+                  roi={roi}
                   setActiveScreen={setActiveScreen}
                 />
-              ) : (
-                <EmptyVaultState
-                  title="No Card Selected"
-                  message="There is no card available to display. Add a card or return to your collection."
-                  actionLabel="Go to My Collection"
-                  onAction={() => setActiveScreen("My Collection")}
-                />
-              ))}
+              </div>
+            </>
+          )}
 
-            {activeScreen === "CardVault Scan" && (
-              <ComingSoonScreen
-                title="CardVault Scan"
-                subtitle="Camera scanning, OCR-assisted card capture, and image-based grading support will connect here."
+          {activeScreen === "My Collection" && (
+            <MyCollection
+              cards={cards}
+              openCardDetail={openCardDetail}
+              setActiveScreen={setActiveScreen}
+              openCollectionReport={() => {
+                setDefaultReport("myCollection");
+                setActiveScreen("Reports");
+              }}
+            />
+          )}
+
+          {activeScreen === "All Cards" && (
+            <AllCards
+              cards={cards}
+              openCardDetail={openCardDetail}
+              setActiveScreen={setActiveScreen}
+              openCollectionReport={() => {
+                setDefaultReport("myCollection");
+                setActiveScreen("Reports");
+              }}
+            />
+          )}
+
+          {activeScreen === "Memorabilia" && (
+            <MemorabiliaPage memorabilia={memorabilia} />
+          )}
+
+          {activeScreen === "Add Card" && <AddCard onSave={saveCardFromForm} />}
+
+          {activeScreen === "Card Detail" &&
+            (selectedCard ? (
+              <CardDetail
+                card={selectedCard}
+                deleteCard={requestDeleteCard}
+                updateCard={updateCard}
+                setActiveScreen={setActiveScreen}
               />
-            )}
-
-            {activeScreen === "Scan Review Queue" && (
-              <ScanReviewQueue
-                temporaryScans={temporaryScans}
-                openTemporaryScanDetail={openTemporaryScanDetail}
-                createDemoTemporaryScan={createDemoTemporaryScan}
-                createTemporaryScanFromImages={createTemporaryScanFromImages}
-                updateTemporaryScanBetaDecision={updateTemporaryScanBetaDecision}
-                exportDallasBetaBackup={exportDallasBetaBackup}
-                betaFeedback={betaFeedback}
-                newBetaFeedback={newBetaFeedback}
-                setNewBetaFeedback={setNewBetaFeedback}
-                addBetaFeedbackNote={addBetaFeedbackNote}
+            ) : (
+              <EmptyVaultState
+                title="No Card Selected"
+                message="There is no card available to display. Add a card or return to your collection."
+                actionLabel="Go to My Collection"
+                onAction={() => setActiveScreen("My Collection")}
               />
-            )}
+            ))}
 
-            {activeScreen === "Temporary Card Detail" &&
-              (selectedTemporaryScan ? (
-                <TemporaryCardDetail
-                  scan={selectedTemporaryScan}
-                  updateTemporaryScan={updateTemporaryScan}
-                  addTemporaryScanToCollection={addTemporaryScanToCollection}
-                  moveTemporaryScanToSellQueue={moveTemporaryScanToSellQueue}
-                  deleteTemporaryScan={deleteTemporaryScan}
-                  setActiveScreen={setActiveScreen}
-                />
-              ) : (
-                <EmptyVaultState
-                  title="No Temporary Scan Selected"
-                  message="There is no temporary scan selected. Return to the scan review queue or create a new temporary scan."
-                  actionLabel="Go to Scan Review Queue"
-                  onAction={() => setActiveScreen("Scan Review Queue")}
-                />
-              ))}
+          {activeScreen === "CardVault Scan" && (
+            <ComingSoonScreen
+              title="CardVault Scan"
+              subtitle="Camera scanning, OCR-assisted card capture, and image-based grading support will connect here."
+            />
+          )}
 
-            {activeScreen === "Market Comps" && <MarketComps cards={cards} />}
+          {activeScreen === "Scan Review Queue" && (
+            <ScanReviewQueue
+              temporaryScans={temporaryScans}
+              openTemporaryScanDetail={openTemporaryScanDetail}
+              createDemoTemporaryScan={createDemoTemporaryScan}
+              createTemporaryScanFromImages={createTemporaryScanFromImages}
+              updateTemporaryScanBetaDecision={updateTemporaryScanBetaDecision}
+              exportDallasBetaBackup={exportDallasBetaBackup}
+              betaFeedback={betaFeedback}
+              newBetaFeedback={newBetaFeedback}
+              setNewBetaFeedback={setNewBetaFeedback}
+              addBetaFeedbackNote={addBetaFeedbackNote}
+            />
+          )}
 
-            {activeScreen === "Grading Center" && (
-              <GradingCenter cards={cards} />
-            )}
-
-            {activeScreen === "Reports" && (
-              <Reports
-                cards={cards}
-                sales={sales}
-                defaultReport={defaultReport}
+          {activeScreen === "Temporary Card Detail" &&
+            (selectedTemporaryScan ? (
+              <TemporaryCardDetail
+                scan={selectedTemporaryScan}
+                updateTemporaryScan={updateTemporaryScan}
+                addTemporaryScanToCollection={addTemporaryScanToCollection}
+                moveTemporaryScanToSellQueue={moveTemporaryScanToSellQueue}
+                deleteTemporaryScan={deleteTemporaryScan}
+                setActiveScreen={setActiveScreen}
               />
-            )}
-
-            {activeScreen === "Sales Tracker" && (
-              <SalesTracker
-                cards={cards}
-                setCards={setCards}
-                sales={sales}
-                setSales={setSales}
+            ) : (
+              <EmptyVaultState
+                title="No Temporary Scan Selected"
+                message="There is no temporary scan selected. Return to the scan review queue or create a new temporary scan."
+                actionLabel="Go to Scan Review Queue"
+                onAction={() => setActiveScreen("Scan Review Queue")}
               />
-            )}
+            ))}
 
-            {activeScreen === "Settings" && (
-              <SettingsScreen resetDemoData={resetDemoData} />
-            )}
-          </section>
-        </main>
-      </div>
+          {activeScreen === "Market Comps" && <MarketComps cards={cards} />}
 
-      {pendingDeleteCardId !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-6 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-3xl border border-vaultGold/40 bg-graphite900 p-6 text-white shadow-[0_0_60px_rgba(245,196,81,0.18)]">
-            <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
-              Confirm Delete
-            </p>
+          {activeScreen === "Grading Center" && <GradingCenter cards={cards} />}
 
-            <h2 className="mt-3 text-3xl font-black">Delete this card?</h2>
+          {activeScreen === "Reports" && (
+            <Reports
+              cards={cards}
+              sales={sales}
+              defaultReport={defaultReport}
+            />
+          )}
 
-            <p className="mt-3 text-sm leading-6 text-zinc-400">
-              This will remove the card from your vault and update your saved
-              collection data. This action cannot be undone.
-            </p>
+          {activeScreen === "Sales Tracker" && (
+            <SalesTracker
+              cards={cards}
+              setCards={setCards}
+              sales={sales}
+              setSales={setSales}
+            />
+          )}
 
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                onClick={cancelDeleteCard}
-                className="rounded-xl border border-steelBorder bg-black/40 px-5 py-3 text-sm font-bold text-zinc-300 hover:text-white"
-              >
-                Cancel
-              </button>
+          {activeScreen === "Settings" && (
+            <SettingsScreen resetDemoData={resetDemoData} />
+          )}
+        </section>
+      </main>
+    </div>
 
-              <button
-                onClick={confirmDeleteCard}
-                className="rounded-xl bg-vaultGold px-5 py-3 text-sm font-black text-black shadow-vault hover:brightness-110"
-              >
-                Delete Card
-              </button>
-            </div>
+    {pendingDeleteCardId !== null && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-6 backdrop-blur-sm">
+        <div className="w-full max-w-md rounded-3xl border border-vaultGold/40 bg-graphite900 p-6 text-white shadow-[0_0_60px_rgba(245,196,81,0.18)]">
+          <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+            Confirm Delete
+          </p>
+
+          <h2 className="mt-3 text-3xl font-black">Delete this card?</h2>
+
+          <p className="mt-3 text-sm leading-6 text-zinc-400">
+            This will remove the card from your vault and update your saved
+            collection data. This action cannot be undone.
+          </p>
+
+          <div className="mt-6 flex justify-end gap-3">
+            <button
+              onClick={cancelDeleteCard}
+              className="rounded-xl border border-steelBorder bg-black/40 px-5 py-3 text-sm font-bold text-zinc-300 hover:text-white"
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={confirmDeleteCard}
+              className="rounded-xl bg-vaultGold px-5 py-3 text-sm font-black text-black shadow-vault hover:brightness-110"
+            >
+              Delete Card
+            </button>
           </div>
         </div>
-      )}
-    </div>
-  );
-}
+      </div>
+    )}
+  </div>
+);
 
 function Sidebar({
   activeScreen,
@@ -11790,6 +12120,7 @@ function numberFromCurrency(value: string) {
   const cleaned = value.replace(/[^0-9.-]/g, "");
   const parsed = Number(cleaned);
   return Number.isFinite(parsed) ? parsed : 0;
+};
 }
 
 export default App;
