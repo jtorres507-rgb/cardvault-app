@@ -603,22 +603,22 @@ const emptyForm: AddCardForm = {
 
 function CardVaultMobileHeader() {
   return (
-    <div className="sticky top-0 z-50 bg-[#020807]/95 px-3 pb-3 pt-3 backdrop-blur-xl xl:hidden">
+    <div className="sticky top-0 z-50 bg-[#020807] px-4 pb-4 pt-3 xl:hidden">
       {/* Status Row */}
-      <div className="mb-3 flex h-6 items-center justify-between px-2 text-[12px] font-black tracking-[0.18em] text-white/90">
+      <div className="mb-4 flex h-6 items-center justify-between text-[12px] font-black tracking-[0.18em] text-white/90">
         <span>9:41</span>
 
-        <div className="flex items-center gap-2 text-white/80">
-          <span className="text-[10px] tracking-[0.4em]">▮▮▮</span>
+        <div className="flex items-center gap-3 text-white/80">
+          <span className="text-[10px] tracking-[0.45em]">▮▮▮</span>
           <span className="text-[12px]">⌁</span>
-          <span className="h-3 w-6 rounded-sm border border-white/70">
+          <span className="flex h-4 w-7 items-center rounded border border-white/70 p-[2px]">
             <span className="block h-full w-4 rounded-sm bg-white/70" />
           </span>
         </div>
       </div>
 
-      {/* Floating Header Bar */}
-      <div className="flex h-[74px] items-center justify-between rounded-[1.6rem] border border-cyan-400/10 bg-gradient-to-r from-[#031716] via-[#062421] to-[#031716] px-5 shadow-[0_12px_35px_rgba(0,0,0,0.65),inset_0_0_24px_rgba(20,184,166,0.12)]">
+      {/* Flat App Header */}
+      <div className="grid h-[58px] grid-cols-[96px_1fr_96px] items-center border-b border-cyan-400/10 bg-[#020807]">
         {/* Left Icons */}
         <div className="flex items-center gap-5 text-vaultGold">
           <button
@@ -639,26 +639,26 @@ function CardVaultMobileHeader() {
             type="button"
             className="grid h-7 w-7 grid-cols-2 gap-1"
           >
-            <span className="rounded-[3px] border border-vaultGold/80" />
-            <span className="rounded-[3px] border border-vaultGold/80" />
-            <span className="rounded-[3px] border border-vaultGold/80" />
-            <span className="rounded-[3px] border border-vaultGold/80" />
+            <span className="rounded-[3px] border border-vaultGold/70" />
+            <span className="rounded-[3px] border border-vaultGold/70" />
+            <span className="rounded-[3px] border border-vaultGold/70" />
+            <span className="rounded-[3px] border border-vaultGold/70" />
           </button>
         </div>
 
         {/* Center Brand */}
         <div className="text-center">
-          <p className="text-[20px] font-black uppercase tracking-[0.45em] text-vaultGold">
+          <p className="text-[22px] font-black uppercase tracking-[0.42em] text-vaultGold">
             CardVault
           </p>
-          <p className="-mt-1 text-[11px] font-black uppercase tracking-[0.42em] text-vaultGold/80">
+          <p className="-mt-1 text-[10px] font-black uppercase tracking-[0.38em] text-vaultGold/80">
             Pro
           </p>
         </div>
 
-        {/* Right Status */}
-        <div className="flex items-center gap-6 text-center">
-          <div>
+        {/* Right Status + Bell */}
+        <div className="flex items-center justify-end gap-4">
+          <div className="text-center">
             <p className="text-[15px] font-black uppercase tracking-[0.2em] text-cyan-100">
               OSS
             </p>
@@ -667,20 +667,19 @@ function CardVaultMobileHeader() {
             </p>
           </div>
 
-          <div>
-            <p className="text-[15px] font-black uppercase tracking-[0.2em] text-cyan-100">
-              S7S
-            </p>
-            <p className="mt-1 text-[9px] font-black uppercase tracking-[0.18em] text-cyan-300">
-              Sync
-            </p>
-          </div>
+          <button
+            type="button"
+            className="relative flex h-9 w-9 items-center justify-center text-cyan-100"
+            aria-label="Notifications"
+          >
+            <span className="text-[24px] leading-none">♢</span>
+            <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.8)]" />
+          </button>
         </div>
       </div>
     </div>
   );
 }
-
 function CardVaultMobileShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-[#020807] text-white">
