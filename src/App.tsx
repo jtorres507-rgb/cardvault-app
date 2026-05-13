@@ -9799,18 +9799,18 @@ function ScanReviewQueue({
           </button>
         </div>
 
-        <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_1fr_260px]">
+        <div className="mt-6 grid gap-5 xl:grid-cols-[1fr_1fr_260px]">
           <div className="rounded-2xl border border-vaultGold/25 bg-black/60 p-4">
             <p className="mb-3 text-center text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
               Front Image
             </p>
 
-            <div className="flex min-h-[260px] items-center justify-center rounded-xl border border-dashed border-steelBorder bg-graphite900/70 p-3">
+            <div className="flex min-h-[240px] items-center justify-center rounded-xl border border-dashed border-steelBorder bg-graphite900/70 p-3">
               {frontUploadPreview ? (
                 <img
                   src={frontUploadPreview}
                   alt="Front upload preview"
-                  className="max-h-[240px] w-full rounded-lg object-contain"
+                  className="max-h-[220px] w-full rounded-lg object-contain"
                 />
               ) : (
                 <p className="text-center text-xs font-black uppercase tracking-widest text-zinc-500">
@@ -9819,12 +9819,22 @@ function ScanReviewQueue({
               )}
             </div>
 
-            <label
-              htmlFor="temporary-front-upload"
-              className="mt-4 flex min-h-[46px] cursor-pointer items-center justify-center rounded-xl border border-vaultGold/50 bg-vaultGold/10 px-4 py-3 text-xs font-black uppercase tracking-widest text-vaultGold transition hover:bg-vaultGold hover:text-black active:scale-[0.98]"
-            >
-              Upload Front
-            </label>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <label
+                htmlFor="temporary-front-upload"
+                className="flex h-12 cursor-pointer items-center justify-center rounded-xl border border-vaultGold/50 bg-vaultGold/10 px-2 text-center text-[10px] font-black uppercase tracking-[0.14em] text-vaultGold transition hover:bg-vaultGold hover:text-black active:scale-[0.98]"
+              >
+                Upload Front
+              </label>
+
+              <button
+                type="button"
+                onClick={() => setFrontUploadPreview("")}
+                className="flex h-12 items-center justify-center rounded-xl border border-red-500/50 bg-red-950/20 px-2 text-center text-[10px] font-black uppercase tracking-[0.14em] text-red-300 transition hover:bg-red-500 hover:text-white active:scale-[0.98]"
+              >
+                Clear Front
+              </button>
+            </div>
 
             <input
               id="temporary-front-upload"
@@ -9840,12 +9850,12 @@ function ScanReviewQueue({
               Back Image
             </p>
 
-            <div className="flex min-h-[260px] items-center justify-center rounded-xl border border-dashed border-steelBorder bg-graphite900/70 p-3">
+            <div className="flex min-h-[240px] items-center justify-center rounded-xl border border-dashed border-steelBorder bg-graphite900/70 p-3">
               {backUploadPreview ? (
                 <img
                   src={backUploadPreview}
                   alt="Back upload preview"
-                  className="max-h-[240px] w-full rounded-lg object-contain"
+                  className="max-h-[220px] w-full rounded-lg object-contain"
                 />
               ) : (
                 <p className="text-center text-xs font-black uppercase tracking-widest text-zinc-500">
@@ -9854,12 +9864,22 @@ function ScanReviewQueue({
               )}
             </div>
 
-            <label
-              htmlFor="temporary-back-upload"
-              className="mt-4 flex min-h-[46px] cursor-pointer items-center justify-center rounded-xl border border-vaultGold/50 bg-vaultGold/10 px-4 py-3 text-xs font-black uppercase tracking-widest text-vaultGold transition hover:bg-vaultGold hover:text-black active:scale-[0.98]"
-            >
-              Upload Back
-            </label>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <label
+                htmlFor="temporary-back-upload"
+                className="flex h-12 cursor-pointer items-center justify-center rounded-xl border border-vaultGold/50 bg-vaultGold/10 px-2 text-center text-[10px] font-black uppercase tracking-[0.14em] text-vaultGold transition hover:bg-vaultGold hover:text-black active:scale-[0.98]"
+              >
+                Upload Back
+              </label>
+
+              <button
+                type="button"
+                onClick={() => setBackUploadPreview("")}
+                className="flex h-12 items-center justify-center rounded-xl border border-red-500/50 bg-red-950/20 px-2 text-center text-[10px] font-black uppercase tracking-[0.14em] text-red-300 transition hover:bg-red-500 hover:text-white active:scale-[0.98]"
+              >
+                Clear Back
+              </button>
+            </div>
 
             <input
               id="temporary-back-upload"
