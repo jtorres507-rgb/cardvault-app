@@ -2427,66 +2427,60 @@ function MyCollection({
       storage, and collection decisions — all in one place.
     </p>
 
-    <div className="mt-6 grid grid-cols-1 gap-3">
-      <button
-        type="button"
-        onClick={() => setActiveScreen("Add Card")}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-vaultGold/70 bg-black/60 px-5 py-4 text-sm font-black text-vaultGold shadow-vault transition hover:bg-vaultGold hover:text-black"
-      >
-        <Plus size={18} />
-        Add Card
-      </button>
+    <div className="mt-5 grid grid-cols-2 gap-3">
+  <button
+    type="button"
+    onClick={() => setActiveScreen("Add Card")}
+    className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-vaultGold/70 bg-black/60 px-3 text-xs font-black text-vaultGold shadow-vault transition hover:bg-vaultGold hover:text-black"
+  >
+    <Plus size={15} />
+    Add Card
+  </button>
 
-      <button
-        type="button"
-        onClick={openCollectionReport}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-b from-[#fff3a0] via-vaultGold to-[#9b6a10] px-5 py-4 text-sm font-black text-black shadow-vault transition hover:scale-[1.02]"
-      >
-        <Download size={18} />
-        Export Collection
-      </button>
-    </div>
+  <button
+    type="button"
+    onClick={openCollectionReport}
+    className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-[#fff3a0] via-vaultGold to-[#9b6a10] px-3 text-xs font-black text-black shadow-vault transition hover:scale-[1.02]"
+  >
+    <Download size={15} />
+    Export
+  </button>
+</div>
 
-    <div className="mt-6 grid grid-cols-2 overflow-hidden rounded-3xl border border-vaultGold/20 bg-black/55">
-      <div className="border-b border-r border-vaultGold/10 p-4">
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
-          Total Cards
-        </p>
-        <p className="mt-2 text-2xl font-black text-white">
-          {cards.length}
-        </p>
-      </div>
+<div className="mt-5 grid grid-cols-2 overflow-hidden rounded-2xl border border-vaultGold/20 bg-black/55">
+  <div className="flex min-h-[88px] flex-col items-center justify-center border-b border-r border-vaultGold/10 p-3 text-center">
+    <p className="text-[9px] font-black uppercase tracking-[0.26em] text-zinc-500">
+      Total Cards
+    </p>
+    <p className="mt-2 text-2xl font-black text-white">{cards.length}</p>
+  </div>
 
-      <div className="border-b border-vaultGold/10 p-4">
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
-          Value
-        </p>
-        <p className="mt-2 text-2xl font-black text-vaultGold">
-          ${collectionValue.toLocaleString()}
-        </p>
-      </div>
+  <div className="flex min-h-[88px] flex-col items-center justify-center border-b border-vaultGold/10 p-3 text-center">
+    <p className="text-[9px] font-black uppercase tracking-[0.26em] text-zinc-500">
+      Value
+    </p>
+    <p className="mt-2 text-2xl font-black text-vaultGold">
+      ${collectionValue.toLocaleString()}
+    </p>
+  </div>
 
-      <div className="border-r border-vaultGold/10 p-4">
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
-          Graded
-        </p>
-        <p className="mt-2 text-2xl font-black text-white">
-          {gradedCards}
-        </p>
-      </div>
+  <div className="flex min-h-[88px] flex-col items-center justify-center border-r border-vaultGold/10 p-3 text-center">
+    <p className="text-[9px] font-black uppercase tracking-[0.26em] text-zinc-500">
+      Graded
+    </p>
+    <p className="mt-2 text-2xl font-black text-white">{gradedCards}</p>
+  </div>
 
-      <div className="p-4">
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">
-          Raw / Sets
-        </p>
-        <p className="mt-2 text-2xl font-black text-white">
-          {rawCards}
-          <span className="ml-2 text-sm text-zinc-500">
-            / {trackedSets}
-          </span>
-        </p>
-      </div>
-    </div>
+  <div className="flex min-h-[88px] flex-col items-center justify-center p-3 text-center">
+    <p className="text-[9px] font-black uppercase tracking-[0.26em] text-zinc-500">
+      Raw / Sets
+    </p>
+    <p className="mt-2 text-2xl font-black text-white">
+      {rawCards}
+      <span className="ml-2 text-sm text-zinc-500">/ {trackedSets}</span>
+    </p>
+  </div>
+</div>
   </div>
 </section>
 
