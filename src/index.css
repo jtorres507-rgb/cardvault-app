@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* ==============================
-   CARDVAULT PRO GLOBAL BASE
+   CARDVAULT PRO GLOBALBASE
    ============================== */
 
 :root {
@@ -3664,4 +3664,59 @@ body,
 
 * {
   box-sizing: border-box;
+}
+
+@media print {
+  body,
+  html,
+  #root {
+    background: white !important;
+    color: black !important;
+  }
+
+  .app-shell,
+  .main-app,
+  .reports-screen-controls,
+  .screen-only {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .clean-print-report-output {
+    display: block !important;
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .clean-print-report-output * {
+    background-color: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  .clean-print-report-output table,
+  .clean-print-report-output th,
+  .clean-print-report-output td {
+    background: white !important;
+    color: black !important;
+    border-color: #d1d5db !important;
+  }
+
+  button,
+  nav,
+  aside {
+    display: none !important;
+  }
+
+  @page {
+    margin: 0.5in;
+  }
 }
