@@ -659,7 +659,7 @@ function CardVaultMobileHeader({
             Pro
           </p>
         </div>
-
+p
         {/* Right Settings Gear + Notification Bell */}
         <div className="flex items-center justify-end gap-4">
           <button
@@ -715,7 +715,29 @@ function CardVaultMobileShell({
   );
 }
 
-function MobileDashboardCommandCenter() {
+function MobileDashboardCommandCenter({ cards }: { cards: CardRecord[] }) {
+  const cardsWithPerformance = cards
+    .map((card) => ({
+      ...card,
+      calculatedGainLoss:
+        typeof card.gainLoss === "number"
+          ? card.gainLoss
+          : card.estimatedValue - card.totalCostBasis,
+    }))
+    .sort((a, b) => b.calculatedGainLoss - a.calculatedGainLoss);
+
+  const biggestGains = cardsWithPerformance
+    .filter((card) => card.calculatedGainLoss > 0)
+    .slice(0, 5);
+
+  const biggestLosses = [...cardsWithPerformance]
+    .filter((card) => card.calculatedGainLoss < 0)
+    .sort((a, b) => a.calculatedGainLoss - b.calculatedGainLoss)
+    .slice(0, 5);
+
+  const topCards = [...cards]
+    .sort((a, b) => b.estimatedValue - a.estimatedValue)
+    .slice(0, 5);
   return (
     <div className="relative overflow-hidden">
       {/* Dashboard Content */}
@@ -723,7 +745,7 @@ function MobileDashboardCommandCenter() {
         {/* Vault Intel Market-Style Panel */}
         <section className="rounded-2xl border border-cyan-400/10 bg-black/10 p-5 shadow-none backdrop-blur-sm">
           <h2 className="text-3xl font-bold tracking-wide text-white">
-            Vault Intel
+            Collection Intelligence
           </h2>
 
           {/* Chart Area */}
@@ -857,13 +879,104 @@ function MobileDashboardCommandCenter() {
 
               <div>
                 <h2 className="text-2xl font-bold tracking-wide text-white">
-                  Collection Intelligence
+                  Collection Breakdown
                 </h2>
 
                 <p className="mt-1 text-sm font-medium leading-6 tracking-wider text-zinc-400">
                   Actionable insights for collection value, card movement,
                   grading strategy, and selling decisions.
                 </p>
+
+                <div className="mt-6 grid gap-5">
+                  {/* Top 5 Biggest Gains */}
+                <div className="rounded-2xl border border-emerald-400/15 bg-black/10 p-4 shadow-none">
+                <h3 className="text-sm font-black uppercase tracking-[0.22em] text-emerald-300">
+                   Top 5 Biggest Gains
+                </h3>
+
+                <div className="mt-4 space-y-3">
+                   {biggestGains.length > 0 ? (
+                   biggestGains.map((card, index) => (
+                <div
+                    key={card.id}
+                     className="grid grid-cols-[32px_1fr_auto] items-center gap-3 border-b border-white/10 pb-3 last:border-b-0 last:pb-0"
+                  >
+                 <p className="text-sm font-black text-emerald-300">
+                     {index + 1}
+                  </p>
+
+                  <div>
+                  <p className="text-sm font-black text-white">
+                {card.player}
+              </p>
+              <p className="text-xs font-semibold text-zinc-500">
+                {card.year} {card.brand} {card.card}
+              </p>
+            </div>
+
+            <div className="text-right">
+              <p className="text-sm font-black text-emerald-300">
+                +${card.calculatedGainLoss.toLocaleString()}
+              </p>
+              <p className="text-[10px] font-bold text-zinc-500">
+                Gain
+              </p>
+            </div>
+          </div>
+        ))
+      ) : (
+        <p className="text-sm font-semibold text-zinc-500">
+          No gain data available yet.
+        </p>
+      )}
+    </div>
+  </div>
+
+  {/* Top 5 Biggest Losses */}
+  <div className="rounded-2xl border border-red-400/15 bg-black/10 p-4 shadow-none">
+    <h3 className="text-sm font-black uppercase tracking-[0.22em] text-red-300">
+      Top 5 Biggest Losses
+    </h3>
+
+    <div className="mt-4 space-y-3">
+      {biggestLosses.length > 0 ? (
+        biggestLosses.map((card, index) => (
+          <div
+            key={card.id}
+            className="grid grid-cols-[32px_1fr_auto] items-center gap-3 border-b border-white/10 pb-3 last:border-b-0 last:pb-0"
+          >
+            <p className="text-sm font-black text-red-300">
+              {index + 1}
+            </p>
+
+            <div>
+              <p className="text-sm font-black text-white">
+                {card.player}
+              </p>
+              <p className="text-xs font-semibold text-zinc-500">
+                {card.year} {card.brand} {card.card}
+              </p>
+            </div>
+
+            <div className="text-right">
+              <p className="text-sm font-black text-red-300">
+                -${Math.abs(card.calculatedGainLoss).toLocaleString()}
+              </p>
+              <p className="text-[10px] font-bold text-zinc-500">
+                Loss
+              </p>
+            </div>
+          </div>
+        ))
+      ) : (
+        <p className="text-sm font-semibold text-zinc-500">
+          No loss data available yet.
+                </p>
+                 )}
+              </div>
+              </div>
+              </div>
+
               </div>
             </div>
           </div>
@@ -871,6 +984,54 @@ function MobileDashboardCommandCenter() {
           <button className="mt-7 w-full rounded-xl px-4 py-4 text-center text-lg font-black uppercase tracking-[0.18em] text-cyan-400">
             View More Collection Intel
           </button>
+
+            {/* Top Cards Panel */}
+        <div className="mt-8 rounded-2xl border border-vaultGold/20 bg-black/10 p-5 shadow-none">
+        <div className="mb-5 flex items-center gap-3">
+         <span className="text-3xl">👑</span>
+        <h2 className="text-2xl font-black uppercase tracking-[0.18em] text-white">
+             Top Cards
+        </h2>
+        </div>
+
+        <div className="space-y-4">
+            {topCards.length > 0 ? (
+              topCards.map((card, index) => (
+        <div
+           key={card.id}
+            className="grid grid-cols-[36px_1fr_auto] items-center gap-3 border-b border-white/10 pb-4 last:border-b-0 last:pb-0"
+          >
+          <div className="flex h-8 w-8 items-center justify-center rounded-full border border-vaultGold/40 text-sm font-black text-vaultGold">
+            {index + 1}
+          </div>
+
+          <div>
+            <p className="text-base font-black text-white">
+              {card.player}
+            </p>
+            <p className="text-xs font-semibold text-zinc-500">
+              {card.year} {card.brand} {card.card}
+            </p>
+          </div>
+
+          <div className="text-right">
+            <p className="text-base font-black text-vaultGold">
+              ${card.estimatedValue.toLocaleString()}
+            </p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+              Value
+            </p>
+          </div>
+        </div>
+      ))
+    ) : (
+      <p className="text-sm font-semibold text-zinc-500">
+        No top card data available yet.
+      </p>
+    )}
+  </div>
+</div>
+
         </section>
       </div>
     </div>
@@ -1599,7 +1760,7 @@ function exportDallasBetaBackup() {
             <>
               {/* New phone dashboard layout */}
               <div className="xl:hidden">
-                <MobileDashboardCommandCenter />
+                <MobileDashboardCommandCenter cards={cards} />
               </div>
 
               {/* Existing desktop dashboard layout */}
