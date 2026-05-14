@@ -622,23 +622,9 @@ function CardVaultMobileHeader({
       </div>
 
       {/* Flat App Header */}
-      <div className="grid h-[58px] grid-cols-[96px_1fr_96px] items-center border-b border-cyan-400/10 bg-[#020807]">
+      <div className="grid h-[58px] grid-cols-[44px_1fr_96px] items-center border-b border-cyan-400/10 bg-[#020807]">
         {/* Left Icons */}
         <div className="flex items-center gap-5 text-vaultGold">
-          <button
-            type="button"
-            className="text-3xl font-light leading-none text-vaultGold/90"
-          >
-            ‹
-          </button>
-
-          <button
-            type="button"
-            className="text-2xl leading-none text-vaultGold/80"
-          >
-            ◊
-          </button>
-
           <button
             type="button"
             className="grid h-7 w-7 grid-cols-2 gap-1"
@@ -742,9 +728,9 @@ function MobileDashboardCommandCenter({ cards }: { cards: CardRecord[] }) {
     <div className="relative overflow-hidden">
       {/* Dashboard Content */}
       <div className="relative z-10 space-y-5">
-        {/* Vault Intel Market-Style Panel */}
+        {/* Collection Intelligence Market-Style Panel */}
         <section className="rounded-2xl border border-cyan-400/10 bg-black/10 p-5 shadow-none backdrop-blur-sm">
-          <h2 className="text-3xl font-bold tracking-wide text-white">
+          <h2 className="text-2xl font-bold tracking-wide text-white">
             Collection Intelligence
           </h2>
 
@@ -872,8 +858,8 @@ function MobileDashboardCommandCenter({ cards }: { cards: CardRecord[] }) {
 
           {/* Collection Intelligence Banner moved to bottom */}
           <div className="mt-8 rounded-2xl border border-cyan-400/10 bg-black/20 p-5">
-            <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-4 border-cyan-500/70 bg-[#10232a] text-3xl text-vaultGold">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-cyan-500/70 bg-[#10232a] text-3xl text-vaultGold">
                 ★
               </div>
 
