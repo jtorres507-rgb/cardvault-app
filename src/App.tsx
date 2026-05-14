@@ -652,8 +652,8 @@ function CardVaultMobileHeader({
 
         {/* Center Brand */}
         <div className="text-center">
-          <p className="text-[15px] font-black uppercase tracking-[0.24em] text-vaultGold">
-            CardVault
+          <p className="text-[23px] font-black uppercase tracking-[0.24em] text-vaultGold">
+              CardVault
           </p>
           <p className="-mt-1 text-[10px] font-black uppercase tracking-[0.38em] text-vaultGold/80">
             Pro
@@ -718,37 +718,8 @@ function CardVaultMobileShell({
 function MobileDashboardCommandCenter() {
   return (
     <div className="relative overflow-hidden">
-      {/* Main Dashboard Watermark */}
-      <div className="pointer-events-none fixed inset-0 z-0 flex items-center justify-center opacity-[0.08]">
-        <img
-          src="/cardvault-background-image.png"
-          alt="CardVault background watermark"
-          className="h-[720px] w-[720px] object-contain"
-        />
-      </div>
-
       {/* Dashboard Content */}
       <div className="relative z-10 space-y-5">
-        {/* Collection Intelligence Banner */}
-        <section className="rounded-2xl border border-white/5 bg-[#101619]/90 p-5 shadow-xl shadow-black/40 backdrop-blur-sm">
-          <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-4 border-cyan-500/70 bg-[#10232a] text-3xl text-vaultGold">
-              ★
-            </div>
-
-            <div>
-              <h2 className="text-2xl font-bold tracking-wide text-white">
-                Collection Intelligence
-              </h2>
-
-              <p className="mt-1 text-sm font-medium leading-6 tracking-wider text-zinc-400">
-                Actionable insights for collection value, card movement,
-                grading strategy, and selling decisions.
-              </p>
-            </div>
-          </div>
-        </section>
-
         {/* Vault Intel Market-Style Panel */}
         <section className="rounded-2xl border border-cyan-400/10 bg-black/10 p-5 shadow-none backdrop-blur-sm">
           <h2 className="text-3xl font-bold tracking-wide text-white">
@@ -875,6 +846,26 @@ function MobileDashboardCommandCenter() {
               value="148"
               change="+12"
             />
+          </div>
+
+          {/* Collection Intelligence Banner moved to bottom */}
+          <div className="mt-8 rounded-2xl border border-cyan-400/10 bg-black/20 p-5">
+            <div className="flex items-center gap-4">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-4 border-cyan-500/70 bg-[#10232a] text-3xl text-vaultGold">
+                ★
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-bold tracking-wide text-white">
+                  Collection Intelligence
+                </h2>
+
+                <p className="mt-1 text-sm font-medium leading-6 tracking-wider text-zinc-400">
+                  Actionable insights for collection value, card movement,
+                  grading strategy, and selling decisions.
+                </p>
+              </div>
+            </div>
           </div>
 
           <button className="mt-7 w-full rounded-xl px-4 py-4 text-center text-lg font-black uppercase tracking-[0.18em] text-cyan-400">
