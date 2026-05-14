@@ -719,11 +719,11 @@ function MobileDashboardCommandCenter() {
   return (
     <div className="relative overflow-hidden">
       {/* Main Dashboard Watermark */}
-      <div className="pointer-events-none fixed inset-0 z-0 flex items-center justify-center opacity-[0.10]">
+      <div className="pointer-events-none fixed inset-0 z-0 flex items-center justify-center opacity-[0.08]">
         <img
           src="/cardvault-background-image.png"
           alt="CardVault background watermark"
-          className="h-[520px] w-[520px] object-contain"
+          className="h-[720px] w-[720px] object-contain"
         />
       </div>
 
@@ -750,13 +750,13 @@ function MobileDashboardCommandCenter() {
         </section>
 
         {/* Vault Intel Market-Style Panel */}
-        <section className="rounded-2xl border border-zinc-700/70 bg-[#101619]/90 p-5 shadow-xl shadow-black/50 backdrop-blur-sm">
+        <section className="rounded-2xl border border-cyan-400/10 bg-black/10 p-5 shadow-none backdrop-blur-sm">
           <h2 className="text-3xl font-bold tracking-wide text-white">
             Vault Intel
           </h2>
 
           {/* Chart Area */}
-          <div className="mt-6 overflow-hidden rounded-xl bg-[#101619]">
+          <div className="mt-6 overflow-hidden rounded-xl bg-transparent">
             <div className="relative h-[255px]">
               {/* Horizontal Chart Lines */}
               <div className="absolute inset-0">
