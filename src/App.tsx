@@ -60,6 +60,7 @@ type CardStatus =
   | "Personal Collection"
   | "For Sale"
   | "Watchlist"
+  | "Watch"
   | "Grade Candidate"
   | "Sold";
 
@@ -7743,6 +7744,30 @@ function CardDetail({
     }, 2500);
   }
 
+  function handleCardDecision(
+    decision: "Personal Collection" | "Watch" | "For Sale"
+  ) {
+    const updatedCard = {
+      ...displayCard,
+      status: decision,
+    };
+
+    setEditCard(updatedCard);
+    updateCard(updatedCard);
+
+    setSaveMessage(
+      decision === "Personal Collection"
+        ? "Card kept in Personal Collection."
+        : decision === "Watch"
+        ? "Card added to Watch List."
+        : "Card moved to Sales Tracker."
+    );
+
+    window.setTimeout(() => {
+      setSaveMessage("");
+    }, 2500);
+  }
+
   const onBack = () => setActiveScreen("My Collection");
   const onDelete = () => deleteCard(card.id);
 
@@ -7946,6 +7971,47 @@ function CardDetail({
           </p>
         )}
       </div>
+    );
+  }
+
+  function DecisionButton({
+    label,
+    sublabel,
+    decision,
+    danger = false,
+  }: {
+    label: string;
+    sublabel: string;
+    decision: "Personal Collection" | "Watch" | "For Sale";
+    danger?: boolean;
+  }) {
+    const isActive = displayCard.status === decision;
+
+    return (
+      <button
+        type="button"
+        onClick={() => handleCardDecision(decision)}
+        className={`rounded-2xl border px-2 py-3 text-left transition ${
+          isActive
+            ? danger
+              ? "border-red-500/60 bg-red-950/40"
+              : "border-vaultGold/60 bg-vaultGold/15"
+            : danger
+            ? "border-red-500/25 bg-black/45"
+            : "border-vaultGold/20 bg-black/45"
+        }`}
+      >
+        <p
+          className={`text-[10px] font-black uppercase tracking-[0.16em] ${
+            danger ? "text-red-300" : "text-vaultGold"
+          }`}
+        >
+          {label}
+        </p>
+        <p className="mt-1 text-[9px] font-bold leading-3 text-zinc-500">
+          {sublabel}
+        </p>
+      </button>
     );
   }
 
@@ -8244,37 +8310,64 @@ function CardDetail({
           </div>
         )}
 
-        {/* CARD DETAIL PART 2 — Premium Mobile Image Area */}
+        {/* CARD DETAIL PART 2 — Premium Mobile Image Area + Decision Sidebar */}
         <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-4 shadow-vault backdrop-blur-xl">
-          <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3">
-            <div className="min-w-full snap-center">
-              <CardImageFrame
-                label="Front"
-                image={displayCard.frontImage}
-                isEditing={isEditing}
-                inputId={`mobile-front-image-${displayCard.id}`}
-                onUpload={(event) =>
-                  handleCardImageUpload("frontImage", event)
-                }
-                onRemove={() => removeCardImage("frontImage")}
-              />
+          <div className="grid grid-cols-[minmax(0,1fr)_90px] gap-3">
+            <div className="min-w-0">
+              <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3">
+                <div className="min-w-full snap-center">
+                  <CardImageFrame
+                    label="Front"
+                    image={displayCard.frontImage}
+                    isEditing={isEditing}
+                    inputId={`mobile-front-image-${displayCard.id}`}
+                    onUpload={(event) =>
+                      handleCardImageUpload("frontImage", event)
+                    }
+                    onRemove={() => removeCardImage("frontImage")}
+                  />
+                </div>
+
+                <div className="min-w-full snap-center">
+                  <CardImageFrame
+                    label="Back"
+                    image={displayCard.backImage}
+                    isEditing={isEditing}
+                    inputId={`mobile-back-image-${displayCard.id}`}
+                    onUpload={(event) =>
+                      handleCardImageUpload("backImage", event)
+                    }
+                    onRemove={() => removeCardImage("backImage")}
+                  />
+                </div>
+              </div>
+
+              <div className="mt-2 flex items-center justify-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-vaultGold" />
+                <span className="h-2 w-2 rounded-full bg-zinc-600" />
+              </div>
             </div>
 
-            <div className="min-w-full snap-center">
-              <CardImageFrame
-                label="Back"
-                image={displayCard.backImage}
-                isEditing={isEditing}
-                inputId={`mobile-back-image-${displayCard.id}`}
-                onUpload={(event) => handleCardImageUpload("backImage", event)}
-                onRemove={() => removeCardImage("backImage")}
+            <div className="flex flex-col gap-2 pt-10">
+              <DecisionButton
+                label="Keep"
+                sublabel="Collection"
+                decision="Personal Collection"
+              />
+
+              <DecisionButton
+                label="Watch"
+                sublabel="Investment"
+                decision="Watch"
+              />
+
+              <DecisionButton
+                label="Sell"
+                sublabel="Tracker"
+                decision="For Sale"
+                danger
               />
             </div>
-          </div>
-
-          <div className="mt-2 flex items-center justify-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-vaultGold" />
-            <span className="h-2 w-2 rounded-full bg-zinc-600" />
           </div>
         </section>
 
@@ -8554,31 +8647,54 @@ function CardDetail({
         )}
 
         <div className="grid grid-cols-12 items-start gap-6">
-          {/* Left image showcase */}
+          {/* Left image showcase + desktop decision panel */}
           <div className="col-span-5 space-y-5">
             <Panel className="bg-black/70 backdrop-blur-sm">
-              <div className="grid grid-cols-2 gap-5">
-                <CardImageFrame
-                  label="Front"
-                  image={displayCard.frontImage}
-                  isEditing={isEditing}
-                  inputId={`front-image-${displayCard.id}`}
-                  onUpload={(event) =>
-                    handleCardImageUpload("frontImage", event)
-                  }
-                  onRemove={() => removeCardImage("frontImage")}
-                />
+              <div className="grid grid-cols-[minmax(0,1fr)_150px] gap-5">
+                <div className="grid grid-cols-2 gap-5">
+                  <CardImageFrame
+                    label="Front"
+                    image={displayCard.frontImage}
+                    isEditing={isEditing}
+                    inputId={`front-image-${displayCard.id}`}
+                    onUpload={(event) =>
+                      handleCardImageUpload("frontImage", event)
+                    }
+                    onRemove={() => removeCardImage("frontImage")}
+                  />
 
-                <CardImageFrame
-                  label="Back"
-                  image={displayCard.backImage}
-                  isEditing={isEditing}
-                  inputId={`back-image-${displayCard.id}`}
-                  onUpload={(event) =>
-                    handleCardImageUpload("backImage", event)
-                  }
-                  onRemove={() => removeCardImage("backImage")}
-                />
+                  <CardImageFrame
+                    label="Back"
+                    image={displayCard.backImage}
+                    isEditing={isEditing}
+                    inputId={`back-image-${displayCard.id}`}
+                    onUpload={(event) =>
+                      handleCardImageUpload("backImage", event)
+                    }
+                    onRemove={() => removeCardImage("backImage")}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <DecisionButton
+                    label="Keep"
+                    sublabel="Personal Collection"
+                    decision="Personal Collection"
+                  />
+
+                  <DecisionButton
+                    label="Watch"
+                    sublabel="Investment Card"
+                    decision="Watch"
+                  />
+
+                  <DecisionButton
+                    label="Sell"
+                    sublabel="Sales Tracker"
+                    decision="For Sale"
+                    danger
+                  />
+                </div>
               </div>
 
               <div className="mt-5 grid grid-cols-3 overflow-hidden rounded-xl border border-vaultGold/30">
