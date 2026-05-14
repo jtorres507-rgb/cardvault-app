@@ -6,6 +6,8 @@ import {
   BarChart3,
   Bell,
   Box,
+  Binoculars,
+  ClipboardList,
   Info,
   Boxes,
   Camera,
@@ -52,9 +54,10 @@ type Screen =
   | "Temporary Card Detail"
   | "Market Comps"
   | "Grading Center"
+  | "Queue"
   | "Reports"
   | "Sales Tracker"
-  | "Settings";
+  | "Settings"
 
 type CardStatus =
   | "Personal Collection"
@@ -273,7 +276,7 @@ const sidebarItems: {
 }[] = [
   { label: "Dashboard", icon: Home },
   { label: "My Collection", icon: Boxes },
-  {label: "Memorabilia",icon: Award },
+  { label: "Memorabilia",icon: Award },
   { label: "Add Card", icon: PlusCircle },
   { label: "CardVault Scan", icon: Camera },
   { label: "Scan Review Queue", icon: Camera },
@@ -3393,6 +3396,23 @@ function MyCollection({
     .sort((a, b) => b.estimatedValue - a.estimatedValue)
     .slice(0, 5);
 
+  const watchCards = cards.filter((card) => card.status === "Watch");
+
+  const queueCards = cards
+    .filter((card) => {
+      const cardData = card as any;
+
+      return (
+        cardData.isQueued === true ||
+        cardData.queueStatus === "Queue" ||
+        cardData.queueStatus === "Temporary Queue" ||
+        cardData.betaQueue === true ||
+        cardData.betaDecision ||
+        cardData.temporaryScan === true
+      );
+    })
+    .slice(0, 30);
+
   const collectionValue = cards.reduce(
     (total, card) => total + card.estimatedValue,
     0
@@ -3448,6 +3468,184 @@ function MyCollection({
       positive: true,
     },
   ];
+
+  function renderCollectionScrollSection({
+    title,
+    icon,
+    cardsToRender,
+    viewLabel,
+    onViewAll,
+    emptyTitle,
+    emptyMessage,
+    queueCount,
+  }: {
+    title: string;
+    icon: React.ReactNode;
+    cardsToRender: CardRecord[];
+    viewLabel: string;
+    onViewAll: () => void;
+    emptyTitle: string;
+    emptyMessage: string;
+    queueCount?: string;
+  }) {
+    return (
+      <Panel className="relative overflow-hidden border-transparent bg-black/50">
+        {/* Phone-only section watermark */}
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.06] xl:hidden">
+          <img
+            src="/cardvault-background-image.png"
+            alt=""
+            className="h-[430px] w-[430px] object-contain"
+          />
+        </div>
+
+        <div className="relative z-10">
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              {icon}
+              <h2 className="text-2xl font-black">{title}</h2>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {queueCount && (
+                <span className="rounded-xl border border-vaultGold/15 bg-black/50 px-3 py-2 text-xs font-black text-zinc-300">
+                  {queueCount}
+                </span>
+              )}
+
+              <button
+                type="button"
+                onClick={onViewAll}
+                className="shrink-0 text-sm font-black text-vaultGold hover:text-white"
+              >
+                {viewLabel} →
+              </button>
+            </div>
+          </div>
+
+          {cardsToRender.length === 0 ? (
+            <div className="rounded-[2rem] border border-vaultGold/15 bg-black/45 p-6 text-center xl:hidden">
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-vaultGold">
+                {emptyTitle}
+              </p>
+              <p className="mt-3 text-sm font-bold leading-6 text-zinc-400">
+                {emptyMessage}
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Phone-only swipe showcase */}
+              <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 pr-5 xl:hidden">
+                {cardsToRender.map((card) => {
+                  const cardData = card as any;
+
+                  const grade =
+                    cardData.grade ||
+                    cardData.gradingStatus ||
+                    cardData.condition ||
+                    "Raw";
+
+                  const cardTitle =
+                    cardData.player ||
+                    cardData.name ||
+                    cardData.itemName ||
+                    "Unknown Player";
+
+                  const cardDescription =
+                    cardData.card ||
+                    cardData.cardName ||
+                    cardData.brand ||
+                    cardData.set ||
+                    "Card details";
+
+                  const cardYear =
+                    cardData.year || cardData.season || "CardVault Pro";
+
+                  const frontImage =
+                    cardData.frontImage ||
+                    cardData.frontImageUrl ||
+                    cardData.image ||
+                    cardData.imageUrl ||
+                    cardData.photo ||
+                    "";
+
+                  return (
+                    <button
+                      key={card.id}
+                      type="button"
+                      onClick={() => openCardDetail(card.id)}
+                      className="min-w-[86%] snap-center overflow-hidden rounded-[2rem] bg-black/75 text-left first:ml-1 last:mr-5"
+                    >
+                      {/* =========================================================
+                           MY COLLECTION CARD IMAGE AREA
+                      ========================================================= */}
+                      <div className="relative flex h-[360px] items-center justify-center overflow-hidden bg-gradient-to-b from-zinc-900 via-black to-zinc-950 px-4 py-3">
+                        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(212,175,55,0.16),transparent_45%)]" />
+
+                        {frontImage ? (
+                          <img
+                            src={frontImage}
+                            alt={`${cardTitle} card front`}
+                            className="relative z-10 max-h-full w-full rounded-2xl object-contain"
+                          />
+                        ) : (
+                          <div className="relative z-10 flex h-full w-full flex-col items-center justify-center rounded-2xl bg-black/55">
+                            <Crown className="h-16 w-16 text-vaultGold/75" />
+                            <p className="mt-5 text-[10px] font-black uppercase tracking-[0.45em] text-zinc-400">
+                              Card Image
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* =========================================================
+                           MY COLLECTION SCREEN LOWER PANEL BELOW CARD IMAGE
+                      ========================================================= */}
+                      <div className="bg-black/95 px-4 py-3">
+                        <p className="text-[10px] font-black uppercase tracking-[0.35em] text-zinc-500">
+                          {cardYear}
+                        </p>
+
+                        <h3 className="mt-2 text-xl font-black uppercase leading-tight text-white">
+                          {cardTitle}
+                        </h3>
+
+                        <p className="mt-1 line-clamp-1 text-xs font-bold uppercase leading-5 text-zinc-400">
+                          {cardDescription}
+                        </p>
+
+                        <div className="mt-4 flex items-center justify-between gap-3">
+                          <div className="rounded-xl bg-black px-4 py-2 text-sm font-black text-white">
+                            {grade}
+                          </div>
+
+                          <p className="text-xl font-black text-emerald-400">
+                            ${card.estimatedValue.toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Desktop grid */}
+              <div className="hidden xl:grid xl:grid-cols-5 xl:gap-6">
+                {cardsToRender.map((card) => (
+                  <CollectionCardTile
+                    key={card.id}
+                    card={card}
+                    openCardDetail={openCardDetail}
+                    compact
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </Panel>
+    );
+  }
 
   if (cards.length === 0) {
     return (
@@ -3573,140 +3771,38 @@ function MyCollection({
         />
       </div>
 
-      <Panel className="relative overflow-hidden border-transparent bg-black/50">
-        {/* Phone-only Top Cards watermark */}
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.06] xl:hidden">
-          <img
-            src={cardgemzLogo}
-            alt="CARDGEMZ Top Cards watermark"
-            className="h-[430px] w-[430px] object-contain"
-          />
-        </div>
+      {renderCollectionScrollSection({
+        title: "Top Cards",
+        icon: <Crown className="h-5 w-5 text-vaultGold" />,
+        cardsToRender: topCards,
+        viewLabel: "View All",
+        onViewAll: () => setActiveScreen("All Cards"),
+        emptyTitle: "No Top Cards Yet",
+        emptyMessage: "Add cards with market values to build your Top Cards list.",
+      })}
 
-        <div className="relative z-10">
-          <div className="mb-5 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <Crown className="h-5 w-5 text-vaultGold" />
-              <h2 className="text-2xl font-black">Top Cards</h2>
-            </div>
+      {renderCollectionScrollSection({
+        title: "Watch List",
+        icon: <Binoculars className="h-5 w-5 text-vaultGold" />,
+        cardsToRender: watchCards,
+        viewLabel: "View All",
+        onViewAll: () => setActiveScreen("All Cards"),
+        emptyTitle: "No Watch Cards Yet",
+        emptyMessage:
+          "Tap Watch from Card Detail to track cards as investment cards.",
+      })}
 
-            <button
-              type="button"
-              onClick={() => setActiveScreen("All Cards")}
-              className="shrink-0 text-sm font-black text-vaultGold hover:text-white"
-            >
-              View All →
-            </button>
-          </div>
-
-          {/* Phone-only swipe showcase */}
-          <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 pr-5 xl:hidden">
-            {topCards.map((card) => {
-              const cardData = card as any;
-
-              const grade =
-                cardData.grade ||
-                cardData.gradingStatus ||
-                cardData.condition ||
-                "Raw";
-
-              const cardTitle =
-                cardData.player ||
-                cardData.name ||
-                cardData.itemName ||
-                "Unknown Player";
-
-              const cardDescription =
-                cardData.card ||
-                cardData.cardName ||
-                cardData.brand ||
-                cardData.set ||
-                "Card details";
-
-              const cardYear =
-                cardData.year || cardData.season || "CardVault Pro";
-
-              const frontImage =
-                cardData.frontImage ||
-                cardData.frontImageUrl ||
-                cardData.image ||
-                cardData.imageUrl ||
-                cardData.photo ||
-                "";
-
-              return (
-                <button
-                  key={card.id}
-                  type="button"
-                  onClick={() => openCardDetail(card.id)}
-                  className="min-w-[86%] snap-center overflow-hidden rounded-[2rem] bg-black/75 text-left first:ml-1 last:mr-5"
-                >
-                  {/* =========================================================
-                       MY COLLECTION CARD IMAGE AREA
-                  ========================================================= */}
-                  <div className="relative flex h-[360px] items-center justify-center overflow-hidden bg-gradient-to-b from-zinc-900 via-black to-zinc-950 px-4 py-3">
-                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(212,175,55,0.16),transparent_45%)]" />
-
-                    {frontImage ? (
-                      <img
-                        src={card.frontImage}
-                        alt={`${cardTitle} card front`}
-                        className="relative z-10 max-h-full w-full rounded-2xl object-contain"
-                      />
-                    ) : (
-                      <div className="relative z-10 flex h-full w-full flex-col items-center justify-center rounded-2xl bg-black/55">
-                        <Crown className="h-16 w-16 text-vaultGold/75" />
-                        <p className="mt-5 text-[10px] font-black uppercase tracking-[0.45em] text-zinc-400">
-                          Card Image
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* =========================================================
-                       MY COLLECTION SCREEN LOWER PANEL BELOW CARD IMAGE
-                  ========================================================= */}
-                  <div className="bg-black/95 px-4 py-3">
-                    <p className="text-[10px] font-black uppercase tracking-[0.35em] text-zinc-500">
-                      {cardYear}
-                    </p>
-
-                    <h3 className="mt-2 text-xl font-black uppercase leading-tight text-white">
-                      {cardTitle}
-                    </h3>
-
-                    <p className="mt-1 line-clamp-1 text-xs font-bold uppercase leading-5 text-zinc-400">
-                      {cardDescription}
-                    </p>
-
-                    <div className="mt-4 flex items-center justify-between gap-3">
-                      <div className="rounded-xl bg-black px-4 py-2 text-sm font-black text-white">
-                        {grade}
-                      </div>
-
-                      <p className="text-xl font-black text-emerald-400">
-                        ${card.estimatedValue.toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Desktop grid */}
-          <div className="hidden xl:grid xl:grid-cols-5 xl:gap-6">
-            {topCards.map((card) => (
-              <CollectionCardTile
-                key={card.id}
-                card={card}
-                openCardDetail={openCardDetail}
-                compact
-              />
-            ))}
-          </div>
-        </div>
-      </Panel>
+      {renderCollectionScrollSection({
+        title: "Queue List",
+        icon: <ClipboardList className="h-5 w-5 text-vaultGold" />,
+        cardsToRender: queueCards,
+        viewLabel: "View Queue",
+        onViewAll: () => setActiveScreen("Queue"),
+        emptyTitle: "No Queue Cards Yet",
+        emptyMessage:
+          "Dallas Card Show beta queue cards will appear here. This list is capped at 30 cards.",
+        queueCount: `${queueCards.length} / 30`,
+      })}
     </div>
   );
 }
