@@ -3720,3 +3720,65 @@ body,
     margin: 0.5in;
   }
 }
+/* =========================================================
+   REPORT PREVIEW WHITE BACKGROUND OVERRIDE
+   Keeps reports clean/printable even though the app theme is dark.
+========================================================= */
+
+.report-preview-output,
+.clean-print-report-output {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+.report-preview-output *,
+.clean-print-report-output * {
+  color: #000000 !important;
+  text-shadow: none !important;
+}
+
+.report-preview-output section,
+.report-preview-output article,
+.report-preview-output div,
+.report-preview-output header,
+.report-preview-output main,
+.clean-print-report-output section,
+.clean-print-report-output article,
+.clean-print-report-output div,
+.clean-print-report-output header,
+.clean-print-report-output main {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.report-preview-output .bg-black,
+.report-preview-output .bg-black\/95,
+.report-preview-output .bg-black\/90,
+.report-preview-output .bg-black\/80,
+.report-preview-output .bg-black\/75,
+.report-preview-output .bg-black\/70,
+.report-preview-output .bg-black\/60,
+.report-preview-output .bg-black\/50,
+.report-preview-output .bg-graphite900,
+.report-preview-output .bg-graphite900\/70,
+.report-preview-output .bg-zinc-900,
+.report-preview-output .bg-zinc-950 {
+  background-color: #ffffff !important;
+}
+
+.report-preview-output table,
+.report-preview-output th,
+.report-preview-output td,
+.clean-print-report-output table,
+.clean-print-report-output th,
+.clean-print-report-output td {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #d1d5db !important;
+}
+
+.report-preview-output img,
+.clean-print-report-output img {
+  background: transparent !important;
+}
