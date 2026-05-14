@@ -717,158 +717,171 @@ function CardVaultMobileShell({
 
 function MobileDashboardCommandCenter() {
   return (
-    <div className="space-y-5">
-      {/* Collection Intelligence Banner */}
-      <section className="rounded-2xl border border-white/5 bg-[#101619] p-5 shadow-xl shadow-black/40">
-        <div className="flex items-center gap-4">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-cyan-500/70 bg-[#10232a] text-3xl text-vaultGold">
-            ★
+    <div className="relative overflow-hidden">
+      {/* Main Dashboard Watermark */}
+      <div className="pointer-events-none fixed inset-0 z-0 flex items-center justify-center opacity-[0.06]">
+        <img
+          src="/cardvault-background-image.png"
+          alt="CardVault background watermark"
+          className="h-[520px] w-[520px] object-contain"
+        />
+      </div>
+
+      {/* Dashboard Content */}
+      <div className="relative z-10 space-y-5">
+        {/* Collection Intelligence Banner */}
+        <section className="rounded-2xl border border-white/5 bg-[#101619]/90 p-5 shadow-xl shadow-black/40 backdrop-blur-sm">
+          <div className="flex items-center gap-4">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-4 border-cyan-500/70 bg-[#10232a] text-3xl text-vaultGold">
+              ★
+            </div>
+
+            <div>
+              <h2 className="text-2xl font-bold tracking-wide text-white">
+                Collection Intelligence
+              </h2>
+
+              <p className="mt-1 text-sm font-medium leading-6 tracking-wider text-zinc-400">
+                Actionable insights for collection value, card movement,
+                grading strategy, and selling decisions.
+              </p>
+            </div>
           </div>
+        </section>
 
-          <div>
-            <h2 className="text-2xl font-bold tracking-wide text-white">
-              Collection Intelligence
-            </h2>
-            <p className="mt-1 text-sm font-medium leading-6 tracking-wider text-zinc-400">
-              Actionable insights for collection value, card movement, grading
-              strategy, and selling decisions.
-            </p>
-          </div>
-        </div>
-      </section>
+        {/* Vault Intel Market-Style Panel */}
+        <section className="rounded-2xl border border-zinc-700/70 bg-[#101619]/90 p-5 shadow-xl shadow-black/50 backdrop-blur-sm">
+          <h2 className="text-3xl font-bold tracking-wide text-white">
+            Vault Intel
+          </h2>
 
-      {/* Vault Intel Market-Style Panel */}
-      <section className="rounded-2xl border border-zinc-700/70 bg-[#101619] p-5 shadow-xl shadow-black/50">
-        <h2 className="text-3xl font-bold tracking-wide text-white">
-          Vault Intel
-        </h2>
+          {/* Chart Area */}
+          <div className="mt-6 overflow-hidden rounded-xl bg-[#101619]">
+            <div className="relative h-[255px]">
+              {/* Horizontal Chart Lines */}
+              <div className="absolute inset-0">
+                {[18, 48, 78, 108, 138, 168, 198].map((top) => (
+                  <div
+                    key={top}
+                    className="absolute left-0 right-0 border-t border-zinc-500/40"
+                    style={{ top }}
+                  />
+                ))}
+              </div>
 
-        {/* Chart Area */}
-        <div className="mt-6 overflow-hidden rounded-xl bg-[#101619]">
-          <div className="relative h-[255px]">
-            {/* Horizontal Chart Lines */}
-            <div className="absolute inset-0">
-              {[18, 48, 78, 108, 138, 168, 198].map((top) => (
-                <div
-                  key={top}
-                  className="absolute left-0 right-0 border-t border-zinc-500/40"
-                  style={{ top }}
+              {/* Percentage Labels */}
+              <div className="absolute right-0 top-2 space-y-[18px] text-right text-xs text-zinc-400">
+                <p>1.47%</p>
+                <p>1.07%</p>
+                <p>0.67%</p>
+                <p>0.27%</p>
+                <p>-0.13%</p>
+                <p>-0.53%</p>
+                <p>-0.93%</p>
+              </div>
+
+              {/* Multi-Line Chart */}
+              <svg
+                className="absolute inset-0 h-full w-full"
+                viewBox="0 0 360 240"
+                preserveAspectRatio="none"
+              >
+                <polyline
+                  points="0,150 25,155 50,130 75,138 100,110 125,118 150,92 175,98 200,70 225,76 250,54 275,62 300,48 330,56 360,42"
+                  fill="none"
+                  stroke="rgba(229,231,235,0.85)"
+                  strokeWidth="2"
                 />
-              ))}
-            </div>
 
-            {/* Percentage Labels */}
-            <div className="absolute right-0 top-2 space-y-[18px] text-right text-xs text-zinc-400">
-              <p>1.47%</p>
-              <p>1.07%</p>
-              <p>0.67%</p>
-              <p>0.27%</p>
-              <p>-0.13%</p>
-              <p>-0.53%</p>
-              <p>-0.93%</p>
-            </div>
+                <polyline
+                  points="0,160 25,168 50,152 75,154 100,142 125,144 150,126 175,128 200,112 225,110 250,96 275,104 300,92 330,98 360,86"
+                  fill="none"
+                  stroke="rgba(59,130,246,0.9)"
+                  strokeWidth="2"
+                />
 
-            {/* Multi-Line Chart */}
-            <svg
-              className="absolute inset-0 h-full w-full"
-              viewBox="0 0 360 240"
-              preserveAspectRatio="none"
-            >
-              <polyline
-                points="0,150 25,155 50,130 75,138 100,110 125,118 150,92 175,98 200,70 225,76 250,54 275,62 300,48 330,56 360,42"
-                fill="none"
-                stroke="rgba(229,231,235,0.85)"
-                strokeWidth="2"
-              />
+                <polyline
+                  points="0,178 25,188 50,166 75,170 100,158 125,162 150,148 175,152 200,136 225,140 250,124 275,130 300,118 330,122 360,112"
+                  fill="none"
+                  stroke="rgba(244,114,182,0.9)"
+                  strokeWidth="2"
+                />
 
-              <polyline
-                points="0,160 25,168 50,152 75,154 100,142 125,144 150,126 175,128 200,112 225,110 250,96 275,104 300,92 330,98 360,86"
-                fill="none"
-                stroke="rgba(59,130,246,0.9)"
-                strokeWidth="2"
-              />
+                <polyline
+                  points="0,185 25,178 50,174 75,180 100,172 125,176 150,168 175,170 200,160 225,164 250,152 275,156 300,146 330,150 360,140"
+                  fill="none"
+                  stroke="rgba(253,186,116,0.95)"
+                  strokeWidth="2"
+                />
+              </svg>
 
-              <polyline
-                points="0,178 25,188 50,166 75,170 100,158 125,162 150,148 175,152 200,136 225,140 250,124 275,130 300,118 330,122 360,112"
-                fill="none"
-                stroke="rgba(244,114,182,0.9)"
-                strokeWidth="2"
-              />
-
-              <polyline
-                points="0,185 25,178 50,174 75,180 100,172 125,176 150,168 175,170 200,160 225,164 250,152 275,156 300,146 330,150 360,140"
-                fill="none"
-                stroke="rgba(253,186,116,0.95)"
-                strokeWidth="2"
-              />
-            </svg>
-
-            {/* Time Labels */}
-            <div className="absolute bottom-0 left-0 right-8 flex justify-between text-xs text-zinc-400">
-              <span>09:30</span>
-              <span>10:34</span>
-              <span>11:39</span>
-              <span>12:43</span>
-              <span>13:48</span>
-              <span>14:52</span>
-              <span>15:57</span>
+              {/* Time Labels */}
+              <div className="absolute bottom-0 left-0 right-8 flex justify-between text-xs text-zinc-400">
+                <span>09:30</span>
+                <span>10:34</span>
+                <span>11:39</span>
+                <span>12:43</span>
+                <span>13:48</span>
+                <span>14:52</span>
+                <span>15:57</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Time Range Tabs */}
-        <div className="mt-6 grid grid-cols-4 overflow-hidden rounded-xl border border-slate-500/70 text-center text-lg font-semibold text-white">
-          <button className="bg-cyan-950/60 px-4 py-4">1 Day</button>
-          <button className="border-l border-slate-500/70 px-4 py-4">
-            5 Day
+          {/* Time Range Tabs */}
+          <div className="mt-6 grid grid-cols-4 overflow-hidden rounded-xl border border-slate-500/70 text-center text-lg font-semibold text-white">
+            <button className="bg-cyan-950/60 px-4 py-4">1 Day</button>
+            <button className="border-l border-slate-500/70 px-4 py-4">
+              5 Day
+            </button>
+            <button className="border-l border-slate-500/70 px-4 py-4">
+              1 Mo...
+            </button>
+            <button className="border-l border-slate-500/70 px-4 py-4">
+              1 Year
+            </button>
+          </div>
+
+          {/* Collection Detail Rows */}
+          <div className="mt-7 divide-y divide-zinc-700/70">
+            <VaultIntelRow
+              dotColor="bg-orange-300"
+              label="Total Value"
+              description="Current collection value"
+              value="$12,450"
+              change="+8.72%"
+            />
+
+            <VaultIntelRow
+              dotColor="bg-zinc-300"
+              label="Total Invested"
+              description="Cost basis tracked"
+              value="$7,820"
+              change="+2.18%"
+            />
+
+            <VaultIntelRow
+              dotColor="bg-blue-500"
+              label="Unrealized Gain"
+              description="Estimated profit position"
+              value="+$4,630"
+              change="+59.23%"
+            />
+
+            <VaultIntelRow
+              dotColor="bg-fuchsia-500"
+              label="Total Cards"
+              description="Cards currently in vault"
+              value="148"
+              change="+12"
+            />
+          </div>
+
+          <button className="mt-7 w-full rounded-xl px-4 py-4 text-center text-lg font-black uppercase tracking-[0.18em] text-cyan-400">
+            View More Collection Intel
           </button>
-          <button className="border-l border-slate-500/70 px-4 py-4">
-            1 Mo...
-          </button>
-          <button className="border-l border-slate-500/70 px-4 py-4">
-            1 Year
-          </button>
-        </div>
-
-        {/* Collection Detail Rows */}
-        <div className="mt-7 divide-y divide-zinc-700/70">
-          <VaultIntelRow
-            dotColor="bg-orange-300"
-            label="Total Value"
-            description="Current collection value"
-            value="$12,450"
-            change="+8.72%"
-          />
-
-          <VaultIntelRow
-            dotColor="bg-zinc-300"
-            label="Total Invested"
-            description="Cost basis tracked"
-            value="$7,820"
-            change="+2.18%"
-          />
-
-          <VaultIntelRow
-            dotColor="bg-blue-500"
-            label="Unrealized Gain"
-            description="Estimated profit position"
-            value="+$4,630"
-            change="+59.23%"
-          />
-
-          <VaultIntelRow
-            dotColor="bg-fuchsia-500"
-            label="Total Cards"
-            description="Cards currently in vault"
-            value="148"
-            change="+12"
-          />
-        </div>
-
-        <button className="mt-7 w-full rounded-xl px-4 py-4 text-center text-lg font-black uppercase tracking-[0.18em] text-cyan-400">
-          View More Collection Intel
-        </button>
-      </section>
+        </section>
+      </div>
     </div>
   );
 }
@@ -911,55 +924,6 @@ function VaultIntelRow({
           {change}
         </p>
       </div>
-    </div>
-  );
-}
-
-function DashboardMetricCard({
-  label,
-  value,
-  sub,
-}: {
-  label: string;
-  value: string;
-  sub: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-cyan-400/10 bg-black/25 p-4 shadow-inner shadow-black/50">
-      <p className="text-[10px] font-black uppercase tracking-widest text-white/70">
-        {label}
-      </p>
-      <p className="mt-3 text-2xl font-black tracking-wide text-cyan-300">
-        {value}
-      </p>
-      <p className="mt-2 text-[10px] font-bold text-emerald-400">
-        {sub}
-      </p>
-    </div>
-  );
-}
-
-function SmallMetric({
-  label,
-  value,
-  orange = false,
-}: {
-  label: string;
-  value: string;
-  orange?: boolean;
-}) {
-  return (
-    <div className="border border-white/8 bg-black/12 p-3">
-      <p
-        className={`text-[18px] font-black ${
-          orange ? "text-orange-400" : "text-cyan-200"
-        }`}
-      >
-        {value}
-      </p>
-      <p className="mt-1 text-[8px] font-black uppercase tracking-[0.12em] text-white/55">
-        {label}
-      </p>
     </div>
   );
 }
