@@ -601,6 +601,7 @@ const emptyForm: AddCardForm = {
   storageLocation: "Vault A-01",
 };
 
+
 function CardVaultMobileHeader({
   setActiveScreen,
 }: {
@@ -621,53 +622,50 @@ function CardVaultMobileHeader({
         </div>
       </div>
 
-      {/* Flat App Header */}
-      <div className="grid h-[58px] grid-cols-[44px_1fr_96px] items-center border-b border-cyan-400/10 bg-[#020807]">
-        {/* Left Icons */}
-        <div className="flex items-center gap-5 text-vaultGold">
+      {/* Main Header Row */}
+      <div className="grid h-[68px] grid-cols-[88px_1fr_104px] items-center border-b border-cyan-400/10 bg-[#020807]">
+        {/* Left Side */}
+        <div className="flex items-center gap-4">
           <button
             type="button"
-            className="grid h-7 w-7 grid-cols-2 gap-1"
+            className="text-3xl font-light leading-none text-vaultGold/90"
+            aria-label="Back"
           >
-            <span className="rounded-[3px] border border-vaultGold/70" />
-            <span className="rounded-[3px] border border-vaultGold/70" />
-            <span className="rounded-[3px] border border-vaultGold/70" />
-            <span className="rounded-[3px] border border-vaultGold/70" />
+            ‹
+          </button>
+
+          <button
+            type="button"
+            className="grid h-10 w-10 grid-cols-2 gap-1"
+            aria-label="Menu Grid"
+          >
+            <span className="rounded-[4px] border border-vaultGold/70" />
+            <span className="rounded-[4px] border border-vaultGold/70" />
+            <span className="rounded-[4px] border border-vaultGold/70" />
+            <span className="rounded-[4px] border border-vaultGold/70" />
           </button>
         </div>
 
         {/* Center Brand */}
-        <div className="text-center">
-          <p className="text-[23px] font-black uppercase tracking-[0.24em] text-vaultGold">
-              CardVault
+        <div className="px-2 text-center">
+          <p className="text-[22px] font-black uppercase tracking-[0.24em] text-vaultGold">
+            CardVault
           </p>
-          <p className="-mt-1 text-[10px] font-black uppercase tracking-[0.38em] text-vaultGold/80">
+          <p className="-mt-1 text-[10px] font-black uppercase tracking-[0.34em] text-vaultGold/80">
             Pro
           </p>
         </div>
-p
-        {/* Right Settings Gear + Notification Bell */}
-        <div className="flex items-center justify-end gap-4">
+
+        {/* Right Side */}
+        <div className="flex items-center justify-end gap-3">
           <button
-  type="button"
-  onClick={() => setActiveScreen("Settings")}
-  className="flex h-11 w-11 items-center justify-center text-cyan-100 transition hover:text-vaultGold"
-  aria-label="Open Settings"
->
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-9 w-9"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.7"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="12" cy="12" r="3.25" />
-    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.04.04a2 2 0 1 1-2.83 2.83l-.04-.04A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 1.52V21a2 2 0 1 1-4 0v-.08a1.65 1.65 0 0 0-1-1.52 1.65 1.65 0 0 0-1.82.33l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.52-1H3a2 2 0 1 1 0-4h.08A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.04-.04a2 2 0 1 1 2.83-2.83l.04.04A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.52V3a2 2 0 1 1 4 0v.08a1.65 1.65 0 0 0 1 1.52 1.65 1.65 0 0 0 1.82-.33l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04A1.65 1.65 0 0 0 19.4 9c.14.35.5.6.92.6H21a2 2 0 1 1 0 4h-.68c-.42 0-.78.25-.92.6Z" />
-  </svg>
-</button>
+            type="button"
+            onClick={() => setActiveScreen("Settings")}
+            className="flex h-10 w-10 items-center justify-center text-cyan-100"
+            aria-label="Open Settings"
+          >
+            <span className="text-[28px] leading-none">⚙</span>
+          </button>
 
           <button
             type="button"
@@ -675,7 +673,7 @@ p
             aria-label="Notifications"
           >
             <span className="text-[24px] leading-none">🔔</span>
-            <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.8)]" />
+            <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full bg-orange-500" />
           </button>
         </div>
       </div>
@@ -724,13 +722,13 @@ function MobileDashboardCommandCenter({ cards }: { cards: CardRecord[] }) {
   const topCards = [...cards]
     .sort((a, b) => b.estimatedValue - a.estimatedValue)
     .slice(0, 5);
+
   return (
     <div className="relative overflow-hidden">
-      {/* Dashboard Content */}
       <div className="relative z-10 space-y-5">
         {/* Collection Intelligence Market-Style Panel */}
         <section className="rounded-2xl border border-cyan-400/10 bg-black/10 p-5 shadow-none backdrop-blur-sm">
-          <h2 className="text-2xl font-bold tracking-wide text-white">
+          <h2 className="text-xl font-bold tracking-wide text-white">
             Collection Intelligence
           </h2>
 
@@ -856,113 +854,115 @@ function MobileDashboardCommandCenter({ cards }: { cards: CardRecord[] }) {
             />
           </div>
 
-          {/* Collection Intelligence Banner moved to bottom */}
-          <div className="mt-8 rounded-2xl border border-cyan-400/10 bg-black/20 p-5">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-cyan-500/70 bg-[#10232a] text-3xl text-vaultGold">
-                ★
-              </div>
+          {/* Collection Breakdown Panel */}
+          <div className="mt-8 rounded-2xl border border-cyan-400/10 bg-black/10 p-5 shadow-none">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-cyan-500/70 bg-[#10232a] text-lg text-vaultGold">
+                  ★
+                </span>
 
-              <div>
-                <h2 className="text-2xl font-bold tracking-wide text-white">
+                <h2 className="text-xl font-bold tracking-wide text-white">
                   Collection Breakdown
                 </h2>
+              </div>
 
-                <p className="mt-1 text-sm font-medium leading-6 tracking-wider text-zinc-400">
-                  Actionable insights for collection value, card movement,
-                  grading strategy, and selling decisions.
-                </p>
+              <p className="mx-auto mt-4 max-w-[310px] text-sm font-medium leading-6 tracking-wider text-zinc-400">
+                Actionable insights for collection value, card movement,
+                grading strategy, and selling decisions.
+              </p>
+            </div>
 
-                <div className="mt-6 grid gap-5">
-                  {/* Top 5 Biggest Gains */}
-                <div className="rounded-2xl border border-emerald-400/15 bg-black/10 p-4 shadow-none">
+            <div className="mt-6 grid gap-5">
+              {/* Top 5 Biggest Gains */}
+              <div className="rounded-2xl border border-emerald-400/15 bg-black/10 p-4 shadow-none">
                 <h3 className="text-sm font-black uppercase tracking-[0.22em] text-emerald-300">
-                   Top 5 Biggest Gains
+                  Top 5 Biggest Gains
                 </h3>
 
                 <div className="mt-4 space-y-3">
-                   {biggestGains.length > 0 ? (
-                   biggestGains.map((card, index) => (
-                <div
-                    key={card.id}
-                     className="grid grid-cols-[32px_1fr_auto] items-center gap-3 border-b border-white/10 pb-3 last:border-b-0 last:pb-0"
-                  >
-                 <p className="text-sm font-black text-emerald-300">
-                     {index + 1}
-                  </p>
+                  {biggestGains.length > 0 ? (
+                    biggestGains.map((card, index) => (
+                      <div
+                        key={card.id}
+                        className="grid grid-cols-[32px_1fr_auto] items-center gap-3 border-b border-white/10 pb-3 last:border-b-0 last:pb-0"
+                      >
+                        <p className="text-sm font-black text-emerald-300">
+                          {index + 1}
+                        </p>
 
-                  <div>
-                  <p className="text-sm font-black text-white">
-                {card.player}
-              </p>
-              <p className="text-xs font-semibold text-zinc-500">
-                {card.year} {card.brand} {card.card}
-              </p>
-            </div>
+                        <div>
+                          <p className="text-sm font-black text-white">
+                            {card.player}
+                          </p>
+                          <p className="text-xs font-semibold text-zinc-500">
+                            {card.year} {card.brand} {card.card}
+                          </p>
+                        </div>
 
-            <div className="text-right">
-              <p className="text-sm font-black text-emerald-300">
-                +${card.calculatedGainLoss.toLocaleString()}
-              </p>
-              <p className="text-[10px] font-bold text-zinc-500">
-                Gain
-              </p>
-            </div>
-          </div>
-        ))
-      ) : (
-        <p className="text-sm font-semibold text-zinc-500">
-          No gain data available yet.
-        </p>
-      )}
-    </div>
-  </div>
-
-  {/* Top 5 Biggest Losses */}
-  <div className="rounded-2xl border border-red-400/15 bg-black/10 p-4 shadow-none">
-    <h3 className="text-sm font-black uppercase tracking-[0.22em] text-red-300">
-      Top 5 Biggest Losses
-    </h3>
-
-    <div className="mt-4 space-y-3">
-      {biggestLosses.length > 0 ? (
-        biggestLosses.map((card, index) => (
-          <div
-            key={card.id}
-            className="grid grid-cols-[32px_1fr_auto] items-center gap-3 border-b border-white/10 pb-3 last:border-b-0 last:pb-0"
-          >
-            <p className="text-sm font-black text-red-300">
-              {index + 1}
-            </p>
-
-            <div>
-              <p className="text-sm font-black text-white">
-                {card.player}
-              </p>
-              <p className="text-xs font-semibold text-zinc-500">
-                {card.year} {card.brand} {card.card}
-              </p>
-            </div>
-
-            <div className="text-right">
-              <p className="text-sm font-black text-red-300">
-                -${Math.abs(card.calculatedGainLoss).toLocaleString()}
-              </p>
-              <p className="text-[10px] font-bold text-zinc-500">
-                Loss
-              </p>
-            </div>
-          </div>
-        ))
-      ) : (
-        <p className="text-sm font-semibold text-zinc-500">
-          No loss data available yet.
-                </p>
-                 )}
-              </div>
-              </div>
+                        <div className="text-right">
+                          <p className="text-sm font-black text-emerald-300">
+                            +${card.calculatedGainLoss.toLocaleString()}
+                          </p>
+                          <p className="text-[10px] font-bold text-zinc-500">
+                            Gain
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm font-semibold text-zinc-500">
+                      No gain data available yet.
+                    </p>
+                  )}
+                </div>
               </div>
 
+              {/* Top 5 Biggest Losses */}
+              <div className="rounded-2xl border border-red-400/15 bg-black/10 p-4 shadow-none">
+                <h3 className="text-sm font-black uppercase tracking-[0.22em] text-red-300">
+                  Top 5 Biggest Losses
+                </h3>
+
+                <div className="mt-4 space-y-3">
+                  {biggestLosses.length > 0 ? (
+                    biggestLosses.map((card, index) => (
+                      <div
+                        key={card.id}
+                        className="grid grid-cols-[32px_1fr_auto] items-center gap-3 border-b border-white/10 pb-3 last:border-b-0 last:pb-0"
+                      >
+                        <p className="text-sm font-black text-red-300">
+                          {index + 1}
+                        </p>
+
+                        <div>
+                          <p className="text-sm font-black text-white">
+                            {card.player}
+                          </p>
+                          <p className="text-xs font-semibold text-zinc-500">
+                            {card.year} {card.brand} {card.card}
+                          </p>
+                        </div>
+
+                        <div className="text-right">
+                          <p className="text-sm font-black text-red-300">
+                            -$
+                            {Math.abs(
+                              card.calculatedGainLoss
+                            ).toLocaleString()}
+                          </p>
+                          <p className="text-[10px] font-bold text-zinc-500">
+                            Loss
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm font-semibold text-zinc-500">
+                      No loss data available yet.
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -971,53 +971,52 @@ function MobileDashboardCommandCenter({ cards }: { cards: CardRecord[] }) {
             View More Collection Intel
           </button>
 
-            {/* Top Cards Panel */}
-        <div className="mt-8 rounded-2xl border border-vaultGold/20 bg-black/10 p-5 shadow-none">
-        <div className="mb-5 flex items-center gap-3">
-         <span className="text-3xl">👑</span>
-        <h2 className="text-2xl font-black uppercase tracking-[0.18em] text-white">
-             Top Cards
-        </h2>
-        </div>
+          {/* Top Cards Panel */}
+          <div className="mt-8 rounded-2xl border border-vaultGold/20 bg-black/10 p-5 shadow-none">
+            <div className="mb-5 flex items-center gap-3">
+              <span className="text-3xl">👑</span>
+              <h2 className="text-2xl font-black uppercase tracking-[0.18em] text-white">
+                Top Cards
+              </h2>
+            </div>
 
-        <div className="space-y-4">
-            {topCards.length > 0 ? (
-              topCards.map((card, index) => (
-        <div
-           key={card.id}
-            className="grid grid-cols-[36px_1fr_auto] items-center gap-3 border-b border-white/10 pb-4 last:border-b-0 last:pb-0"
-          >
-          <div className="flex h-8 w-8 items-center justify-center rounded-full border border-vaultGold/40 text-sm font-black text-vaultGold">
-            {index + 1}
+            <div className="space-y-4">
+              {topCards.length > 0 ? (
+                topCards.map((card, index) => (
+                  <div
+                    key={card.id}
+                    className="grid grid-cols-[36px_1fr_auto] items-center gap-3 border-b border-white/10 pb-4 last:border-b-0 last:pb-0"
+                  >
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full border border-vaultGold/40 text-sm font-black text-vaultGold">
+                      {index + 1}
+                    </div>
+
+                    <div>
+                      <p className="text-base font-black text-white">
+                        {card.player}
+                      </p>
+                      <p className="text-xs font-semibold text-zinc-500">
+                        {card.year} {card.brand} {card.card}
+                      </p>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="text-base font-black text-vaultGold">
+                        ${card.estimatedValue.toLocaleString()}
+                      </p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                        Value
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm font-semibold text-zinc-500">
+                  No top card data available yet.
+                </p>
+              )}
+            </div>
           </div>
-
-          <div>
-            <p className="text-base font-black text-white">
-              {card.player}
-            </p>
-            <p className="text-xs font-semibold text-zinc-500">
-              {card.year} {card.brand} {card.card}
-            </p>
-          </div>
-
-          <div className="text-right">
-            <p className="text-base font-black text-vaultGold">
-              ${card.estimatedValue.toLocaleString()}
-            </p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-              Value
-            </p>
-          </div>
-        </div>
-      ))
-    ) : (
-      <p className="text-sm font-semibold text-zinc-500">
-        No top card data available yet.
-      </p>
-    )}
-  </div>
-</div>
-
         </section>
       </div>
     </div>
