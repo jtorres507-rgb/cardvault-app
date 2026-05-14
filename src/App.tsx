@@ -3461,14 +3461,15 @@ function MyCollection({
   return (
     <div className="w-full max-w-full space-y-6 overflow-x-hidden">
       {/* Mobile / Tablet Collection Hero */}
-      <section className="relative overflow-hidden rounded-[2rem] bg-black/70 px-5 py-6 xl:hidden">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(212,175,55,0.16),transparent_38%),linear-gradient(135deg,rgba(255,255,255,0.04),transparent_45%)]" />
+      <section className="relative overflow-hidden rounded-[2rem] border border-vaultGold/10 bg-black/45 px-5 py-6 xl:hidden">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(212,175,55,0.12),transparent_38%),linear-gradient(135deg,rgba(255,255,255,0.03),transparent_45%)]" />
 
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.07]">
+        {/* Mobile Hero Watermark */}
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.05]">
           <img
-            src={cardgemzLogo}
+            src="/cardvault-background-image.png"
             alt="CARDGEMZ watermark"
-            className="h-[360px] w-[360px] object-contain"
+            className="h-[720px] w-[720px] object-contain"
           />
         </div>
 
@@ -3484,7 +3485,7 @@ function MyCollection({
             <button
               type="button"
               onClick={() => setActiveScreen("Add Card")}
-              className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-black/50 px-3 text-[11px] font-black text-vaultGold transition hover:bg-vaultGold hover:text-black"
+              className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-vaultGold/10 bg-black/35 px-3 text-[11px] font-black text-vaultGold transition hover:bg-vaultGold hover:text-black"
             >
               <Plus size={14} />
               Add Card
@@ -3493,21 +3494,21 @@ function MyCollection({
             <button
               type="button"
               onClick={openCollectionReport}
-              className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-vaultGold/85 px-3 text-[11px] font-black text-black transition hover:bg-vaultGold"
+              className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-vaultGold/10 bg-vaultGold/75 px-3 text-[11px] font-black text-black transition hover:bg-vaultGold"
             >
               <Download size={14} />
               Export
             </button>
           </div>
 
-          {/* Stock-List Style Metrics */}
-          <div className="mt-6 overflow-hidden rounded-2xl bg-black/45">
+          {/* Bordered KPI Metric Cards */}
+          <div className="mt-6 space-y-3">
             {collectionMetrics.map((metric) => (
               <button
                 key={metric.label}
                 type="button"
                 onClick={() => setActiveScreen("Sales Tracker")}
-                className="flex w-full items-center justify-between gap-4 border-b border-white/10 px-4 py-4 text-left last:border-b-0"
+                className="flex w-full items-center justify-between gap-4 rounded-2xl border border-vaultGold/15 bg-black/25 px-4 py-4 text-left backdrop-blur-sm transition hover:border-vaultGold/35 hover:bg-black/40"
               >
                 <div className="min-w-0">
                   <p className="text-base font-black uppercase tracking-[0.08em] text-white">
