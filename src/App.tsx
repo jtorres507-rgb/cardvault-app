@@ -699,7 +699,13 @@ function CardVaultMobileShell({
   );
 }
 
-function MobileDashboardCommandCenter({ cards }: { cards: CardRecord[] }) {
+function MobileDashboardCommandCenter({
+  cards,
+  setActiveScreen,
+}: {
+  cards: CardRecord[];
+  setActiveScreen: React.Dispatch<React.SetStateAction<Screen>>;
+}) {
   const cardsWithPerformance = cards
     .map((card) => ({
       ...card,
@@ -846,13 +852,14 @@ function MobileDashboardCommandCenter({ cards }: { cards: CardRecord[] }) {
             />
 
             <VaultIntelRow
-              dotColor="bg-fuchsia-500"
-              label="Total Cards"
-              description="Cards currently in vault"
-              value="148"
-              change="+12"
-            />
-          </div>
+               dotColor="bg-fuchsia-500"
+               label="Total Cards"
+               description="Cards currently in vault"
+               value={cards.length.toString()}
+               change="Open"
+               onClick={() => setActiveScreen("My Collection")}
+              />
+            </div>
 
           {/* Collection Breakdown Panel */}
           <div className="mt-8 rounded-2xl border border-cyan-400/10 bg-black/10 p-5 shadow-none">
@@ -1029,15 +1036,17 @@ function VaultIntelRow({
   description,
   value,
   change,
+  onClick,
 }: {
   dotColor: string;
   label: string;
   description: string;
   value: string;
   change: string;
+  onClick?: () => void;
 }) {
-  return (
-    <div className="grid grid-cols-[1fr_auto] gap-4 py-4">
+  const rowContent = (
+    <>
       <div className="flex items-start gap-4">
         <span className={`mt-2 h-4 w-4 rounded-full ${dotColor}`} />
 
@@ -1061,6 +1070,24 @@ function VaultIntelRow({
           {change}
         </p>
       </div>
+    </>
+  );
+
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className="grid w-full grid-cols-[1fr_auto] gap-4 py-4 text-left transition hover:bg-white/[0.03]"
+      >
+        {rowContent}
+      </button>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-[1fr_auto] gap-4 py-4">
+      {rowContent}
     </div>
   );
 }
@@ -1745,7 +1772,7 @@ function exportDallasBetaBackup() {
             <>
               {/* New phone dashboard layout */}
               <div className="xl:hidden">
-                <MobileDashboardCommandCenter cards={cards} />
+                <MobileDashboardCommandCenter cards={cards} setActiveScreen={setActiveScreen}/>
               </div>
 
               {/* Existing desktop dashboard layout */}
