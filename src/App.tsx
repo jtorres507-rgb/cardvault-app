@@ -6611,12 +6611,14 @@ function Reports({
 
       {cards.length > 0 && (
         <>
-          <div className="screen-only report-preview-output overflow-x-auto rounded-[2rem] border border-vaultGold/10 bg-white p-3 text-black shadow-vault sm:p-5 xl:rounded-3xl xl:p-8">
-            <div className="min-w-[760px] xl:min-w-0">{renderActiveReport()}</div>
-          </div>
+          <div className="screen-only overflow-x-auto rounded-[2rem] border border-vaultGold/10 bg-white p-3 text-black shadow-vault sm:p-5 xl:rounded-3xl xl:p-8">
+          <div className="report-preview-output force-report-light min-w-[760px] overflow-hidden rounded-2xl bg-white text-black xl:min-w-0">
+             {renderActiveReport()}
+         </div>
+        </div>
 
-          <div className="print-only clean-print-report-output">
-            {renderActiveReport()}
+          <div className="print-only clean-print-report-output force-report-light">
+              {renderActiveReport()}
           </div>
         </>
       )}
