@@ -108,6 +108,24 @@ type CardRecord = {
   receiptImage?: string;
 };
 
+type NotificationCategory =
+  | "Scan"
+  | "Sales"
+  | "Collection"
+  | "Reports"
+  | "Backup"
+  | "System"
+  | "Beta";
+type CardVaultNotification = {
+  id: number;
+  title: string;
+  message: string;
+  category: NotificationCategory;
+  linkedScreen: Screen;
+  isRead: boolean;
+  createdAt: string;
+};
+
 type TemporaryScanRecord = {
   id: number;
   player: string;
@@ -601,11 +619,63 @@ const emptyForm: AddCardForm = {
   storageLocation: "Vault A-01",
 };
 
+const starterNotifications: CardVaultNotification[] = [
+  {
+    id: 1,
+    title: "Temporary Scan Waiting",
+    message: "You have a card scan waiting in the review queue.",
+    category: "Scan",
+    linkedScreen: "Scan Review Queue",
+    isRead: false,
+    createdAt: "Today • 9:41 AM",
+  },
+  {
+    id: 2,
+    title: "Dallas Beta Field Note",
+    message: "Remember to log booth, dealer, asking price, and negotiation notes.",
+    category: "Beta",
+    linkedScreen: "Temporary Card Detail",
+    isRead: false,
+    createdAt: "Today • 9:28 AM",
+  },
+  {
+    id: 3,
+    title: "Backup Export Reminder",
+    message: "Export your local beta backup before leaving the show floor.",
+    category: "Backup",
+    linkedScreen: "Scan Review Queue",
+    isRead: false,
+    createdAt: "Today • 8:55 AM",
+  },
+  {
+    id: 4,
+    title: "Sales Tracker Ready",
+    message: "Review recent sale activity and profit movement.",
+    category: "Sales",
+    linkedScreen: "Sales Tracker",
+    isRead: true,
+    createdAt: "Yesterday • 7:20 PM",
+  },
+  {
+    id: 5,
+    title: "Reports Center Updated",
+    message: "Collection, sales, and memorabilia reports are ready to review.",
+    category: "Reports",
+    linkedScreen: "Reports",
+    isRead: true,
+    createdAt: "Yesterday • 5:15 PM",
+  },
+];
+
 
 function CardVaultMobileHeader({
   setActiveScreen,
+  unreadNotificationCount,
+  onOpenNotifications,
 }: {
   setActiveScreen: React.Dispatch<React.SetStateAction<Screen>>;
+  unreadNotificationCount: number;
+  onOpenNotifications: () => void;
 }) {
   return (
     <div className="sticky top-0 z-50 bg-[#020807] px-4 pb-4 pt-3 xl:hidden">
@@ -669,11 +739,23 @@ function CardVaultMobileHeader({
 
           <button
             type="button"
+            onClick={onOpenNotifications}
             className="relative flex h-10 w-10 items-center justify-center text-vaultGold"
-            aria-label="Notifications"
+            aria-label="Open Notifications"
           >
             <span className="text-[24px] leading-none">🔔</span>
-            <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full bg-orange-500" />
+
+            {unreadNotificationCount > 0 && (
+              <>
+                <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full bg-orange-500 ring-2 ring-[#020807]" />
+
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-black text-black">
+                  {unreadNotificationCount > 9
+                    ? "9+"
+                    : unreadNotificationCount}
+                </span>
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -681,7 +763,7 @@ function CardVaultMobileHeader({
   );
 }
 
-function CardVaultMobileShell({
+function CardvaultMobileShell({
   children,
   setActiveScreen,
 }: {
@@ -690,8 +772,12 @@ function CardVaultMobileShell({
 }) {
   return (
     <div className="min-h-screen bg-[#020807] text-white">
-      <div className="mx-auto min-h-screen w-full max-w-[430px] overflow-hidden bg-gradient-to-b from-[#031413] via-[#041b18] to-black shadow-2xl shadow-black">
-        <CardVaultMobileHeader setActiveScreen={setActiveScreen} />
+      <div className="mx-auto min-h-screen w-full max-w-[430px] overflow-hidden">
+        <CardVaultMobileHeader
+          setActiveScreen={setActiveScreen}
+          unreadNotificationCount={0}
+          onOpenNotifications={() => {}}
+        />
 
         <main className="px-3 pb-8 pt-3">{children}</main>
       </div>
@@ -1115,6 +1201,16 @@ function App() {
     }
   });
 
+  const [notifications, setNotifications] =
+    useState<CardVaultNotification[]>(starterNotifications);
+
+  const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] =
+    useState(false);
+
+  const unreadNotificationCount = notifications.filter(
+    (notification) => !notification.isRead
+  ).length;
+
   const [cards, setCards] = useState<CardRecord[]>(() => {
     const normalizeCard = (card: CardRecord): CardRecord => ({
       ...card,
@@ -1172,23 +1268,24 @@ function App() {
     }
   );
 
- const [selectedTemporaryScanId, setSelectedTemporaryScanId] = useState<
-  number | null
->(null);
+  const [selectedTemporaryScanId, setSelectedTemporaryScanId] = useState<
+    number | null
+  >(null);
 
-const [betaFeedback, setBetaFeedback] = useState<BetaFeedbackRecord[]>([]);
+  const [betaFeedback, setBetaFeedback] = useState<BetaFeedbackRecord[]>([]);
 
-const [newBetaFeedback, setNewBetaFeedback] = useState<BetaFeedbackRecord>({
-  id: Date.now(),
-  category: "Workflow",
-  priority: "Medium",
-  note: "",
-  createdAt: new Date().toISOString(),
-});
+  const [newBetaFeedback, setNewBetaFeedback] = useState<BetaFeedbackRecord>({
+    id: Date.now(),
+    category: "Workflow",
+    priority: "Medium",
+    note: "",
+    createdAt: new Date().toISOString(),
+  });
 
-const [pendingDeleteCardId, setPendingDeleteCardId] = useState<number | null>(
-  null
-);
+  const [pendingDeleteCardId, setPendingDeleteCardId] = useState<number | null>(
+    null
+  );
+
   const [defaultReport, setDefaultReport] = useState<
     | "cardAnalysis"
     | "myCollection"
@@ -1226,6 +1323,7 @@ const [pendingDeleteCardId, setPendingDeleteCardId] = useState<number | null>(
       JSON.stringify(temporaryScans)
     );
   }, [temporaryScans]);
+
   useEffect(() => {
     try {
       localStorage.setItem(
@@ -1235,10 +1333,32 @@ const [pendingDeleteCardId, setPendingDeleteCardId] = useState<number | null>(
     } catch (error) {
       console.error("Unable to save temporary scans to localStorage:", error);
       window.alert(
-      "CardVault could not save this scan because the image files are too large. Try using smaller or compressed images."
+        "CardVault could not save this scan because the image files are too large. Try using smaller or compressed images."
+      );
+    }
+  }, [temporaryScans]);
+
+  function openNotification(notification: CardVaultNotification) {
+    setNotifications((currentNotifications) =>
+      currentNotifications.map((currentNotification) =>
+        currentNotification.id === notification.id
+          ? { ...currentNotification, isRead: true }
+          : currentNotification
+      )
+    );
+
+    setIsNotificationDrawerOpen(false);
+    setActiveScreen(notification.linkedScreen);
+  }
+
+  function markAllNotificationsAsRead() {
+    setNotifications((currentNotifications) =>
+      currentNotifications.map((notification) => ({
+        ...notification,
+        isRead: true,
+      }))
     );
   }
-}, [temporaryScans]);
 
   function openCardDetail(cardId: number) {
     setSelectedCardId(cardId);
@@ -1292,6 +1412,7 @@ const [pendingDeleteCardId, setPendingDeleteCardId] = useState<number | null>(
       receiptImage: "",
       scanStatus: "Needs Review",
       scanSource: "Demo Scan",
+
       // Phase 6 Dallas Card Show beta fields
       boothNumber: "",
       dealerName: "",
@@ -1305,85 +1426,141 @@ const [pendingDeleteCardId, setPendingDeleteCardId] = useState<number | null>(
     };
 
     setTemporaryScans((currentScans) => [newTemporaryScan, ...currentScans]);
+
+    setNotifications((currentNotifications) => [
+      {
+        id: Date.now() + 1,
+        title: "Temporary Scan Created",
+        message: "A demo temporary scan is waiting in your review queue.",
+        category: "Scan",
+        linkedScreen: "Scan Review Queue",
+        isRead: false,
+        createdAt: "Just now",
+      },
+      ...currentNotifications,
+    ]);
+
     setSelectedTemporaryScanId(newTemporaryScan.id);
     setActiveScreen("Temporary Card Detail");
   }
 
- function createTemporaryScanFromImages(frontImage: string, backImage: string) {
-  if (temporaryScans.length >= MAX_TEMPORARY_SCANS) {
-    alert(
-      "Temporary Scan Queue Full. You have reached the 30-card beta storage limit. " +
-      "Export your beta backup or delete older scans before adding more."
-    );
-    return;
-  }
+  function createTemporaryScanFromImages(frontImage: string, backImage: string) {
+    if (temporaryScans.length >= MAX_TEMPORARY_SCANS) {
+      alert(
+        "Temporary Scan Queue Full. You have reached the 30-card beta storage limit. " +
+          "Export your beta backup or delete older scans before adding more."
+      );
 
-  if (temporaryScans.length >= TEMPORARY_SCAN_WARNING_LIMIT) {
-    alert(
-      `Beta Storage Warning: You are at ${temporaryScans.length} of ${MAX_TEMPORARY_SCANS} temporary scans. ` +
-       "Consider exporting your beta backup before continuing."
-    );
-  }
+      setNotifications((currentNotifications) => [
+        {
+          id: Date.now(),
+          title: "Beta Storage Full",
+          message:
+            "You reached the 30-card beta storage limit. Export a backup or delete older scans.",
+          category: "Beta",
+          linkedScreen: "Scan Review Queue",
+          isRead: false,
+          createdAt: "Just now",
+        },
+        ...currentNotifications,
+      ]);
+
+      return;
+    }
+
+    if (temporaryScans.length >= TEMPORARY_SCAN_WARNING_LIMIT) {
+      alert(
+        `Beta Storage Warning: You are at ${temporaryScans.length} of ${MAX_TEMPORARY_SCANS} temporary scans. ` +
+          "Consider exporting your beta backup before continuing."
+      );
+
+      setNotifications((currentNotifications) => [
+        {
+          id: Date.now(),
+          title: "Beta Storage Warning",
+          message: `You are at ${temporaryScans.length} of ${MAX_TEMPORARY_SCANS} temporary scans. Consider exporting your beta backup.`,
+          category: "Beta",
+          linkedScreen: "Scan Review Queue",
+          isRead: false,
+          createdAt: "Just now",
+        },
+        ...currentNotifications,
+      ]);
+    }
 
     const newTemporaryScan: TemporaryScanRecord = {
-  id: Date.now(),
-  player: "Pending Identification",
-  card: "Uploaded Card Scan",
-  team: "Pending",
-  sport: "Pending",
-  year: "Pending",
-  brand: "Pending",
-  set: "Pending",
-  cardNumber: "Pending",
-  parallel: "Pending",
-  grade: "Raw",
-  grader: "Review",
-  serialNumber: "N/A",
-  sku: `TEMP-${Date.now()}`,
-  status: "Personal Collection",
-  purchaseDate: "Pending",
-  purchasePrice: 0,
-  taxesFees: 0,
-  shippingCost: 0,
-  totalCostBasis: 0,
-  source: "Camera Upload",
-  seller: "Pending",
-  paymentMethod: "Pending",
-  storageLocation: "Temporary Scan Queue",
-  estimatedValue: 0,
-  lastSale: 0,
-  averageComp: 0,
-  highComp: 0,
-  lowComp: 0,
-  compConfidence: "Pending AI Review",
-  gainLoss: 0,
-  roi: 0,
-  notes:
-    "Temporary scan created from uploaded card images. Confirm card details before adding to collection or moving to sell queue.",
-  frontImage,
-  backImage,
-  slabImage: "",
-  receiptImage: "",
-  scanStatus: "Needs Review",
-  scanSource: "Manual Upload",
+      id: Date.now(),
+      player: "Pending Identification",
+      card: "Uploaded Card Scan",
+      team: "Pending",
+      sport: "Pending",
+      year: "Pending",
+      brand: "Pending",
+      set: "Pending",
+      cardNumber: "Pending",
+      parallel: "Pending",
+      grade: "Raw",
+      grader: "Review",
+      serialNumber: "N/A",
+      sku: `TEMP-${Date.now()}`,
+      status: "Personal Collection",
+      purchaseDate: "Pending",
+      purchasePrice: 0,
+      taxesFees: 0,
+      shippingCost: 0,
+      totalCostBasis: 0,
+      source: "Camera Upload",
+      seller: "Pending",
+      paymentMethod: "Pending",
+      storageLocation: "Temporary Scan Queue",
+      estimatedValue: 0,
+      lastSale: 0,
+      averageComp: 0,
+      highComp: 0,
+      lowComp: 0,
+      compConfidence: "Pending AI Review",
+      gainLoss: 0,
+      roi: 0,
+      notes:
+        "Temporary scan created from uploaded card images. Confirm card details before adding to collection or moving to sell queue.",
+      frontImage,
+      backImage,
+      slabImage: "",
+      receiptImage: "",
+      scanStatus: "Needs Review",
+      scanSource: "Manual Upload",
 
-  // Phase 6 Dallas Card Show beta fields
-  boothNumber: "",
-  dealerName: "",
-  askingPrice: 0,
-  recentComp: 0,
-  offerTarget: 0,
-  maxBuyPrice: 0,
-  negotiationNotes: "",
-  betaDecision: "Watch",
+      // Phase 6 Dallas Card Show beta fields
+      boothNumber: "",
+      dealerName: "",
+      askingPrice: 0,
+      recentComp: 0,
+      offerTarget: 0,
+      maxBuyPrice: 0,
+      negotiationNotes: "",
+      betaDecision: "Watch",
 
-  aiReviewStatus: "Not Started",
-  aiConfidence: "Pending",
-  aiSuggestedMatch: "Pending AI Review",
-  createdAt: new Date().toISOString(),
-};
+      aiReviewStatus: "Not Started",
+      aiConfidence: "Pending",
+      aiSuggestedMatch: "Pending AI Review",
+      createdAt: new Date().toISOString(),
+    };
 
     setTemporaryScans((currentScans) => [newTemporaryScan, ...currentScans]);
+
+    setNotifications((currentNotifications) => [
+      {
+        id: Date.now() + 1,
+        title: "Card Scan Uploaded",
+        message: "Your uploaded card images are waiting in the review queue.",
+        category: "Scan",
+        linkedScreen: "Scan Review Queue",
+        isRead: false,
+        createdAt: "Just now",
+      },
+      ...currentNotifications,
+    ]);
+
     setSelectedTemporaryScanId(newTemporaryScan.id);
     setActiveScreen("Temporary Card Detail");
   }
@@ -1411,79 +1588,118 @@ const [pendingDeleteCardId, setPendingDeleteCardId] = useState<number | null>(
       )
     );
 
+    setNotifications((currentNotifications) => [
+      {
+        id: Date.now(),
+        title: "AI Scan Review Updated",
+        message: "A temporary scan was updated and marked ready to keep.",
+        category: "Scan",
+        linkedScreen: "Temporary Card Detail",
+        isRead: false,
+        createdAt: "Just now",
+      },
+      ...currentNotifications,
+    ]);
+
     setSelectedTemporaryScanId(normalizedScan.id);
     setActiveScreen("Temporary Card Detail");
   }
 
-function updateTemporaryScanBetaDecision(
-  scanId: number,
-  betaDecision: TemporaryScanRecord["betaDecision"]
-) {
-  setTemporaryScans((currentScans) =>
-    currentScans.map((scan) =>
-      scan.id === scanId
-        ? {
-            ...scan,
-            betaDecision,
-          }
-        : scan
-    )
-  );
-}
-
-function addBetaFeedbackNote() {
-  if (!newBetaFeedback.note.trim()) {
-    window.alert("Add a feedback note before saving.");
-    return;
+  function updateTemporaryScanBetaDecision(
+    scanId: number,
+    betaDecision: TemporaryScanRecord["betaDecision"]
+  ) {
+    setTemporaryScans((currentScans) =>
+      currentScans.map((scan) =>
+        scan.id === scanId
+          ? {
+              ...scan,
+              betaDecision,
+            }
+          : scan
+      )
+    );
   }
 
-  setBetaFeedback((currentFeedback) => [
-    {
-      ...newBetaFeedback,
+  function addBetaFeedbackNote() {
+    if (!newBetaFeedback.note.trim()) {
+      window.alert("Add a feedback note before saving.");
+      return;
+    }
+
+    setBetaFeedback((currentFeedback) => [
+      {
+        ...newBetaFeedback,
+        id: Date.now(),
+        createdAt: new Date().toISOString(),
+      },
+      ...currentFeedback,
+    ]);
+
+    setNotifications((currentNotifications) => [
+      {
+        id: Date.now() + 1,
+        title: "Beta Field Note Saved",
+        message: "Your Dallas beta feedback note was added to the field log.",
+        category: "Beta",
+        linkedScreen: "Scan Review Queue",
+        isRead: false,
+        createdAt: "Just now",
+      },
+      ...currentNotifications,
+    ]);
+
+    setNewBetaFeedback({
       id: Date.now(),
+      category: "Workflow",
+      priority: "Medium",
+      note: "",
       createdAt: new Date().toISOString(),
-    },
-    ...currentFeedback,
-  ]);
+    });
+  }
 
-  setNewBetaFeedback({
-    id: Date.now(),
-    category: "Workflow",
-    priority: "Medium",
-    note: "",
-    createdAt: new Date().toISOString(),
-  });
-}
+  function exportDallasBetaBackup() {
+    const backupData = {
+      exportedAt: new Date().toISOString(),
+      phase: "Phase 6 — Dallas Card Show Beta Prep",
+      event: "Dallas Card Show Beta Test",
+      maxTemporaryScans: MAX_TEMPORARY_SCANS,
+      totalTemporaryScans: temporaryScans.length,
+      temporaryScans,
+      betaFeedback,
+    };
 
-function exportDallasBetaBackup() {
-  const backupData = {
-    exportedAt: new Date().toISOString(),
-    phase: "Phase 6 — Dallas Card Show Beta Prep",
-    event: "Dallas Card Show Beta Test",
-    maxTemporaryScans: MAX_TEMPORARY_SCANS,
-    totalTemporaryScans: temporaryScans.length,
-    temporaryScans,
-    betaFeedback,
-  };
+    const backupBlob = new Blob([JSON.stringify(backupData, null, 2)], {
+      type: "application/json",
+    });
 
-  const backupBlob = new Blob([JSON.stringify(backupData, null, 2)], {
-    type: "application/json",
-  });
+    const backupUrl = URL.createObjectURL(backupBlob);
+    const backupLink = document.createElement("a");
 
-  const backupUrl = URL.createObjectURL(backupBlob);
-  const backupLink = document.createElement("a");
+    backupLink.href = backupUrl;
+    backupLink.download = `cardvault-dallas-beta-backup-${new Date()
+      .toISOString()
+      .slice(0, 10)}.json`;
 
-  backupLink.href = backupUrl;
-  backupLink.download = `cardvault-dallas-beta-backup-${new Date()
-    .toISOString()
-    .slice(0, 10)}.json`;
+    document.body.appendChild(backupLink);
+    backupLink.click();
+    document.body.removeChild(backupLink);
 
-  document.body.appendChild(backupLink);
-  backupLink.click();
-  document.body.removeChild(backupLink);
+    URL.revokeObjectURL(backupUrl);
 
-  URL.revokeObjectURL(backupUrl);
-}
+    setNotifications((currentNotifications) => [
+      {
+        id: Date.now(),
+        title: "Backup Export Complete",
+        message: "Your Dallas beta backup file was exported successfully.",
+        category: "Backup",
+        linkedScreen: "Scan Review Queue",
+        isRead: false,
+        createdAt: "Just now",
+      },
+      ...currentNotifications,
+    ]);
+  }
 
   function deleteTemporaryScan(scanId: number) {
     setTemporaryScans((currentScans) =>
@@ -1544,6 +1760,19 @@ function exportDallasBetaBackup() {
       currentScans.filter((temporaryScan) => temporaryScan.id !== scan.id)
     );
 
+    setNotifications((currentNotifications) => [
+      {
+        id: Date.now() + 1,
+        title: "Card Added To Collection",
+        message: `${scan.player} was added to My Collection.`,
+        category: "Collection",
+        linkedScreen: "My Collection",
+        isRead: false,
+        createdAt: "Just now",
+      },
+      ...currentNotifications,
+    ]);
+
     setSelectedCardId(newCard.id);
     setSelectedTemporaryScanId(null);
     setActiveScreen("Card Detail");
@@ -1598,6 +1827,19 @@ function exportDallasBetaBackup() {
     setTemporaryScans((currentScans) =>
       currentScans.filter((temporaryScan) => temporaryScan.id !== scan.id)
     );
+
+    setNotifications((currentNotifications) => [
+      {
+        id: Date.now() + 1,
+        title: "Moved To Sell Queue",
+        message: `${scan.player} was moved into the Sales Tracker workflow.`,
+        category: "Sales",
+        linkedScreen: "Sales Tracker",
+        isRead: false,
+        createdAt: "Just now",
+      },
+      ...currentNotifications,
+    ]);
 
     setSelectedCardId(newCardForSale.id);
     setSelectedTemporaryScanId(null);
@@ -1696,6 +1938,20 @@ function exportDallasBetaBackup() {
     };
 
     setCards((prev) => [newCard, ...prev]);
+
+    setNotifications((currentNotifications) => [
+      {
+        id: Date.now() + 1,
+        title: "New Card Added",
+        message: `${newCard.player} was added to your CardVault collection.`,
+        category: "Collection",
+        linkedScreen: "My Collection",
+        isRead: false,
+        createdAt: "Just now",
+      },
+      ...currentNotifications,
+    ]);
+
     setSelectedCardId(newCard.id);
     setActiveScreen("Card Detail");
   }
@@ -1737,208 +1993,407 @@ function exportDallasBetaBackup() {
     setActiveScreen("Dashboard");
   }
 
- return (
-  <div className="min-h-screen bg-[#0b0c10] text-white">
-    <div className="flex min-h-screen">
-      <Sidebar activeScreen={activeScreen} setActiveScreen={setActiveScreen} />
-      <MobileBottomNav
-        activeScreen={activeScreen}
-        setActiveScreen={setActiveScreen}
-      />
+  return (
+    <div className="min-h-screen bg-[#0b0c10] text-white">
+      <div className="flex min-h-screen">
+        <Sidebar activeScreen={activeScreen} setActiveScreen={setActiveScreen} />
 
-      <main className="relative w-full min-w-0 max-w-full flex-1 overflow-x-hidden bg-[#0b0c10] pb-24 xl:pb-0">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(95,24,18,0.14),transparent_40%)]" />
+        <MobileBottomNav
+          activeScreen={activeScreen}
+          setActiveScreen={setActiveScreen}
+        />
 
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.04]">
-          <img
-            src="/cardgemz-main-logo.png"
-            alt="CARDGEMZ background watermark"
-            className="max-h-[780px] max-w-[780px] object-contain"
-          />
-        </div>
+        <main className="relative w-full min-w-0 max-w-full flex-1 overflow-x-hidden bg-[#0b0c10] pb-24 xl:pb-0">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(95,24,18,0.14),transparent_40%)]" />
 
-        {/* Mobile premium app header throughout the app */}
-        <div className="relative z-20 xl:hidden">
-          <CardVaultMobileHeader setActiveScreen={setActiveScreen} />
-        </div>
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.04]">
+            <img
+              src="/cardgemz-main-logo.png"
+              alt="CARDGEMZ background watermark"
+              className="max-h-[780px] max-w-[780px] object-contain"
+            />
+          </div>
 
-        {/* Desktop top bar stays for desktop/tablet-wide layout */}
-        <div className="hidden xl:block">
-          <TopBar activeScreen={activeScreen} />
-        </div>
+          {/* Mobile premium app header throughout the app */}
+          <div className="relative z-20 xl:hidden">
+            <CardVaultMobileHeader
+              setActiveScreen={setActiveScreen}
+              unreadNotificationCount={unreadNotificationCount}
+              onOpenNotifications={() => setIsNotificationDrawerOpen(true)}
+            />
+          </div>
 
-        <section className="relative z-10 w-full min-w-0 max-w-full overflow-x-hidden px-0 pb-0 pt-0 sm:px-0 xl:p-8">
-          {activeScreen === "Dashboard" && (
-            <>
-              {/* New phone dashboard layout */}
-              <div className="xl:hidden">
-                <MobileDashboardCommandCenter cards={cards} setActiveScreen={setActiveScreen}/>
-              </div>
+          {/* Desktop top bar stays for desktop/tablet-wide layout */}
+          <div className="hidden xl:block">
+            <TopBar activeScreen={activeScreen} />
+          </div>
 
-              {/* Existing desktop dashboard layout */}
-              <div className="hidden xl:block">
-                <Dashboard
-                  cards={cards}
-                  collectionValue={collectionValue}
-                  moneyInvested={moneyInvested}
-                  netGain={netGain}
-                  roi={roi}
+          <section className="relative z-10 w-full min-w-0 max-w-full overflow-x-hidden px-0 pb-0 pt-0 sm:px-0 xl:p-8">
+            {activeScreen === "Dashboard" && (
+              <>
+                {/* New phone dashboard layout */}
+                <div className="xl:hidden">
+                  <MobileDashboardCommandCenter
+                    cards={cards}
+                    setActiveScreen={setActiveScreen}
+                  />
+                </div>
+
+                {/* Existing desktop dashboard layout */}
+                <div className="hidden xl:block">
+                  <Dashboard
+                    cards={cards}
+                    collectionValue={collectionValue}
+                    moneyInvested={moneyInvested}
+                    netGain={netGain}
+                    roi={roi}
+                    setActiveScreen={setActiveScreen}
+                  />
+                </div>
+              </>
+            )}
+
+            {activeScreen === "My Collection" && (
+              <MyCollection
+                cards={cards}
+                openCardDetail={openCardDetail}
+                setActiveScreen={setActiveScreen}
+                openCollectionReport={() => {
+                  setDefaultReport("myCollection");
+                  setActiveScreen("Reports");
+                }}
+              />
+            )}
+
+            {activeScreen === "All Cards" && (
+              <AllCards
+                cards={cards}
+                openCardDetail={openCardDetail}
+                setActiveScreen={setActiveScreen}
+                openCollectionReport={() => {
+                  setDefaultReport("myCollection");
+                  setActiveScreen("Reports");
+                }}
+              />
+            )}
+
+            {activeScreen === "Memorabilia" && (
+              <MemorabiliaPage memorabilia={memorabilia} />
+            )}
+
+            {activeScreen === "Add Card" && (
+              <AddCard onSave={saveCardFromForm} />
+            )}
+
+            {activeScreen === "Card Detail" &&
+              (selectedCard ? (
+                <CardDetail
+                  card={selectedCard}
+                  deleteCard={requestDeleteCard}
+                  updateCard={updateCard}
                   setActiveScreen={setActiveScreen}
                 />
-              </div>
-            </>
-          )}
+              ) : (
+                <EmptyVaultState
+                  title="No Card Selected"
+                  message="There is no card available to display. Add a card or return to your collection."
+                  actionLabel="Go to My Collection"
+                  onAction={() => setActiveScreen("My Collection")}
+                />
+              ))}
 
-          {activeScreen === "My Collection" && (
-            <MyCollection
-              cards={cards}
-              openCardDetail={openCardDetail}
-              setActiveScreen={setActiveScreen}
-              openCollectionReport={() => {
-                setDefaultReport("myCollection");
-                setActiveScreen("Reports");
-              }}
-            />
-          )}
-
-          {activeScreen === "All Cards" && (
-            <AllCards
-              cards={cards}
-              openCardDetail={openCardDetail}
-              setActiveScreen={setActiveScreen}
-              openCollectionReport={() => {
-                setDefaultReport("myCollection");
-                setActiveScreen("Reports");
-              }}
-            />
-          )}
-
-          {activeScreen === "Memorabilia" && (
-            <MemorabiliaPage memorabilia={memorabilia} />
-          )}
-
-          {activeScreen === "Add Card" && <AddCard onSave={saveCardFromForm} />}
-
-          {activeScreen === "Card Detail" &&
-            (selectedCard ? (
-              <CardDetail
-                card={selectedCard}
-                deleteCard={requestDeleteCard}
-                updateCard={updateCard}
-                setActiveScreen={setActiveScreen}
+            {activeScreen === "CardVault Scan" && (
+              <ComingSoonScreen
+                title="CardVault Scan"
+                subtitle="Camera scanning, OCR-assisted card capture, and image-based grading support will connect here."
               />
-            ) : (
-              <EmptyVaultState
-                title="No Card Selected"
-                message="There is no card available to display. Add a card or return to your collection."
-                actionLabel="Go to My Collection"
-                onAction={() => setActiveScreen("My Collection")}
+            )}
+
+            {activeScreen === "Scan Review Queue" && (
+              <ScanReviewQueue
+                temporaryScans={temporaryScans}
+                openTemporaryScanDetail={openTemporaryScanDetail}
+                createDemoTemporaryScan={createDemoTemporaryScan}
+                createTemporaryScanFromImages={createTemporaryScanFromImages}
+                updateTemporaryScanBetaDecision={updateTemporaryScanBetaDecision}
+                exportDallasBetaBackup={exportDallasBetaBackup}
+                betaFeedback={betaFeedback}
+                newBetaFeedback={newBetaFeedback}
+                setNewBetaFeedback={setNewBetaFeedback}
+                addBetaFeedbackNote={addBetaFeedbackNote}
               />
-            ))}
+            )}
 
-          {activeScreen === "CardVault Scan" && (
-            <ComingSoonScreen
-              title="CardVault Scan"
-              subtitle="Camera scanning, OCR-assisted card capture, and image-based grading support will connect here."
-            />
-          )}
+            {activeScreen === "Temporary Card Detail" &&
+              (selectedTemporaryScan ? (
+                <TemporaryCardDetail
+                  scan={selectedTemporaryScan}
+                  updateTemporaryScan={updateTemporaryScan}
+                  addTemporaryScanToCollection={addTemporaryScanToCollection}
+                  moveTemporaryScanToSellQueue={moveTemporaryScanToSellQueue}
+                  deleteTemporaryScan={deleteTemporaryScan}
+                  setActiveScreen={setActiveScreen}
+                />
+              ) : (
+                <EmptyVaultState
+                  title="No Temporary Scan Selected"
+                  message="There is no temporary scan selected. Return to the scan review queue or create a new temporary scan."
+                  actionLabel="Go to Scan Review Queue"
+                  onAction={() => setActiveScreen("Scan Review Queue")}
+                />
+              ))}
 
-          {activeScreen === "Scan Review Queue" && (
-            <ScanReviewQueue
-              temporaryScans={temporaryScans}
-              openTemporaryScanDetail={openTemporaryScanDetail}
-              createDemoTemporaryScan={createDemoTemporaryScan}
-              createTemporaryScanFromImages={createTemporaryScanFromImages}
-              updateTemporaryScanBetaDecision={updateTemporaryScanBetaDecision}
-              exportDallasBetaBackup={exportDallasBetaBackup}
-              betaFeedback={betaFeedback}
-              newBetaFeedback={newBetaFeedback}
-              setNewBetaFeedback={setNewBetaFeedback}
-              addBetaFeedbackNote={addBetaFeedbackNote}
-            />
-          )}
+            {activeScreen === "Market Comps" && <MarketComps cards={cards} />}
 
-          {activeScreen === "Temporary Card Detail" &&
-            (selectedTemporaryScan ? (
-              <TemporaryCardDetail
-                scan={selectedTemporaryScan}
-                updateTemporaryScan={updateTemporaryScan}
-                addTemporaryScanToCollection={addTemporaryScanToCollection}
-                moveTemporaryScanToSellQueue={moveTemporaryScanToSellQueue}
-                deleteTemporaryScan={deleteTemporaryScan}
-                setActiveScreen={setActiveScreen}
+            {activeScreen === "Grading Center" && (
+              <GradingCenter cards={cards} />
+            )}
+
+            {activeScreen === "Reports" && (
+              <Reports
+                cards={cards}
+                sales={sales}
+                defaultReport={defaultReport}
               />
-            ) : (
-              <EmptyVaultState
-                title="No Temporary Scan Selected"
-                message="There is no temporary scan selected. Return to the scan review queue or create a new temporary scan."
-                actionLabel="Go to Scan Review Queue"
-                onAction={() => setActiveScreen("Scan Review Queue")}
+            )}
+
+            {activeScreen === "Sales Tracker" && (
+              <SalesTracker
+                cards={cards}
+                setCards={setCards}
+                sales={sales}
+                setSales={setSales}
               />
-            ))}
+            )}
 
-          {activeScreen === "Market Comps" && <MarketComps cards={cards} />}
+            {activeScreen === "Settings" && (
+              <SettingsScreen resetDemoData={resetDemoData} />
+            )}
+          </section>
+        </main>
+      </div>
 
-          {activeScreen === "Grading Center" && <GradingCenter cards={cards} />}
+      <NotificationDrawer
+        isOpen={isNotificationDrawerOpen}
+        notifications={notifications}
+        unreadNotificationCount={unreadNotificationCount}
+        onClose={() => setIsNotificationDrawerOpen(false)}
+        onOpenNotification={openNotification}
+        onMarkAllAsRead={markAllNotificationsAsRead}
+      />
 
-          {activeScreen === "Reports" && (
-            <Reports
-              cards={cards}
-              sales={sales}
-              defaultReport={defaultReport}
-            />
-          )}
+      {pendingDeleteCardId !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-6 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-3xl border border-vaultGold/40 bg-graphite900 p-6 text-white shadow-[0_0_60px_rgba(245,196,81,0.18)]">
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+              Confirm Delete
+            </p>
 
-          {activeScreen === "Sales Tracker" && (
-            <SalesTracker
-              cards={cards}
-              setCards={setCards}
-              sales={sales}
-              setSales={setSales}
-            />
-          )}
+            <h2 className="mt-3 text-3xl font-black">Delete this card?</h2>
 
-          {activeScreen === "Settings" && (
-            <SettingsScreen resetDemoData={resetDemoData} />
-          )}
-        </section>
-      </main>
+            <p className="mt-3 text-sm leading-6 text-zinc-400">
+              This will remove the card from your vault and update your saved
+              collection data. This action cannot be undone.
+            </p>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={cancelDeleteCard}
+                className="rounded-xl border border-steelBorder bg-black/40 px-5 py-3 text-sm font-bold text-zinc-300 hover:text-white"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={confirmDeleteCard}
+                className="rounded-xl bg-vaultGold px-5 py-3 text-sm font-black text-black shadow-vault hover:brightness-110"
+              >
+                Delete Card
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
 
-    {pendingDeleteCardId !== null && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-6 backdrop-blur-sm">
-        <div className="w-full max-w-md rounded-3xl border border-vaultGold/40 bg-graphite900 p-6 text-white shadow-[0_0_60px_rgba(245,196,81,0.18)]">
-          <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
-            Confirm Delete
-          </p>
+function NotificationDrawer({
+  isOpen,
+  notifications,
+  unreadNotificationCount,
+  onClose,
+  onOpenNotification,
+  onMarkAllAsRead,
+}: {
+  isOpen: boolean;
+  notifications: CardVaultNotification[];
+  unreadNotificationCount: number;
+  onClose: () => void;
+  onOpenNotification: (notification: CardVaultNotification) => void;
+  onMarkAllAsRead: () => void;
+}) {
+  if (!isOpen) return null;
 
-          <h2 className="mt-3 text-3xl font-black">Delete this card?</h2>
+  const categoryStyles: Record<
+    NotificationCategory,
+    {
+      label: string;
+      className: string;
+    }
+  > = {
+    Scan: {
+      label: "Scan",
+      className: "border-cyan-400/30 bg-cyan-400/10 text-cyan-200",
+    },
+    Sales: {
+      label: "Sales",
+      className: "border-emerald-400/30 bg-emerald-400/10 text-emerald-200",
+    },
+    Collection: {
+      label: "Collection",
+      className: "border-vaultGold/30 bg-vaultGold/10 text-vaultGold",
+    },
+    Reports: {
+      label: "Reports",
+      className: "border-purple-400/30 bg-purple-400/10 text-purple-200",
+    },
+    Backup: {
+      label: "Backup",
+      className: "border-orange-400/30 bg-orange-400/10 text-orange-200",
+    },
+    System: {
+      label: "System",
+      className: "border-zinc-400/30 bg-zinc-400/10 text-zinc-200",
+    },
+    Beta: {
+      label: "Beta",
+      className: "border-vaultGold/30 bg-vaultGold/10 text-vaultGold",
+    },
+  };
 
-          <p className="mt-3 text-sm leading-6 text-zinc-400">
-            This will remove the card from your vault and update your saved
-            collection data. This action cannot be undone.
-          </p>
+  return (
+    <div className="fixed inset-0 z-[80] bg-black/70 backdrop-blur-sm">
+      <button
+        type="button"
+        aria-label="Close notifications overlay"
+        onClick={onClose}
+        className="absolute inset-0 h-full w-full cursor-default"
+      />
 
-          <div className="mt-6 flex justify-end gap-3">
+      <aside className="absolute bottom-0 right-0 top-auto z-[90] flex max-h-[88vh] w-full flex-col overflow-hidden rounded-t-[2rem] border border-vaultGold/20 bg-[#050706] text-white shadow-none sm:bottom-auto sm:top-4 sm:mr-4 sm:max-h-[calc(100vh-2rem)] sm:w-[420px] sm:rounded-[2rem] xl:top-6 xl:mr-6">
+        {/* Drawer Header */}
+        <div className="border-b border-white/10 bg-gradient-to-br from-black via-[#071312] to-black px-5 py-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-vaultGold">
+                CardVault Intel
+              </p>
+
+              <h2 className="mt-1 text-2xl font-black tracking-tight text-white">
+                Notifications
+              </h2>
+
+              <p className="mt-2 text-xs font-medium leading-5 text-zinc-400">
+                Scan alerts, beta reminders, sales movement, reports, and system
+                updates.
+              </p>
+            </div>
+
             <button
-              onClick={cancelDeleteCard}
-              className="rounded-xl border border-steelBorder bg-black/40 px-5 py-3 text-sm font-bold text-zinc-300 hover:text-white"
+              type="button"
+              onClick={onClose}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-xl font-black text-zinc-300 transition hover:border-vaultGold/30 hover:text-vaultGold"
+              aria-label="Close Notifications"
             >
-              Cancel
+              ×
             </button>
+          </div>
+
+          <div className="mt-5 flex items-center justify-between gap-3">
+            <div className="rounded-full border border-orange-400/30 bg-orange-400/10 px-3 py-1 text-xs font-black text-orange-300">
+              {unreadNotificationCount} Unread
+            </div>
 
             <button
-              onClick={confirmDeleteCard}
-              className="rounded-xl bg-vaultGold px-5 py-3 text-sm font-black text-black shadow-vault hover:brightness-110"
+              type="button"
+              onClick={onMarkAllAsRead}
+              disabled={unreadNotificationCount === 0}
+              className="rounded-full border border-vaultGold/30 bg-vaultGold/10 px-4 py-2 text-xs font-black text-vaultGold transition hover:bg-vaultGold/20 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              Delete Card
+              Mark All Read
             </button>
           </div>
         </div>
-      </div>
-    )}
-  </div>
-);
+
+        {/* Notification List */}
+        <div className="flex-1 overflow-y-auto px-4 py-4">
+          {notifications.length === 0 ? (
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-center">
+              <p className="text-sm font-black text-white">
+                No notifications yet.
+              </p>
+              <p className="mt-2 text-xs leading-5 text-zinc-500">
+                Future scan, sale, backup, and report alerts will appear here.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {notifications.map((notification) => {
+                const categoryStyle = categoryStyles[notification.category];
+
+                return (
+                  <button
+                    key={notification.id}
+                    type="button"
+                    onClick={() => onOpenNotification(notification)}
+                    className={`w-full rounded-2xl border p-4 text-left transition hover:border-vaultGold/40 hover:bg-vaultGold/[0.04] ${
+                      notification.isRead
+                        ? "border-white/10 bg-white/[0.025]"
+                        : "border-cyan-400/20 bg-cyan-400/[0.055]"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span
+                            className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] ${categoryStyle.className}`}
+                          >
+                            {categoryStyle.label}
+                          </span>
+
+                          {!notification.isRead && (
+                            <span className="h-2.5 w-2.5 rounded-full bg-orange-500" />
+                          )}
+                        </div>
+
+                        <h3 className="mt-3 text-sm font-black text-white">
+                          {notification.title}
+                        </h3>
+
+                        <p className="mt-1 text-xs font-medium leading-5 text-zinc-400">
+                          {notification.message}
+                        </p>
+
+                        <p className="mt-3 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">
+                          {notification.createdAt}
+                        </p>
+                      </div>
+
+                      <span className="mt-1 shrink-0 text-lg font-black text-vaultGold">
+                        ›
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </aside>
+    </div>
+  );
+}
 
 function Sidebar({
   activeScreen,
@@ -12298,6 +12753,5 @@ function numberFromCurrency(value: string) {
   const parsed = Number(cleaned);
   return Number.isFinite(parsed) ? parsed : 0;
 };
-}
 
 export default App;
