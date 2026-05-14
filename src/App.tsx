@@ -3753,9 +3753,130 @@ function AllCards({
     return matchesSearch && matchesFilter;
   });
 
+  const filterOptions = [
+    "All",
+    "Raw",
+    "Graded",
+    "For Sale",
+    "Grade Candidate",
+  ] as const;
+
+  function getCardTitle(card: CardRecord) {
+    const cardData = card as any;
+    return (
+      cardData.player ||
+      cardData.players ||
+      cardData.playerNames ||
+      "Unknown Player"
+    );
+  }
+
+  function getCardDescription(card: CardRecord) {
+    const cardData = card as any;
+    return [card.year, card.brand, cardData.set || cardData.cardSet, card.card]
+      .filter(Boolean)
+      .join(" • ");
+  }
+
+  function getCardStatus(card: CardRecord) {
+    const cardData = card as any;
+    return card.status || cardData.decision || "Review";
+  }
+
+  function getCardGrade(card: CardRecord) {
+    const cardData = card as any;
+    return card.grade || cardData.currentGrade || cardData.gradeStatus || "Raw";
+  }
+
+  function getCardImage(card: CardRecord) {
+    const cardData = card as any;
+    return (
+      card.frontImage ||
+      cardData.frontImageUrl ||
+      cardData.image ||
+      cardData.imageUrl ||
+      cardData.photo ||
+      ""
+    );
+  }
+
   return (
-    <>
-      <section className="relative mb-6 overflow-hidden rounded-3xl border border-vaultGold/25 bg-black px-8 py-7">
+    <div className="w-full max-w-full space-y-5 overflow-x-hidden">
+      {/* Mobile / Tablet Vault Manager Header */}
+      <section className="relative overflow-hidden rounded-[2rem] border border-vaultGold/10 bg-black/50 px-5 py-6 shadow-vault xl:hidden">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(212,175,55,0.14),transparent_38%),linear-gradient(180deg,rgba(255,255,255,0.04),transparent_45%)]" />
+
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.05]">
+          <img
+            src="/cardvault-background-image.png"
+            alt="CardVault background watermark"
+            className="h-[350px] w-[350px] object-contain"
+          />
+        </div>
+
+        <div className="relative z-10">
+          <button
+            type="button"
+            onClick={() => setActiveScreen("My Collection")}
+            className="mb-4 inline-flex items-center gap-2 rounded-full border border-vaultGold/20 bg-black/35 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-vaultGold"
+          >
+            <ArrowLeft size={14} />
+            My Collection
+          </button>
+
+          <h1 className="text-5xl font-black tracking-tight text-white">
+            Vault Manager
+          </h1>
+
+          <p className="mt-3 text-sm font-bold leading-6 text-zinc-400">
+            Manage every card in your vault. Review, keep, watch, sell, grade,
+            or update cards from one mobile inventory screen.
+          </p>
+
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setActiveScreen("Add Card")}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-vaultGold/15 bg-black/35 px-3 text-[11px] font-black text-vaultGold transition hover:bg-vaultGold hover:text-black"
+            >
+              <Plus size={14} />
+              Add Card
+            </button>
+
+            <button
+              type="button"
+              onClick={openCollectionReport}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-vaultGold/15 bg-vaultGold/80 px-3 text-[11px] font-black text-black transition hover:bg-vaultGold"
+            >
+              <Download size={14} />
+              Export
+            </button>
+          </div>
+
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            <div className="rounded-2xl border border-vaultGold/15 bg-black/30 px-4 py-3">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-zinc-500">
+                Total Cards
+              </p>
+              <p className="mt-1 text-2xl font-black text-white">
+                {cards.length.toLocaleString()}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-vaultGold/15 bg-black/30 px-4 py-3">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-zinc-500">
+                Showing
+              </p>
+              <p className="mt-1 text-2xl font-black text-vaultGold">
+                {filteredCards.length.toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Desktop Vault Manager Header */}
+      <section className="relative mb-6 hidden overflow-hidden rounded-3xl border border-vaultGold/25 bg-black px-8 py-7 xl:block">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_20%,rgba(245,196,81,0.18),transparent_30%),linear-gradient(90deg,rgba(0,0,0,0.15),rgba(0,0,0,0.95))]" />
 
         <div className="relative flex items-start justify-between gap-6">
@@ -3770,11 +3891,11 @@ function AllCards({
             </button>
 
             <h1 className="font-vault-heading text-5xl font-black tracking-[-0.04em] text-white">
-              All Cards
+              Vault Manager
             </h1>
 
             <p className="mt-2 text-sm text-zinc-400">
-              My Collection › All Cards
+              My Collection › Vault Manager
             </p>
 
             <p className="mt-4 text-sm font-bold text-zinc-300">
@@ -3815,7 +3936,121 @@ function AllCards({
         </div>
       </section>
 
-      <Panel className="border-vaultGold/20 bg-black/50">
+      {/* Mobile / Tablet Search + Filters */}
+      <section className="rounded-[2rem] border border-vaultGold/10 bg-black/45 p-4 shadow-vault xl:hidden">
+        <div className="flex items-center gap-3 rounded-2xl border border-vaultGold/15 bg-black/45 px-4 py-3">
+          <Search size={18} className="shrink-0 text-zinc-500" />
+
+          <input
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            className="w-full bg-transparent text-sm font-bold text-white outline-none placeholder:text-zinc-500"
+            placeholder="Search your vault..."
+          />
+        </div>
+
+        <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
+          {filterOptions.map((filter) => (
+            <button
+              key={filter}
+              type="button"
+              onClick={() => setCollectionFilter(filter)}
+              className={`shrink-0 rounded-full border px-4 py-2 text-[11px] font-black uppercase tracking-[0.12em] transition ${
+                collectionFilter === filter
+                  ? "border-vaultGold bg-vaultGold text-black"
+                  : "border-vaultGold/15 bg-black/35 text-zinc-400"
+              }`}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* Mobile / Tablet Card List */}
+      <section className="space-y-3 xl:hidden">
+        {filteredCards.length === 0 ? (
+          <div className="rounded-[2rem] border border-vaultGold/15 bg-black/45 p-6 text-center">
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-vaultGold">
+              No Cards Found
+            </p>
+            <p className="mt-3 text-sm font-bold text-zinc-400">
+              Try a different search or filter.
+            </p>
+          </div>
+        ) : (
+          filteredCards.map((card) => {
+            const frontImage = getCardImage(card);
+            const cardTitle = getCardTitle(card);
+            const cardDescription = getCardDescription(card);
+            const cardStatus = getCardStatus(card);
+            const cardGrade = getCardGrade(card);
+
+            return (
+              <button
+                key={card.id}
+                type="button"
+                onClick={() => openCardDetail(card.id)}
+                className="flex w-full gap-4 overflow-hidden rounded-[1.5rem] border border-vaultGold/12 bg-black/55 p-3 text-left shadow-vault"
+              >
+                <div className="relative flex h-28 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-zinc-900 via-black to-zinc-950">
+                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(212,175,55,0.14),transparent_45%)]" />
+
+                  {frontImage ? (
+                    <img
+                      src={frontImage}
+                      alt={`${cardTitle} card front`}
+                      className="relative z-10 h-full w-full object-contain p-1"
+                    />
+                  ) : (
+                    <Crown className="relative z-10 h-9 w-9 text-vaultGold/70" />
+                  )}
+                </div>
+
+                <div className="min-w-0 flex-1 py-1">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="line-clamp-1 text-base font-black uppercase leading-5 text-white">
+                        {cardTitle}
+                      </p>
+
+                      <p className="mt-1 line-clamp-2 text-xs font-bold uppercase leading-5 text-zinc-400">
+                        {cardDescription || "Card details"}
+                      </p>
+                    </div>
+
+                    <span className="shrink-0 text-xl font-black text-zinc-600">
+                      ›
+                    </span>
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <span className="rounded-full border border-vaultGold/15 bg-black/45 px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-vaultGold">
+                      {cardGrade}
+                    </span>
+
+                    <span className="rounded-full border border-zinc-700 bg-black/45 px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-zinc-300">
+                      {cardStatus}
+                    </span>
+                  </div>
+
+                  <p className="mt-3 text-lg font-black text-profitGreen">
+                    ${card.estimatedValue.toLocaleString()}
+                  </p>
+                </div>
+              </button>
+            );
+          })
+        )}
+
+        <p className="px-1 pt-2 text-center text-xs font-bold text-zinc-500">
+          Showing {filteredCards.length.toLocaleString()} of{" "}
+          {cards.length.toLocaleString()} cards
+        </p>
+      </section>
+
+      {/* Desktop Search, Filters, Grid */}
+      <Panel className="hidden border-vaultGold/20 bg-black/50 xl:block">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
           <div className="flex min-w-[320px] flex-1 items-center gap-3 rounded-xl border border-steelBorder bg-black/50 px-4 py-3">
             <Search size={18} className="text-zinc-500" />
@@ -3829,21 +4064,19 @@ function AllCards({
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {(["All", "Raw", "Graded", "For Sale", "Grade Candidate"] as const).map(
-              (filter) => (
-                <button
-                  key={filter}
-                  onClick={() => setCollectionFilter(filter)}
-                  className={`rounded-xl border px-4 py-3 text-xs font-black transition ${
-                    collectionFilter === filter
-                      ? "border-vaultGold bg-vaultGold text-black shadow-vault"
-                      : "border-steelBorder bg-black/40 text-zinc-300 hover:border-vaultGold/50 hover:text-vaultGold"
-                  }`}
-                >
-                  {filter}
-                </button>
-              )
-            )}
+            {filterOptions.map((filter) => (
+              <button
+                key={filter}
+                onClick={() => setCollectionFilter(filter)}
+                className={`rounded-xl border px-4 py-3 text-xs font-black transition ${
+                  collectionFilter === filter
+                    ? "border-vaultGold bg-vaultGold text-black shadow-vault"
+                    : "border-steelBorder bg-black/40 text-zinc-300 hover:border-vaultGold/50 hover:text-vaultGold"
+                }`}
+              >
+                {filter}
+              </button>
+            ))}
 
             <button className="rounded-xl border border-vaultGold/40 bg-black/50 p-3 text-vaultGold">
               <Grid3X3 size={16} />
@@ -3872,15 +4105,25 @@ function AllCards({
           </p>
 
           <div className="flex items-center gap-2">
-            <button className="rounded-lg border border-steelBorder px-3 py-2 text-white">‹</button>
-            <button className="rounded-lg border border-vaultGold bg-vaultGold px-3 py-2 font-black text-black">1</button>
-            <button className="rounded-lg border border-steelBorder px-3 py-2 text-white">2</button>
-            <button className="rounded-lg border border-steelBorder px-3 py-2 text-white">3</button>
-            <button className="rounded-lg border border-steelBorder px-3 py-2 text-white">›</button>
+            <button className="rounded-lg border border-steelBorder px-3 py-2 text-white">
+              ‹
+            </button>
+            <button className="rounded-lg border border-vaultGold bg-vaultGold px-3 py-2 font-black text-black">
+              1
+            </button>
+            <button className="rounded-lg border border-steelBorder px-3 py-2 text-white">
+              2
+            </button>
+            <button className="rounded-lg border border-steelBorder px-3 py-2 text-white">
+              3
+            </button>
+            <button className="rounded-lg border border-steelBorder px-3 py-2 text-white">
+              ›
+            </button>
           </div>
         </div>
       </Panel>
-    </>
+    </div>
   );
 }
 
