@@ -3416,6 +3416,37 @@ function MyCollection({
       .filter(Boolean)
   ).size;
 
+  const collectionMetrics = [
+    {
+      label: "Total Cards",
+      sublabel: "View collection tracker",
+      value: cards.length.toLocaleString(),
+      trend: "+ Active Vault",
+      positive: true,
+    },
+    {
+      label: "Collection Value",
+      sublabel: "View value tracker",
+      value: `$${collectionValue.toLocaleString()}`,
+      trend: "Market Value",
+      positive: true,
+    },
+    {
+      label: "Graded",
+      sublabel: "View grading tracker",
+      value: gradedCards.toLocaleString(),
+      trend: "Protected Assets",
+      positive: true,
+    },
+    {
+      label: "Raw / Sets",
+      sublabel: "View set tracker",
+      value: `${rawCards} / ${trackedSets}`,
+      trend: "Inventory Mix",
+      positive: true,
+    },
+  ];
+
   if (cards.length === 0) {
     return (
       <EmptyVaultState
@@ -3427,91 +3458,87 @@ function MyCollection({
     );
   }
 
-return (
-  <div className="w-full max-w-full space-y-6 overflow-x-hidden">
-    {/* Mobile / Tablet Collection Hero */}
-    <section className="relative overflow-hidden rounded-[2rem] border border-vaultGold/25 bg-black/70 px-5 py-6 shadow-vault xl:hidden">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(212,175,55,0.18),transparent_38%),linear-gradient(135deg,rgba(255,255,255,0.05),transparent_45%)]" />
+  return (
+    <div className="w-full max-w-full space-y-6 overflow-x-hidden">
+      {/* Mobile / Tablet Collection Hero */}
+      <section className="relative overflow-hidden rounded-[2rem] bg-black/70 px-5 py-6 xl:hidden">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(212,175,55,0.16),transparent_38%),linear-gradient(135deg,rgba(255,255,255,0.04),transparent_45%)]" />
 
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.08]">
-        <img
-          src={cardgemzLogo}
-          alt="CARDGEMZ watermark"
-          className="h-[360px] w-[360px] object-contain"
-        />
-      </div>
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.07]">
+          <img
+            src={cardgemzLogo}
+            alt="CARDGEMZ watermark"
+            className="h-[360px] w-[360px] object-contain"
+          />
+        </div>
 
-      <div className="relative z-10">
-        <div className="mb-5">
-          <div className="text-center">
+        <div className="relative z-10">
+          <div className="mb-5 text-center">
             <h1 className="text-5xl font-black tracking-tight text-white">
               My Collection
             </h1>
           </div>
-        </div>
 
-        <div className="mt-5 grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => setActiveScreen("Add Card")}
-            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-vaultGold/70 bg-black/60 px-3 text-xs font-black text-vaultGold shadow-vault transition hover:bg-vaultGold hover:text-black"
-          >
-            <Plus size={15} />
-            Add Card
-          </button>
+          {/* Smaller Action Buttons */}
+          <div className="mx-auto mt-5 grid max-w-sm grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setActiveScreen("Add Card")}
+              className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-black/50 px-3 text-[11px] font-black text-vaultGold transition hover:bg-vaultGold hover:text-black"
+            >
+              <Plus size={14} />
+              Add Card
+            </button>
 
-          <button
-            type="button"
-            onClick={openCollectionReport}
-            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-[#fff3a0] via-vaultGold to-[#9b6a10] px-3 text-xs font-black text-black shadow-vault transition hover:scale-[1.02]"
-          >
-            <Download size={15} />
-            Export
-          </button>
-        </div>
-
-        <div className="mt-5 grid grid-cols-2 overflow-hidden rounded-2xl border border-vaultGold/20 bg-black/55">
-          <div className="flex min-h-[88px] flex-col items-center justify-center border-b border-r border-vaultGold/10 p-3 text-center">
-            <p className="text-[9px] font-black uppercase tracking-[0.26em] text-zinc-500">
-              Total Cards
-            </p>
-            <p className="mt-2 text-2xl font-black text-white">
-              {cards.length}
-            </p>
+            <button
+              type="button"
+              onClick={openCollectionReport}
+              className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-vaultGold/85 px-3 text-[11px] font-black text-black transition hover:bg-vaultGold"
+            >
+              <Download size={14} />
+              Export
+            </button>
           </div>
 
-          <div className="flex min-h-[88px] flex-col items-center justify-center border-b border-vaultGold/10 p-3 text-center">
-            <p className="text-[9px] font-black uppercase tracking-[0.26em] text-zinc-500">
-              Value
-            </p>
-            <p className="mt-2 text-2xl font-black text-vaultGold">
-              ${collectionValue.toLocaleString()}
-            </p>
-          </div>
+          {/* Stock-List Style Metrics */}
+          <div className="mt-6 overflow-hidden rounded-2xl bg-black/45">
+            {collectionMetrics.map((metric) => (
+              <button
+                key={metric.label}
+                type="button"
+                onClick={() => setActiveScreen("Sales Tracker")}
+                className="flex w-full items-center justify-between gap-4 border-b border-white/10 px-4 py-4 text-left last:border-b-0"
+              >
+                <div className="min-w-0">
+                  <p className="text-base font-black uppercase tracking-[0.08em] text-white">
+                    {metric.label}
+                  </p>
+                  <p className="mt-1 text-xs font-bold text-zinc-500">
+                    {metric.sublabel}
+                  </p>
+                </div>
 
-          <div className="flex min-h-[88px] flex-col items-center justify-center border-r border-vaultGold/10 p-3 text-center">
-            <p className="text-[9px] font-black uppercase tracking-[0.26em] text-zinc-500">
-              Graded
-            </p>
-            <p className="mt-2 text-2xl font-black text-white">
-              {gradedCards}
-            </p>
-          </div>
+                <div className="flex shrink-0 items-center gap-3 text-right">
+                  <div>
+                    <p className="text-xl font-black text-white">
+                      {metric.value}
+                    </p>
+                    <p
+                      className={`mt-1 text-xs font-black ${
+                        metric.positive ? "text-profitGreen" : "text-red-400"
+                      }`}
+                    >
+                      {metric.trend}
+                    </p>
+                  </div>
 
-          <div className="flex min-h-[88px] flex-col items-center justify-center p-3 text-center">
-            <p className="text-[9px] font-black uppercase tracking-[0.26em] text-zinc-500">
-              Raw / Sets
-            </p>
-            <p className="mt-2 text-2xl font-black text-white">
-              {rawCards}
-              <span className="ml-2 text-sm text-zinc-500">
-                / {trackedSets}
-              </span>
-            </p>
+                  <span className="text-2xl font-black text-zinc-500">›</span>
+                </div>
+              </button>
+            ))}
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
       {/* Desktop Collection Hero */}
       <div className="hidden xl:block">
@@ -3543,7 +3570,7 @@ return (
         />
       </div>
 
-      <Panel className="relative overflow-hidden border-vaultGold/25 bg-black/50">
+      <Panel className="relative overflow-hidden border-transparent bg-black/50">
         {/* Phone-only Top Cards watermark */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.06] xl:hidden">
           <img
@@ -3609,11 +3636,11 @@ return (
                   key={card.id}
                   type="button"
                   onClick={() => openCardDetail(card.id)}
-                  className="min-w-[86%] snap-center overflow-hidden rounded-[2rem] border border-vaultGold/25 bg-black/75 text-left shadow-vault first:ml-1 last:mr-5"
+                  className="min-w-[86%] snap-center overflow-hidden rounded-[2rem] bg-black/75 text-left first:ml-1 last:mr-5"
                 >
-                {/* =========================================================
-                     MY COLLECTION CARD IMAGE AREA 
-                ========================================================= */}
+                  {/* =========================================================
+                       MY COLLECTION CARD IMAGE AREA
+                  ========================================================= */}
                   <div className="relative flex h-[360px] items-center justify-center overflow-hidden bg-gradient-to-b from-zinc-900 via-black to-zinc-950 px-4 py-3">
                     <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(212,175,55,0.16),transparent_45%)]" />
 
@@ -3624,7 +3651,7 @@ return (
                         className="relative z-10 max-h-full w-full rounded-2xl object-contain"
                       />
                     ) : (
-                      <div className="relative z-10 flex h-full w-full flex-col items-center justify-center rounded-2xl border border-vaultGold/25 bg-black/55 shadow-vault">
+                      <div className="relative z-10 flex h-full w-full flex-col items-center justify-center rounded-2xl bg-black/55">
                         <Crown className="h-16 w-16 text-vaultGold/75" />
                         <p className="mt-5 text-[10px] font-black uppercase tracking-[0.45em] text-zinc-400">
                           Card Image
@@ -3632,10 +3659,11 @@ return (
                       </div>
                     )}
                   </div>
-                   {/* =========================================================
-                        MY COLLECTION SCREEN LOWER PANEL BELOW CARD IMAGE 
-                   ========================================================= */}
-                  <div className="border-t border-vaultGold/15 bg-black/95 px-4 py-3">
+
+                  {/* =========================================================
+                       MY COLLECTION SCREEN LOWER PANEL BELOW CARD IMAGE
+                  ========================================================= */}
+                  <div className="bg-black/95 px-4 py-3">
                     <p className="text-[10px] font-black uppercase tracking-[0.35em] text-zinc-500">
                       {cardYear}
                     </p>
@@ -3649,7 +3677,7 @@ return (
                     </p>
 
                     <div className="mt-4 flex items-center justify-between gap-3">
-                      <div className="rounded-xl border border-steelBorder bg-black px-4 py-2 text-sm font-black text-white">
+                      <div className="rounded-xl bg-black px-4 py-2 text-sm font-black text-white">
                         {grade}
                       </div>
 
