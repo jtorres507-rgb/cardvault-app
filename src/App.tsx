@@ -6,6 +6,7 @@ import {
   BarChart3,
   Bell,
   Box,
+  Info,
   Boxes,
   Camera,
   CheckCircle2,
@@ -3725,6 +3726,31 @@ function AllCards({
     "All" | "Raw" | "Graded" | "For Sale" | "Grade Candidate"
   >("All");
 
+  /* =========================================================
+     VAULT MANAGER FILTER SYSTEM
+
+     CURRENT FRONTEND FILTERS:
+     - Search local card fields
+     - Filter by All / Raw / Graded / For Sale / Grade Candidate
+
+     FUTURE BACKEND FILTER EXPANSION:
+     - Server-side search
+     - Pagination / infinite scroll
+     - Player, team, year, brand, set, grade, status filters
+     - Keep / Watch / Sell / Grade / Review decision filters
+     - Value range filters
+     - ROI range filters
+     - Serial-numbered / autograph / patch filters
+     - Storage location filters
+     - Dealer / source / purchase platform filters
+     - Indexed database queries for large vaults
+     - Thumbnail-first image loading
+
+     IMPORTANT:
+     For large inventories, do not load the full vault into the phone.
+     Load paginated results from backend search.
+  ========================================================= */
+
   const filteredCards = cards.filter((card) => {
     const query = searchTerm.toLowerCase().trim();
 
@@ -3824,14 +3850,19 @@ function AllCards({
             My Collection
           </button>
 
-          <h1 className="text-5xl font-black tracking-tight text-white">
-            Vault Manager
-          </h1>
+          <div className="flex items-center justify-between gap-4">
+            <h1 className="text-5xl font-black tracking-tight text-white">
+              Vault Manager
+            </h1>
 
-          <p className="mt-3 text-sm font-bold leading-6 text-zinc-400">
-            Manage every card in your vault. Review, keep, watch, sell, grade,
-            or update cards from one mobile inventory screen.
-          </p>
+            <button
+              type="button"
+              title="Manage every card in your vault. Review, keep, watch, sell, grade, or update cards from one mobile inventory screen."
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-vaultGold/20 bg-black/40 text-vaultGold"
+            >
+              <Info size={18} />
+            </button>
+          </div>
 
           <div className="mt-5 grid grid-cols-2 gap-3">
             <button
@@ -3854,20 +3885,20 @@ function AllCards({
           </div>
 
           <div className="mt-5 grid grid-cols-2 gap-3">
-            <div className="rounded-2xl border border-vaultGold/15 bg-black/30 px-4 py-3">
+            <div className="flex min-h-[88px] flex-col items-center justify-center rounded-2xl border border-vaultGold/15 bg-black/30 px-4 py-3 text-center">
               <p className="text-[9px] font-black uppercase tracking-[0.22em] text-zinc-500">
                 Total Cards
               </p>
-              <p className="mt-1 text-2xl font-black text-white">
+              <p className="mt-2 text-3xl font-black text-white">
                 {cards.length.toLocaleString()}
               </p>
             </div>
 
-            <div className="rounded-2xl border border-vaultGold/15 bg-black/30 px-4 py-3">
+            <div className="flex min-h-[88px] flex-col items-center justify-center rounded-2xl border border-vaultGold/15 bg-black/30 px-4 py-3 text-center">
               <p className="text-[9px] font-black uppercase tracking-[0.22em] text-zinc-500">
                 Showing
               </p>
-              <p className="mt-1 text-2xl font-black text-vaultGold">
+              <p className="mt-2 text-3xl font-black text-vaultGold">
                 {filteredCards.length.toLocaleString()}
               </p>
             </div>
@@ -3890,9 +3921,19 @@ function AllCards({
               Back to My Collection
             </button>
 
-            <h1 className="font-vault-heading text-5xl font-black tracking-[-0.04em] text-white">
-              Vault Manager
-            </h1>
+            <div className="flex items-center gap-4">
+              <h1 className="font-vault-heading text-5xl font-black tracking-[-0.04em] text-white">
+                Vault Manager
+              </h1>
+
+              <button
+                type="button"
+                title="Manage every card in your vault. Review, keep, watch, sell, grade, or update cards from one inventory screen."
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-vaultGold/20 bg-black/40 text-vaultGold"
+              >
+                <Info size={18} />
+              </button>
+            </div>
 
             <p className="mt-2 text-sm text-zinc-400">
               My Collection › Vault Manager
