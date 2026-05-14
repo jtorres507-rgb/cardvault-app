@@ -719,7 +719,7 @@ function MobileDashboardCommandCenter() {
   return (
     <div className="relative overflow-hidden">
       {/* Main Dashboard Watermark */}
-      <div className="pointer-events-none fixed inset-0 z-0 flex items-center justify-center opacity-[0.06]">
+      <div className="pointer-events-none fixed inset-0 z-0 flex items-center justify-center opacity-[0.10]">
         <img
           src="/cardvault-background-image.png"
           alt="CardVault background watermark"
