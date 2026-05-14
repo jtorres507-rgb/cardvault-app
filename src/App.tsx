@@ -5975,22 +5975,26 @@ function Reports({
     {
       id: "BGS",
       label: "BGS / Beckett",
-      description: "Premium grading prep for subgrades, autos, and modern cards.",
+      description:
+        "Premium grading prep for subgrades, autos, and modern cards.",
     },
     {
       id: "SGC",
       label: "SGC",
-      description: "Clean submission prep for vintage, modern, and quick-turn cards.",
+      description:
+        "Clean submission prep for vintage, modern, and quick-turn cards.",
     },
     {
       id: "CGC",
       label: "CGC Cards",
-      description: "Submission prep for sports cards, TCG, and non-sports cards.",
+      description:
+        "Submission prep for sports cards, TCG, and non-sports cards.",
     },
     {
       id: "TAG",
       label: "TAG",
-      description: "Tech-forward grading prep with transparent reporting workflow.",
+      description:
+        "Tech-forward grading prep with transparent reporting workflow.",
     },
   ];
 
@@ -6076,15 +6080,14 @@ function Reports({
   }[] = [
     {
       id: "cardAnalysis",
-      title: "Card Analysis Reports",
+      title: "Card Analysis",
       description:
         "One-card inspection, grading, market, and sell/hold analysis.",
     },
     {
       id: "myCollection",
-      title: "My Collection Report",
-      description:
-        "Printable inventory list for your full personal collection.",
+      title: "Collection",
+      description: "Printable inventory list for your full collection.",
     },
     {
       id: "gradingForms",
@@ -6094,15 +6097,15 @@ function Reports({
     },
     {
       id: "memorabilia",
-      title: "Memorabilia Reports",
+      title: "Memorabilia",
       description:
         "Authentication, signature verification, provenance, and memorabilia documentation.",
     },
     {
       id: "sales",
-      title: "Sales & Profit Reports",
+      title: "Sales Reports",
       description:
-        "Revenue, gross profit, net proceeds, margins, fees, units sold, and platform performance by year, quarter, or month.",
+        "Revenue, gross profit, net proceeds, margins, fees, units sold, and platform performance.",
     },
   ];
 
@@ -6134,41 +6137,92 @@ function Reports({
       return <MemorabiliaReportPreview memorabiliaItems={[]} />;
     }
 
-if (activeReport === "sales") {
-  return (
-    <SalesReportPreview
-       cards={cards}
-       sales={sales}
-       selectedYear={selectedSalesYear}
-       selectedQuarter={selectedSalesQuarter}
-       selectedMonth={selectedSalesMonth}
-      />
-    );
-  }
+    if (activeReport === "sales") {
+      return (
+        <SalesReportPreview
+          cards={cards}
+          sales={sales}
+          selectedYear={selectedSalesYear}
+          selectedQuarter={selectedSalesQuarter}
+          selectedMonth={selectedSalesMonth}
+        />
+      );
+    }
 
     return null;
   };
 
   return (
     <>
-      <div className="reports-screen-controls">
-        <PageHero
-          title="Reports Center"
-          subtitle="Generate polished collection, grading, sales, memorabilia, and card analysis reports for CardVault Pro."
-          actions={
-            <>
-              <HeroButton variant="black" onClick={() => window.print()}>
+      <div className="reports-screen-controls space-y-5">
+        {/* Mobile Reports Header */}
+        <section className="relative overflow-hidden rounded-[2rem] border border-vaultGold/10 bg-black/50 px-5 py-6 shadow-vault xl:hidden">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(212,175,55,0.14),transparent_38%),linear-gradient(180deg,rgba(255,255,255,0.04),transparent_45%)]" />
+
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.05]">
+            <img
+              src="/cardvault-background-image.png"
+              alt=""
+              className="h-[520px] w-[520px] object-contain"
+            />
+          </div>
+
+          <div className="relative z-10">
+            <div className="flex items-center justify-between gap-4">
+              <h1 className="text-5xl font-black tracking-tight text-white">
+                Reports Center
+              </h1>
+
+              <button
+                type="button"
+                title="Generate polished collection, grading, sales, memorabilia, and card analysis reports for CardVault Pro."
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-vaultGold/20 bg-black/40 text-vaultGold"
+              >
+                <Info size={18} />
+              </button>
+            </div>
+
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="inline-flex h-10 items-center justify-center rounded-xl border border-vaultGold/15 bg-black/35 px-3 text-[11px] font-black text-vaultGold transition hover:bg-vaultGold hover:text-black"
+              >
                 Export PDF
-              </HeroButton>
+              </button>
 
-              <HeroButton variant="gold" onClick={() => window.print()}>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="inline-flex h-10 items-center justify-center rounded-xl border border-vaultGold/15 bg-vaultGold/80 px-3 text-[11px] font-black text-black transition hover:bg-vaultGold"
+              >
                 Print Report
-              </HeroButton>
-            </>
-          }
-        />
+              </button>
+            </div>
+          </div>
+        </section>
 
-        <div className="grid grid-cols-5 gap-4">
+        {/* Desktop Reports Header */}
+        <div className="hidden xl:block">
+          <PageHero
+            title="Reports Center"
+            subtitle="Generate polished collection, grading, sales, memorabilia, and card analysis reports for CardVault Pro."
+            actions={
+              <>
+                <HeroButton variant="black" onClick={() => window.print()}>
+                  Export PDF
+                </HeroButton>
+
+                <HeroButton variant="gold" onClick={() => window.print()}>
+                  Print Report
+                </HeroButton>
+              </>
+            }
+          />
+        </div>
+
+        {/* Report Tabs */}
+        <div className="flex gap-3 overflow-x-auto pb-1 xl:grid xl:grid-cols-5 xl:overflow-visible xl:pb-0">
           {reportTabs.map((tab) => {
             const isActive = activeReport === tab.id;
 
@@ -6176,14 +6230,22 @@ if (activeReport === "sales") {
               <button
                 key={tab.id}
                 onClick={() => setActiveReport(tab.id)}
-                className={`rounded-2xl border p-5 text-left transition ${
+                title={tab.description}
+                className={`min-w-[180px] rounded-2xl border p-4 text-left transition xl:min-w-0 xl:p-5 ${
                   isActive
                     ? "border-vaultGold bg-vaultGold/10 text-vaultGold shadow-vault"
-                    : "border-steelBorder bg-graphite900/60 text-white hover:border-vaultGold/50"
+                    : "border-vaultGold/10 bg-black/45 text-white hover:border-vaultGold/50"
                 }`}
               >
-                <h3 className="text-lg font-black">{tab.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-zinc-400">
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="text-sm font-black leading-5 xl:text-lg">
+                    {tab.title}
+                  </h3>
+
+                  <Info className="h-4 w-4 shrink-0 text-vaultGold/80 xl:hidden" />
+                </div>
+
+                <p className="mt-3 hidden text-sm leading-6 text-zinc-400 xl:block">
                   {tab.description}
                 </p>
               </button>
@@ -6191,12 +6253,13 @@ if (activeReport === "sales") {
           })}
         </div>
 
-        <Panel className="mt-6 mb-6">
+        {/* Report Parameters */}
+        <Panel className="mt-0 mb-6 border-vaultGold/10 bg-black/45">
           <p className="mb-5 text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
             Report Parameters
           </p>
 
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <label>
               <span className="mb-2 block text-xs font-black text-zinc-300">
                 Select Player
@@ -6204,7 +6267,7 @@ if (activeReport === "sales") {
               <select
                 value={selectedPlayer}
                 onChange={(event) => setSelectedPlayer(event.target.value)}
-                className="w-full rounded-xl border border-steelBorder bg-black/50 px-4 py-3 text-sm font-bold text-white outline-none"
+                className="w-full rounded-xl border border-vaultGold/15 bg-black/50 px-4 py-3 text-sm font-bold text-white outline-none"
               >
                 <option>All Players</option>
                 {players.map((player) => (
@@ -6220,7 +6283,7 @@ if (activeReport === "sales") {
               <select
                 value={selectedSport}
                 onChange={(event) => setSelectedSport(event.target.value)}
-                className="w-full rounded-xl border border-steelBorder bg-black/50 px-4 py-3 text-sm font-bold text-white outline-none"
+                className="w-full rounded-xl border border-vaultGold/15 bg-black/50 px-4 py-3 text-sm font-bold text-white outline-none"
               >
                 <option>All Sports</option>
                 {sports.map((sport) => (
@@ -6236,7 +6299,7 @@ if (activeReport === "sales") {
               <select
                 value={selectedGrade}
                 onChange={(event) => setSelectedGrade(event.target.value)}
-                className="w-full rounded-xl border border-steelBorder bg-black/50 px-4 py-3 text-sm font-bold text-white outline-none"
+                className="w-full rounded-xl border border-vaultGold/15 bg-black/50 px-4 py-3 text-sm font-bold text-white outline-none"
               >
                 <option>All Grades</option>
                 {grades.map((grade) => (
@@ -6252,7 +6315,7 @@ if (activeReport === "sales") {
               <select
                 value={selectedStatus}
                 onChange={(event) => setSelectedStatus(event.target.value)}
-                className="w-full rounded-xl border border-steelBorder bg-black/50 px-4 py-3 text-sm font-bold text-white outline-none"
+                className="w-full rounded-xl border border-vaultGold/15 bg-black/50 px-4 py-3 text-sm font-bold text-white outline-none"
               >
                 <option>All Statuses</option>
                 {statuses.map((status) => (
@@ -6264,25 +6327,35 @@ if (activeReport === "sales") {
         </Panel>
 
         {activeReport === "gradingForms" && (
-          <Panel className="mb-6">
-            <div className="mb-5 flex items-start justify-between gap-6">
+          <Panel className="mb-6 border-vaultGold/10 bg-black/45">
+            <div className="mb-5 flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between xl:gap-6">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
                   Grading Submission Prep
                 </p>
 
-                <h3 className="mt-2 text-2xl font-black text-white">
-                  Choose Grading Company
-                </h3>
+                <div className="mt-2 flex items-center justify-between gap-4">
+                  <h3 className="text-2xl font-black text-white">
+                    Choose Grading Company
+                  </h3>
 
-                <p className="mt-2 text-sm leading-6 text-zinc-400">
+                  <button
+                    type="button"
+                    title="Generate a CardVault Pro grading prep sheet for your selected grading company before completing the official submission process."
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-vaultGold/20 bg-black/40 text-vaultGold xl:hidden"
+                  >
+                    <Info size={16} />
+                  </button>
+                </div>
+
+                <p className="mt-2 hidden text-sm leading-6 text-zinc-400 xl:block">
                   Generate a CardVault Pro grading prep sheet for your selected
                   grading company before completing the official submission
                   process.
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-vaultGold/40 bg-vaultGold/10 px-5 py-4 text-right">
+              <div className="rounded-2xl border border-vaultGold/30 bg-vaultGold/10 px-5 py-4 text-left xl:text-right">
                 <p className="text-xs font-black uppercase tracking-[0.25em] text-vaultGold">
                   Selected Company
                 </p>
@@ -6292,7 +6365,7 @@ if (activeReport === "sales") {
               </div>
             </div>
 
-            <div className="grid grid-cols-5 gap-3">
+            <div className="flex gap-3 overflow-x-auto pb-1 xl:grid xl:grid-cols-5 xl:overflow-visible xl:pb-0">
               {gradingCompanies.map((company) => {
                 const isSelected = selectedGradingCompany === company.id;
 
@@ -6300,15 +6373,16 @@ if (activeReport === "sales") {
                   <button
                     key={company.id}
                     onClick={() => setSelectedGradingCompany(company.id)}
-                    className={`rounded-2xl border p-4 text-left transition ${
+                    title={company.description}
+                    className={`min-w-[150px] rounded-2xl border p-4 text-left transition xl:min-w-0 ${
                       isSelected
                         ? "border-vaultGold bg-vaultGold text-black shadow-vault"
-                        : "border-steelBorder bg-black/40 text-zinc-300 hover:border-vaultGold/50 hover:text-vaultGold"
+                        : "border-vaultGold/10 bg-black/40 text-zinc-300 hover:border-vaultGold/50 hover:text-vaultGold"
                     }`}
                   >
                     <p className="text-lg font-black">{company.label}</p>
                     <p
-                      className={`mt-2 text-xs leading-5 ${
+                      className={`mt-2 hidden text-xs leading-5 xl:block ${
                         isSelected ? "text-black/70" : "text-zinc-400"
                       }`}
                     >
@@ -6322,24 +6396,34 @@ if (activeReport === "sales") {
         )}
 
         {activeReport === "sales" && (
-          <Panel className="mb-6">
-            <div className="mb-5 flex items-start justify-between gap-6">
+          <Panel className="mb-6 border-vaultGold/10 bg-black/45">
+            <div className="mb-5 flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between xl:gap-6">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
                   Sales Report Period
                 </p>
 
-                <h3 className="mt-2 text-2xl font-black text-white">
-                  Choose Year, Quarter, or Month
-                </h3>
+                <div className="mt-2 flex items-center justify-between gap-4">
+                  <h3 className="text-2xl font-black text-white">
+                    Choose Year, Quarter, or Month
+                  </h3>
 
-                <p className="mt-2 text-sm leading-6 text-zinc-400">
+                  <button
+                    type="button"
+                    title="Generate sales performance by full year, quarter, or a single month."
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-vaultGold/20 bg-black/40 text-vaultGold xl:hidden"
+                  >
+                    <Info size={16} />
+                  </button>
+                </div>
+
+                <p className="mt-2 hidden text-sm leading-6 text-zinc-400 xl:block">
                   Generate sales performance by full year, quarter, or a single
                   month.
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-vaultGold/40 bg-vaultGold/10 px-5 py-4 text-right">
+              <div className="rounded-2xl border border-vaultGold/30 bg-vaultGold/10 px-5 py-4 text-left xl:text-right">
                 <p className="text-xs font-black uppercase tracking-[0.25em] text-vaultGold">
                   Active Period
                 </p>
@@ -6353,7 +6437,7 @@ if (activeReport === "sales") {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <label>
                 <span className="mb-2 block text-xs font-black text-zinc-300">
                   Sales Year
@@ -6361,7 +6445,7 @@ if (activeReport === "sales") {
                 <select
                   value={selectedSalesYear}
                   onChange={(event) => setSelectedSalesYear(event.target.value)}
-                  className="w-full rounded-xl border border-steelBorder bg-black/50 px-4 py-3 text-sm font-bold text-white outline-none"
+                  className="w-full rounded-xl border border-vaultGold/15 bg-black/50 px-4 py-3 text-sm font-bold text-white outline-none"
                 >
                   {salesYears.map((year) => (
                     <option key={year}>{year}</option>
@@ -6379,7 +6463,7 @@ if (activeReport === "sales") {
                     setSelectedSalesQuarter(event.target.value);
                     setSelectedSalesMonth("All Months");
                   }}
-                  className="w-full rounded-xl border border-steelBorder bg-black/50 px-4 py-3 text-sm font-bold text-white outline-none"
+                  className="w-full rounded-xl border border-vaultGold/15 bg-black/50 px-4 py-3 text-sm font-bold text-white outline-none"
                 >
                   {salesQuarters.map((quarter) => (
                     <option key={quarter}>{quarter}</option>
@@ -6399,7 +6483,7 @@ if (activeReport === "sales") {
                       setSelectedSalesQuarter("All Quarters");
                     }
                   }}
-                  className="w-full rounded-xl border border-steelBorder bg-black/50 px-4 py-3 text-sm font-bold text-white outline-none"
+                  className="w-full rounded-xl border border-vaultGold/15 bg-black/50 px-4 py-3 text-sm font-bold text-white outline-none"
                 >
                   {salesMonths.map((month) => (
                     <option key={month}>{month}</option>
@@ -6411,24 +6495,34 @@ if (activeReport === "sales") {
         )}
 
         {activeReport === "myCollection" && (
-          <Panel className="mb-6">
-            <div className="mb-5 flex items-start justify-between gap-6">
+          <Panel className="mb-6 border-vaultGold/10 bg-black/45">
+            <div className="mb-5 flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between xl:gap-6">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
                   Report Builder
                 </p>
 
-                <h3 className="mt-2 text-2xl font-black text-white">
-                  Choose Report Columns
-                </h3>
+                <div className="mt-2 flex items-center justify-between gap-4">
+                  <h3 className="text-2xl font-black text-white">
+                    Choose Report Columns
+                  </h3>
 
-                <p className="mt-2 text-sm leading-6 text-zinc-400">
+                  <button
+                    type="button"
+                    title="Select the fields you want included in this printable collection report."
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-vaultGold/20 bg-black/40 text-vaultGold xl:hidden"
+                  >
+                    <Info size={16} />
+                  </button>
+                </div>
+
+                <p className="mt-2 hidden text-sm leading-6 text-zinc-400 xl:block">
                   Select the fields you want included in this printable
                   collection report.
                 </p>
               </div>
 
-              <div className="flex flex-wrap justify-end gap-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 xl:flex xl:flex-wrap xl:justify-end">
                 <button
                   onClick={() =>
                     setSelectedCollectionColumns([
@@ -6439,7 +6533,7 @@ if (activeReport === "sales") {
                       "location",
                     ])
                   }
-                  className="rounded-xl border border-steelBorder bg-black/40 px-4 py-3 text-xs font-black text-zinc-300 hover:border-vaultGold/50 hover:text-vaultGold"
+                  className="rounded-xl border border-vaultGold/10 bg-black/40 px-4 py-3 text-xs font-black text-zinc-300 hover:border-vaultGold/50 hover:text-vaultGold"
                 >
                   Inventory Summary
                 </button>
@@ -6454,7 +6548,7 @@ if (activeReport === "sales") {
                       "gainLoss",
                     ])
                   }
-                  className="rounded-xl border border-steelBorder bg-black/40 px-4 py-3 text-xs font-black text-zinc-300 hover:border-vaultGold/50 hover:text-vaultGold"
+                  className="rounded-xl border border-vaultGold/10 bg-black/40 px-4 py-3 text-xs font-black text-zinc-300 hover:border-vaultGold/50 hover:text-vaultGold"
                 >
                   Financial Summary
                 </button>
@@ -6473,14 +6567,14 @@ if (activeReport === "sales") {
                       "location",
                     ])
                   }
-                  className="rounded-xl border border-steelBorder bg-black/40 px-4 py-3 text-xs font-black text-zinc-300 hover:border-vaultGold/50 hover:text-vaultGold"
+                  className="rounded-xl border border-vaultGold/10 bg-black/40 px-4 py-3 text-xs font-black text-zinc-300 hover:border-vaultGold/50 hover:text-vaultGold"
                 >
                   Tracking Summary
                 </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
               {collectionReportColumnOptions.map((column) => {
                 const isSelected = selectedCollectionColumns.includes(
                   column.id
@@ -6493,7 +6587,7 @@ if (activeReport === "sales") {
                     className={`rounded-xl border px-4 py-3 text-left text-xs font-black transition ${
                       isSelected
                         ? "border-vaultGold bg-vaultGold text-black shadow-vault"
-                        : "border-steelBorder bg-black/40 text-zinc-300 hover:border-vaultGold/50 hover:text-vaultGold"
+                        : "border-vaultGold/10 bg-black/40 text-zinc-300 hover:border-vaultGold/50 hover:text-vaultGold"
                     }`}
                   >
                     {isSelected ? "✓ " : "+ "}
@@ -6517,8 +6611,8 @@ if (activeReport === "sales") {
 
       {cards.length > 0 && (
         <>
-          <div className="screen-only report-preview-output rounded-3xl border border-steelBorder bg-white p-8 text-black shadow-vault">
-            {renderActiveReport()}
+          <div className="screen-only report-preview-output overflow-x-auto rounded-[2rem] border border-vaultGold/10 bg-white p-3 text-black shadow-vault sm:p-5 xl:rounded-3xl xl:p-8">
+            <div className="min-w-[760px] xl:min-w-0">{renderActiveReport()}</div>
           </div>
 
           <div className="print-only clean-print-report-output">
@@ -11638,15 +11732,135 @@ function ScanReviewQueue({
     return "border-zinc-600 bg-zinc-900/70 text-zinc-300";
   }
 
-  return (
-    <>
-      <PageHeader
-        eyebrow="Phase 6.7 Dallas Card Show Beta Prep"
-        title="Scan Review Queue"
-        subtitle="Temporary holding area for scanned or uploaded cards before they are added to your collection or moved to the sell queue."
-      />
+  const betaMetrics = [
+    {
+      label: "Beta Storage",
+      value: `${temporaryScans.length}/${MAX_TEMPORARY_SCANS}`,
+      className: betaStorageIsWarning
+        ? "border-red-500/40 bg-red-950/25 text-red-300"
+        : "border-vaultGold/25 bg-vaultGold/10 text-vaultGold",
+    },
+    {
+      label: "Buy",
+      value: buyDecisionScans.length,
+      className: "border-profitGreen/30 bg-profitGreen/10 text-profitGreen",
+    },
+    {
+      label: "Watch",
+      value: watchDecisionScans.length,
+      className: "border-vaultGold/25 bg-vaultGold/10 text-vaultGold",
+    },
+    {
+      label: "Pass",
+      value: passDecisionScans.length,
+      className: "border-red-700/40 bg-red-950/30 text-red-400",
+    },
+    {
+      label: "Ready Keep",
+      value: readyToKeepScans.length,
+      className: "border-profitGreen/30 bg-profitGreen/10 text-profitGreen",
+    },
+    {
+      label: "Ready Sell",
+      value: readyToSellScans.length,
+      className: "border-vaultGold/25 bg-vaultGold/10 text-vaultGold",
+    },
+  ];
 
-      <div className="mt-4 rounded-2xl border border-vaultGold/25 bg-black/60 p-4">
+  return (
+    <div className="w-full max-w-full space-y-5 overflow-x-hidden">
+      {/* Mobile / Tablet Scan Review Header */}
+      <section className="relative overflow-hidden rounded-[2rem] border border-vaultGold/10 bg-black/50 px-5 py-6 shadow-vault xl:hidden">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(212,175,55,0.14),transparent_38%),linear-gradient(180deg,rgba(255,255,255,0.04),transparent_45%)]" />
+
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.05]">
+          <img
+            src="/cardvault-background-image.png"
+            alt=""
+            className="h-[520px] w-[520px] object-contain"
+          />
+        </div>
+
+        <div className="relative z-10">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.25em] text-vaultGold">
+                Dallas Beta
+              </p>
+
+              <h1 className="mt-2 text-4xl font-black tracking-tight text-white">
+                Scan Review
+              </h1>
+            </div>
+
+            <button
+              type="button"
+              title="Temporary holding area for scanned or uploaded cards before they are added to your collection or moved to the sell queue."
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-vaultGold/20 bg-black/40 text-vaultGold"
+            >
+              <Info size={18} />
+            </button>
+          </div>
+
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={createDemoTemporaryScan}
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-vaultGold/15 bg-black/35 px-3 text-[11px] font-black text-vaultGold transition hover:bg-vaultGold hover:text-black"
+            >
+              + Demo Scan
+            </button>
+
+            <button
+              type="button"
+              onClick={exportDallasBetaBackup}
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-vaultGold/15 bg-vaultGold/80 px-3 text-[11px] font-black text-black transition hover:bg-vaultGold"
+            >
+              Export Backup
+            </button>
+          </div>
+
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            <div className="flex min-h-[88px] flex-col items-center justify-center rounded-2xl border border-vaultGold/15 bg-black/30 px-4 py-3 text-center">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-zinc-500">
+                Queue
+              </p>
+              <p
+                className={`mt-2 text-3xl font-black ${
+                  betaStorageIsWarning ? "text-red-300" : "text-vaultGold"
+                }`}
+              >
+                {temporaryScans.length}/{MAX_TEMPORARY_SCANS}
+              </p>
+            </div>
+
+            <div className="flex min-h-[88px] flex-col items-center justify-center rounded-2xl border border-vaultGold/15 bg-black/30 px-4 py-3 text-center">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-zinc-500">
+                Status
+              </p>
+              <p
+                className={`mt-2 text-lg font-black ${
+                  betaStorageIsWarning ? "text-red-300" : "text-profitGreen"
+                }`}
+              >
+                {betaStorageIsWarning ? "Warning" : "Beta Ready"}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Desktop Header */}
+      <div className="hidden xl:block">
+        <PageHeader
+          eyebrow="Phase 6.7 Dallas Card Show Beta Prep"
+          title="Scan Review Queue"
+          subtitle="Temporary holding area for scanned or uploaded cards before they are added to your collection or moved to the sell queue."
+        />
+      </div>
+
+      {/* Desktop Beta Storage Banner */}
+      <div className="hidden rounded-2xl border border-vaultGold/25 bg-black/60 p-4 xl:block">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             <p
@@ -11685,18 +11899,29 @@ function ScanReviewQueue({
         </div>
       </div>
 
-      <Panel>
-        <div className="flex flex-wrap items-center justify-between gap-5">
+      {/* Upload / Create Scan */}
+      <Panel className="border-vaultGold/10 bg-black/45">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
               Temporary Scan Workflow
             </p>
 
-            <h2 className="mt-2 text-3xl font-black text-white">
-              Upload Card Images
-            </h2>
+            <div className="mt-2 flex items-center justify-between gap-4">
+              <h2 className="text-2xl font-black text-white xl:text-3xl">
+                Upload Card Images
+              </h2>
 
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">
+              <button
+                type="button"
+                title="Upload a front and back card image. CardVault Pro creates a temporary scan record first, then you can review it before sending it to your collection or sell queue."
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-vaultGold/20 bg-black/40 text-vaultGold xl:hidden"
+              >
+                <Info size={16} />
+              </button>
+            </div>
+
+            <p className="mt-2 hidden max-w-3xl text-sm leading-6 text-zinc-400 xl:block">
               Upload a front and back card image. CardVault Pro will create a
               temporary scan record first, then you can review it before sending
               it to your collection or sell queue.
@@ -11706,19 +11931,19 @@ function ScanReviewQueue({
           <button
             type="button"
             onClick={createDemoTemporaryScan}
-            className="min-h-[46px] rounded-xl border border-vaultGold/50 bg-black/50 px-6 py-3 text-sm font-black text-vaultGold shadow-vault transition hover:bg-vaultGold hover:text-black active:scale-[0.98]"
+            className="hidden min-h-[46px] rounded-xl border border-vaultGold/50 bg-black/50 px-6 py-3 text-sm font-black text-vaultGold shadow-vault transition hover:bg-vaultGold hover:text-black active:scale-[0.98] xl:block"
           >
             + Create Demo Scan
           </button>
         </div>
 
         <div className="mt-6 grid gap-5 xl:grid-cols-[1fr_1fr_260px]">
-          <div className="rounded-2xl border border-vaultGold/25 bg-black/60 p-4">
+          <div className="rounded-2xl border border-vaultGold/15 bg-black/45 p-4">
             <p className="mb-3 text-center text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
               Front Image
             </p>
 
-            <div className="flex min-h-[240px] items-center justify-center rounded-xl border border-dashed border-steelBorder bg-graphite900/70 p-3">
+            <div className="flex min-h-[220px] items-center justify-center rounded-xl border border-dashed border-vaultGold/15 bg-black/50 p-3 xl:min-h-[240px]">
               {frontUploadPreview ? (
                 <img
                   src={frontUploadPreview}
@@ -11758,12 +11983,12 @@ function ScanReviewQueue({
             />
           </div>
 
-          <div className="rounded-2xl border border-vaultGold/25 bg-black/60 p-4">
+          <div className="rounded-2xl border border-vaultGold/15 bg-black/45 p-4">
             <p className="mb-3 text-center text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
               Back Image
             </p>
 
-            <div className="flex min-h-[240px] items-center justify-center rounded-xl border border-dashed border-steelBorder bg-graphite900/70 p-3">
+            <div className="flex min-h-[220px] items-center justify-center rounded-xl border border-dashed border-vaultGold/15 bg-black/50 p-3 xl:min-h-[240px]">
               {backUploadPreview ? (
                 <img
                   src={backUploadPreview}
@@ -11803,19 +12028,19 @@ function ScanReviewQueue({
             />
           </div>
 
-          <div className="flex flex-col justify-between rounded-2xl border border-vaultGold/25 bg-black/60 p-5">
+          <div className="flex flex-col justify-between rounded-2xl border border-vaultGold/15 bg-black/45 p-5">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
                 Next Step
               </p>
 
               <h3 className="mt-2 text-2xl font-black text-white">
-                Create Temporary Scan
+                Create Scan
               </h3>
 
               <p className="mt-3 text-sm leading-6 text-zinc-400">
-                This will send the uploaded images into the Scan Review Queue as
-                a temporary card detail.
+                Send uploaded images into the Scan Review Queue as a temporary
+                card detail.
               </p>
             </div>
 
@@ -11834,7 +12059,7 @@ function ScanReviewQueue({
                   setFrontUploadPreview("");
                   setBackUploadPreview("");
                 }}
-                className="min-h-[46px] w-full rounded-xl border border-steelBorder bg-black/50 px-5 py-3 text-sm font-bold text-zinc-300 transition hover:text-white active:scale-[0.98]"
+                className="min-h-[46px] w-full rounded-xl border border-vaultGold/15 bg-black/50 px-5 py-3 text-sm font-bold text-zinc-300 transition hover:text-white active:scale-[0.98]"
               >
                 Clear Uploads
               </button>
@@ -11843,65 +12068,27 @@ function ScanReviewQueue({
         </div>
       </Panel>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-6">
-        <div className="rounded-2xl border border-vaultGold/30 bg-vaultGold/10 p-4">
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-vaultGold">
-            Beta Storage
-          </p>
-          <p className="mt-2 text-3xl font-black text-white">
-            {temporaryScans.length}/{MAX_TEMPORARY_SCANS}
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-profitGreen/30 bg-profitGreen/10 p-4">
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-profitGreen">
-            Buy
-          </p>
-          <p className="mt-2 text-3xl font-black text-white">
-            {buyDecisionScans.length}
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-vaultGold/30 bg-vaultGold/10 p-4">
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-vaultGold">
-            Watch
-          </p>
-          <p className="mt-2 text-3xl font-black text-white">
-            {watchDecisionScans.length}
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-red-700/40 bg-red-950/30 p-4">
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-red-400">
-            Pass
-          </p>
-          <p className="mt-2 text-3xl font-black text-white">
-            {passDecisionScans.length}
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-profitGreen/30 bg-profitGreen/10 p-4">
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-profitGreen">
-            Ready to Keep
-          </p>
-          <p className="mt-2 text-3xl font-black text-white">
-            {readyToKeepScans.length}
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-vaultGold/30 bg-vaultGold/10 p-4">
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-vaultGold">
-            Ready to Sell
-          </p>
-          <p className="mt-2 text-3xl font-black text-white">
-            {readyToSellScans.length}
-          </p>
-        </div>
+      {/* Beta Metrics */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        {betaMetrics.map((metric) => (
+          <div
+            key={metric.label}
+            className={`flex min-h-[88px] flex-col items-center justify-center rounded-2xl border px-4 py-3 text-center ${metric.className}`}
+          >
+            <p className="text-[9px] font-black uppercase tracking-[0.22em] text-current opacity-80">
+              {metric.label}
+            </p>
+            <p className="mt-2 text-3xl font-black text-white">
+              {metric.value}
+            </p>
+          </div>
+        ))}
       </div>
 
+      {/* Queue Cards */}
       {temporaryScans.length === 0 ? (
-        <Panel className="mt-6">
-          <div className="flex min-h-[260px] flex-col items-center justify-center text-center">
+        <Panel className="border-vaultGold/10 bg-black/45">
+          <div className="flex min-h-[220px] flex-col items-center justify-center text-center">
             <div className="flex h-20 w-20 items-center justify-center rounded-3xl border border-vaultGold/40 bg-vaultGold/10 text-4xl text-vaultGold">
               📷
             </div>
@@ -11917,28 +12104,28 @@ function ScanReviewQueue({
           </div>
         </Panel>
       ) : (
-        <div className="mt-6 grid gap-5 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           {temporaryScans.map((scan) => (
             <article
               key={scan.id}
-              className="group rounded-3xl border border-vaultGold/25 bg-black/70 p-5 shadow-[0_0_35px_rgba(0,0,0,0.45)] transition hover:border-vaultGold hover:shadow-[0_0_45px_rgba(245,196,81,0.16)]"
+              className="group rounded-[2rem] border border-vaultGold/15 bg-black/55 p-4 shadow-vault transition hover:border-vaultGold/50"
             >
               <div className="mb-4 flex items-center justify-between gap-3">
                 <span
-                  className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] ${statusBadgeClass(
+                  className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] ${statusBadgeClass(
                     scan.scanStatus
                   )}`}
                 >
                   {scan.scanStatus}
                 </span>
 
-                <span className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500">
+                <span className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">
                   {scan.scanSource}
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="flex h-48 items-center justify-center rounded-2xl border border-vaultGold/25 bg-graphite900/70">
+                <div className="flex h-44 items-center justify-center rounded-2xl border border-vaultGold/15 bg-black/50 xl:h-48">
                   {scan.frontImage ? (
                     <img
                       src={scan.frontImage}
@@ -11957,7 +12144,7 @@ function ScanReviewQueue({
                   )}
                 </div>
 
-                <div className="flex h-48 items-center justify-center rounded-2xl border border-vaultGold/25 bg-graphite900/70">
+                <div className="flex h-44 items-center justify-center rounded-2xl border border-vaultGold/15 bg-black/50 xl:h-48">
                   {scan.backImage ? (
                     <img
                       src={scan.backImage}
@@ -11978,16 +12165,16 @@ function ScanReviewQueue({
               </div>
 
               <div className="mt-5">
-                <h3 className="text-2xl font-black text-white">
+                <h3 className="line-clamp-1 text-2xl font-black text-white">
                   {scan.player}
                 </h3>
 
-                <p className="mt-1 text-sm leading-5 text-zinc-400">
+                <p className="mt-1 line-clamp-2 text-sm leading-5 text-zinc-400">
                   {scan.year} {scan.brand} {scan.card}
                 </p>
 
                 <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
-                  <div className="rounded-xl border border-steelBorder bg-black/50 p-3">
+                  <div className="rounded-xl border border-vaultGold/10 bg-black/50 p-3">
                     <p className="font-black uppercase text-zinc-500">
                       Images
                     </p>
@@ -11997,7 +12184,7 @@ function ScanReviewQueue({
                     </p>
                   </div>
 
-                  <div className="rounded-xl border border-steelBorder bg-black/50 p-3">
+                  <div className="rounded-xl border border-vaultGold/10 bg-black/50 p-3">
                     <p className="font-black uppercase text-zinc-500">Value</p>
                     <p className="mt-1 font-bold text-white">
                       ${scan.estimatedValue.toLocaleString()}
@@ -12014,10 +12201,10 @@ function ScanReviewQueue({
                         onClick={() =>
                           updateTemporaryScanBetaDecision(scan.id, decision)
                         }
-                        className={`min-h-[46px] rounded-xl border px-3 py-3 text-sm font-black uppercase tracking-widest transition active:scale-[0.98] ${
+                        className={`min-h-[44px] rounded-xl border px-2 py-3 text-xs font-black uppercase tracking-widest transition active:scale-[0.98] ${
                           scan.betaDecision === decision
                             ? "border-vaultGold bg-vaultGold text-black"
-                            : "border-steelBorder bg-black/50 text-zinc-400 hover:border-vaultGold hover:text-vaultGold"
+                            : "border-vaultGold/10 bg-black/50 text-zinc-400 hover:border-vaultGold hover:text-vaultGold"
                         }`}
                       >
                         {decision}
@@ -12039,18 +12226,29 @@ function ScanReviewQueue({
         </div>
       )}
 
-      <Panel className="mt-6">
+      {/* Beta Feedback Log */}
+      <Panel className="border-vaultGold/10 bg-black/45">
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
               Phase 6.6 Beta Feedback Log
             </p>
 
-            <h2 className="mt-2 text-3xl font-black text-white">
-              Dallas Card Show Field Notes
-            </h2>
+            <div className="mt-2 flex items-center justify-between gap-4">
+              <h2 className="text-2xl font-black text-white xl:text-3xl">
+                Field Notes
+              </h2>
 
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">
+              <button
+                type="button"
+                title="Capture bugs, workflow issues, mobile layout problems, feature requests, and pricing/dealer tracking notes during live beta testing."
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-vaultGold/20 bg-black/40 text-vaultGold xl:hidden"
+              >
+                <Info size={16} />
+              </button>
+            </div>
+
+            <p className="mt-2 hidden max-w-3xl text-sm leading-6 text-zinc-400 xl:block">
               Capture bugs, workflow issues, mobile layout problems, feature
               requests, and pricing/dealer tracking notes during live beta
               testing.
@@ -12077,7 +12275,7 @@ function ScanReviewQueue({
                     event.target.value as BetaFeedbackRecord["category"],
                 }))
               }
-              className="w-full rounded-xl border border-steelBorder bg-black/60 px-4 py-3 text-sm font-bold text-white outline-none focus:border-vaultGold"
+              className="w-full rounded-xl border border-vaultGold/15 bg-black/60 px-4 py-3 text-sm font-bold text-white outline-none focus:border-vaultGold"
             >
               <option value="Workflow">Workflow</option>
               <option value="Quick Scan">Quick Scan</option>
@@ -12104,7 +12302,7 @@ function ScanReviewQueue({
                     event.target.value as BetaFeedbackRecord["priority"],
                 }))
               }
-              className="w-full rounded-xl border border-steelBorder bg-black/60 px-4 py-3 text-sm font-bold text-white outline-none focus:border-vaultGold"
+              className="w-full rounded-xl border border-vaultGold/15 bg-black/60 px-4 py-3 text-sm font-bold text-white outline-none focus:border-vaultGold"
             >
               <option value="Low">Low</option>
               <option value="Medium">Medium</option>
@@ -12125,7 +12323,7 @@ function ScanReviewQueue({
                   note: event.target.value,
                 }))
               }
-              className="min-h-[100px] w-full rounded-xl border border-steelBorder bg-black/60 p-3 text-sm text-white outline-none focus:border-vaultGold"
+              className="min-h-[100px] w-full rounded-xl border border-vaultGold/15 bg-black/60 p-3 text-sm text-white outline-none focus:border-vaultGold"
               placeholder="Example: Buttons need to be bigger on mobile while walking the show floor."
             />
           </div>
@@ -12146,7 +12344,7 @@ function ScanReviewQueue({
             {betaFeedback.map((feedback) => (
               <div
                 key={feedback.id}
-                className="rounded-2xl border border-steelBorder bg-black/50 p-4"
+                className="rounded-2xl border border-vaultGold/10 bg-black/50 p-4"
               >
                 <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                   <div>
@@ -12161,7 +12359,7 @@ function ScanReviewQueue({
                             ? "border-red-500/50 bg-red-950/40 text-red-300"
                             : feedback.priority === "Medium"
                             ? "border-vaultGold/40 bg-vaultGold/10 text-vaultGold"
-                            : "border-steelBorder bg-black/40 text-zinc-400"
+                            : "border-vaultGold/10 bg-black/40 text-zinc-400"
                         }`}
                       >
                         {feedback.priority}
@@ -12182,7 +12380,7 @@ function ScanReviewQueue({
           </div>
         )}
       </Panel>
-    </>
+    </div>
   );
 }
 
@@ -12203,27 +12401,27 @@ function TemporaryCardDetail({
 }) {
   const [isEditing, setIsEditing] = useState(false);
 
-function normalizeTemporaryScanBetaFields(
-  currentScan: TemporaryScanRecord
-): TemporaryScanRecord {
-  return {
-    ...currentScan,
-    boothNumber: currentScan.boothNumber ?? "",
-    dealerName: currentScan.dealerName ?? "",
-    askingPrice: currentScan.askingPrice ?? 0,
-    recentComp: currentScan.recentComp ?? 0,
-    offerTarget: currentScan.offerTarget ?? 0,
-    maxBuyPrice: currentScan.maxBuyPrice ?? 0,
-    negotiationNotes: currentScan.negotiationNotes ?? "",
-    betaDecision: currentScan.betaDecision ?? "Watch",
-  };
-}
+  function normalizeTemporaryScanBetaFields(
+    currentScan: TemporaryScanRecord
+  ): TemporaryScanRecord {
+    return {
+      ...currentScan,
+      boothNumber: currentScan.boothNumber ?? "",
+      dealerName: currentScan.dealerName ?? "",
+      askingPrice: currentScan.askingPrice ?? 0,
+      recentComp: currentScan.recentComp ?? 0,
+      offerTarget: currentScan.offerTarget ?? 0,
+      maxBuyPrice: currentScan.maxBuyPrice ?? 0,
+      negotiationNotes: currentScan.negotiationNotes ?? "",
+      betaDecision: currentScan.betaDecision ?? "Watch",
+    };
+  }
 
-const [editScan, setEditScan] = useState<TemporaryScanRecord>(() =>
-  normalizeTemporaryScanBetaFields(scan)
-);
+  const [editScan, setEditScan] = useState<TemporaryScanRecord>(() =>
+    normalizeTemporaryScanBetaFields(scan)
+  );
 
-const [saveMessage, setSaveMessage] = useState("");
+  const [saveMessage, setSaveMessage] = useState("");
   const [pendingDeleteScanId, setPendingDeleteScanId] = useState<number | null>(
     null
   );
@@ -12231,13 +12429,13 @@ const [saveMessage, setSaveMessage] = useState("");
     "keep" | "sell" | null
   >(null);
 
- useEffect(() => {
-  setEditScan(normalizeTemporaryScanBetaFields(scan));
-}, [scan]);
+  useEffect(() => {
+    setEditScan(normalizeTemporaryScanBetaFields(scan));
+  }, [scan]);
 
-const displayScan = isEditing
-  ? normalizeTemporaryScanBetaFields(editScan)
-  : normalizeTemporaryScanBetaFields(scan);
+  const displayScan = isEditing
+    ? normalizeTemporaryScanBetaFields(editScan)
+    : normalizeTemporaryScanBetaFields(scan);
 
   const marketValue = displayScan.estimatedValue || 0;
   const costBasis =
@@ -12251,6 +12449,13 @@ const displayScan = isEditing
   ) {
     setEditScan((currentScan) => ({
       ...currentScan,
+      [field]: value,
+    }));
+  }
+
+  function updateAnyTempField(field: string, value: string | number) {
+    setEditScan((currentScan) => ({
+      ...(currentScan as any),
       [field]: value,
     }));
   }
@@ -12336,9 +12541,7 @@ const displayScan = isEditing
           ? "Rookie Card"
           : displayScan.card,
       team:
-        displayScan.team === "Pending"
-          ? "San Antonio Spurs"
-          : displayScan.team,
+        displayScan.team === "Pending" ? "San Antonio Spurs" : displayScan.team,
       sport:
         displayScan.sport === "Pending" ? "Basketball" : displayScan.sport,
       year: displayScan.year === "Pending" ? "2023-24" : displayScan.year,
@@ -12380,415 +12583,450 @@ CardVault Pro identified a likely match and filled in suggested card details. Th
     }, 2500);
   }
 
-  return (
-    <div className="relative isolate overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center opacity-[0.045]">
-        <img
-          src="/safe-door-emblem.png"
-          alt=""
-          className="h-[760px] w-[760px] object-contain grayscale"
-        />
+  type TemporaryMobileRowConfig = {
+    label: string;
+    value: string | number;
+    field?: string;
+    inputType?: "text" | "number" | "textarea";
+  };
+
+  function renderTemporaryMobileRow(row: TemporaryMobileRowConfig) {
+    const { label, value, field, inputType = "text" } = row;
+    const fieldName = field || "";
+    const isEditable = isEditing && Boolean(fieldName);
+
+    const editableValue =
+      fieldName && (editScan as any)[fieldName] !== undefined
+        ? (editScan as any)[fieldName]
+        : value || "";
+
+    return (
+      <div
+        key={label}
+        className="flex items-start justify-between gap-4 px-4 py-3"
+      >
+        <p className="shrink-0 text-xs font-black uppercase tracking-[0.2em] text-zinc-500">
+          {label}
+        </p>
+
+        {isEditable ? (
+          inputType === "textarea" ? (
+            <textarea
+              defaultValue={String(editableValue)}
+              onBlur={(event) =>
+                updateAnyTempField(fieldName, event.target.value)
+              }
+              className="min-h-24 w-full rounded-xl border border-vaultGold/20 bg-black/70 px-3 py-2 text-right text-sm font-black leading-6 text-white outline-none focus:border-vaultGold"
+            />
+          ) : (
+            <input
+              type={inputType}
+              defaultValue={String(editableValue)}
+              onBlur={(event) =>
+                updateAnyTempField(
+                  fieldName,
+                  inputType === "number"
+                    ? event.target.value === ""
+                      ? 0
+                      : Number(event.target.value)
+                    : event.target.value
+                )
+              }
+              className="w-full rounded-xl border border-vaultGold/20 bg-black/70 px-3 py-2 text-right text-sm font-black text-white outline-none focus:border-vaultGold"
+            />
+          )
+        ) : (
+          <p className="text-right text-sm font-black leading-6 text-white">
+            {value || "Not listed"}
+          </p>
+        )}
       </div>
+    );
+  }
 
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-6">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
-            Temporary Card Detail
-          </p>
+  function TemporaryDecisionButton({
+    label,
+    sublabel,
+    onClick,
+    danger = false,
+    cyan = false,
+  }: {
+    label: string;
+    sublabel: string;
+    onClick: () => void;
+    danger?: boolean;
+    cyan?: boolean;
+  }) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={`rounded-2xl border px-2 py-3 text-left transition ${
+          danger
+            ? "border-red-500/25 bg-black/45"
+            : cyan
+            ? "border-cyan-400/30 bg-cyan-400/10"
+            : "border-vaultGold/20 bg-black/45"
+        }`}
+      >
+        <p
+          className={`text-[10px] font-black uppercase tracking-[0.16em] ${
+            danger ? "text-red-300" : cyan ? "text-cyan-300" : "text-vaultGold"
+          }`}
+        >
+          {label}
+        </p>
+        <p className="mt-1 text-[9px] font-bold leading-3 text-zinc-500">
+          {sublabel}
+        </p>
+      </button>
+    );
+  }
 
-          <h1 className="mt-2 text-5xl font-black tracking-wide text-white">
-            Scan Review
-          </h1>
+  const temporaryInfoRows: TemporaryMobileRowConfig[] = [
+    { label: "Player", value: displayScan.player, field: "player" },
+    { label: "Team", value: displayScan.team, field: "team" },
+    { label: "Sport", value: displayScan.sport, field: "sport" },
+    { label: "Year", value: displayScan.year, field: "year" },
+    { label: "Brand", value: displayScan.brand, field: "brand" },
+    { label: "Set", value: displayScan.set, field: "set" },
+    { label: "Card", value: displayScan.card, field: "card" },
+    {
+      label: "Card Number",
+      value: displayScan.cardNumber,
+      field: "cardNumber",
+    },
+    { label: "Parallel", value: displayScan.parallel, field: "parallel" },
+    { label: "Grade", value: displayScan.grade, field: "grade" },
+    { label: "Grader", value: displayScan.grader, field: "grader" },
+    {
+      label: "Serial Number",
+      value: displayScan.serialNumber,
+      field: "serialNumber",
+    },
+    {
+      label: "Storage",
+      value: displayScan.storageLocation,
+      field: "storageLocation",
+    },
+  ];
 
-          <p className="mt-3 text-lg text-zinc-300">
-            {displayScan.player} — {displayScan.year} {displayScan.brand}{" "}
-            {displayScan.parallel}
-          </p>
+  const temporaryMarketRows: TemporaryMobileRowConfig[] = [
+    {
+      label: "Market Value",
+      value: marketValue,
+      field: "estimatedValue",
+      inputType: "number",
+    },
+    {
+      label: "Purchase Price",
+      value: displayScan.purchasePrice || 0,
+      field: "purchasePrice",
+      inputType: "number",
+    },
+    {
+      label: "Taxes / Fees",
+      value: displayScan.taxesFees || 0,
+      field: "taxesFees",
+      inputType: "number",
+    },
+    {
+      label: "Shipping",
+      value: displayScan.shippingCost || 0,
+      field: "shippingCost",
+      inputType: "number",
+    },
+    {
+      label: "Total Cost Basis",
+      value: costBasis,
+      field: "totalCostBasis",
+      inputType: "number",
+    },
+    { label: "Source", value: displayScan.source, field: "source" },
+    { label: "Seller", value: displayScan.seller, field: "seller" },
+  ];
+
+  const dallasBetaRows: TemporaryMobileRowConfig[] = [
+    {
+      label: "Booth / Table #",
+      value: displayScan.boothNumber || "Not entered",
+      field: "boothNumber",
+    },
+    {
+      label: "Dealer Name",
+      value: displayScan.dealerName || "Not entered",
+      field: "dealerName",
+    },
+    {
+      label: "Asking Price",
+      value: displayScan.askingPrice || 0,
+      field: "askingPrice",
+      inputType: "number",
+    },
+    {
+      label: "Recent Comp",
+      value: displayScan.recentComp || 0,
+      field: "recentComp",
+      inputType: "number",
+    },
+    {
+      label: "Offer Target",
+      value: displayScan.offerTarget || 0,
+      field: "offerTarget",
+      inputType: "number",
+    },
+    {
+      label: "Max Buy Price",
+      value: displayScan.maxBuyPrice || 0,
+      field: "maxBuyPrice",
+      inputType: "number",
+    },
+    {
+      label: "Negotiation Notes",
+      value: displayScan.negotiationNotes || "No negotiation notes entered.",
+      field: "negotiationNotes",
+      inputType: "textarea",
+    },
+  ];
+
+  return (
+    <div className="relative isolate w-full max-w-full overflow-hidden">
+      {/* Phone / Tablet Temporary Card Detail Layout */}
+      <div className="relative space-y-5 overflow-hidden pb-32 xl:hidden">
+        <div className="pointer-events-none absolute inset-0 -z-10 flex items-start justify-center opacity-[0.08]">
+          <img
+            src="/cardvault-background-image.png"
+            alt=""
+            className="mt-24 h-[560px] w-[560px] object-contain"
+          />
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_50%_0%,rgba(212,175,55,0.14),transparent_34%),linear-gradient(180deg,rgba(0,0,0,0.2),rgba(0,0,0,0.95))]" />
+
+        {/* Temporary Header */}
+        <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
           <button
             type="button"
             onClick={() => setActiveScreen("Scan Review Queue")}
-            className="rounded-lg border border-vaultGold/40 bg-black/40 px-6 py-3 text-sm font-bold text-white transition hover:border-vaultGold hover:text-vaultGold"
+            className="mb-4 inline-flex items-center rounded-full border border-vaultGold/30 bg-black/30 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-vaultGold"
           >
-            ← Back to Scan Queue
+            ← Scan Queue
           </button>
 
-          {!isEditing && (
-            <button
-              type="button"
-              onClick={runSimulatedAiReview}
-              className="rounded-lg border border-cyan-400/50 bg-cyan-400/10 px-6 py-3 text-sm font-black text-cyan-300 transition hover:bg-cyan-400 hover:text-black"
-            >
-              Simulate AI Review
-            </button>
-          )}
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.25em] text-vaultGold">
+                Temporary Card Detail
+              </p>
 
-          {isEditing ? (
-            <>
-              <button
-                type="button"
-                onClick={saveTemporaryScanChanges}
-                className="rounded-lg border border-profitGreen bg-profitGreen px-6 py-3 text-sm font-black text-black transition hover:brightness-110"
-              >
-                Save Temporary Scan
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setEditScan(scan);
-                  setIsEditing(false);
-                }}
-                className="rounded-lg border border-steelBorder bg-black/40 px-6 py-3 text-sm font-bold text-zinc-300 transition hover:text-white"
-              >
-                Cancel
-              </button>
-            </>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setIsEditing(true)}
-              className="rounded-lg border border-vaultGold bg-vaultGold px-6 py-3 text-sm font-black text-black transition hover:bg-goldHover"
-            >
-              ✎ Edit Scan
-            </button>
-          )}
-
-          {!isEditing && (
-            <>
-              <button
-                type="button"
-                onClick={() => setPendingScanAction("keep")}
-                className="rounded-lg border border-profitGreen bg-profitGreen px-6 py-3 text-sm font-black text-black transition hover:brightness-110"
-              >
-                Keep / Add to Collection
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setPendingScanAction("sell")}
-                className="rounded-lg border border-vaultGold bg-vaultGold px-6 py-3 text-sm font-black text-black transition hover:bg-goldHover"
-              >
-                Move to Sell Queue
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setPendingDeleteScanId(displayScan.id)}
-                className="rounded-lg border border-red-700 bg-red-950/40 px-6 py-3 text-sm font-black text-red-400 transition hover:bg-red-900/40"
-              >
-                Delete Scan
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-
-      {saveMessage && (
-        <div className="mb-6 rounded-2xl border border-profitGreen/30 bg-profitGreen/10 px-5 py-4 text-sm font-bold text-profitGreen">
-          {saveMessage}
-        </div>
-      )}
-
-      <div className="grid grid-cols-12 items-start gap-6">
-        <div className="col-span-5 space-y-5">
-          <Panel className="bg-black/70 backdrop-blur-sm">
-            <div className="grid grid-cols-2 gap-5">
-              <CardImageFrame label="Front" image={displayScan.frontImage} />
-              <CardImageFrame label="Back" image={displayScan.backImage} />
+              <h1 className="mt-2 text-3xl font-black uppercase leading-none text-white">
+                {displayScan.player}
+              </h1>
             </div>
 
-            <div className="mt-5 grid grid-cols-3 overflow-hidden rounded-xl border border-vaultGold/30">
-              <CardBadge
-                icon="📷"
-                label={displayScan.scanStatus}
-                sublabel="Scan Status"
-                accent="text-vaultGold"
-              />
+            <button
+              type="button"
+              title="This temporary card is not part of your main collection yet. Review the scan, run simulated AI, then keep it, sell it, or delete it."
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-vaultGold/20 bg-black/40 text-vaultGold"
+            >
+              <Info size={18} />
+            </button>
+          </div>
 
-              <CardBadge
-                icon="AI"
-                label={displayScan.aiConfidence || "Pending"}
-                sublabel={
-                  displayScan.aiReviewStatus === "Simulated Review Complete"
-                    ? "Simulated Match"
-                    : "AI Backend Pending"
-                }
-                accent="text-cyan-300"
-              />
+          <p className="mt-3 text-sm font-bold uppercase leading-6 tracking-[0.08em] text-zinc-400">
+            {displayScan.year} {displayScan.brand} {displayScan.set}{" "}
+            {displayScan.parallel}
+          </p>
 
-              <CardBadge
-                icon="$"
-                label={displayScan.status || "Review"}
-                sublabel="Next Action"
-                accent="text-vaultGold"
-              />
+          <div className="mt-5 grid grid-cols-3 gap-2">
+            <div className="rounded-2xl border border-vaultGold/20 bg-black/45 p-3 text-center backdrop-blur-xl">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-zinc-500">
+                Value
+              </p>
+              <p className="mt-1 text-lg font-black text-vaultGold">
+                ${marketValue.toLocaleString()}
+              </p>
             </div>
-          </Panel>
 
-          {displayScan.aiReviewStatus === "Simulated Review Complete" && (
-            <Panel>
-              <p className="text-xs font-black uppercase tracking-[0.3em] text-cyan-300">
-                Simulate AI Result
+            <div className="rounded-2xl border border-vaultGold/20 bg-black/45 p-3 text-center backdrop-blur-xl">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-zinc-500">
+                ROI
               </p>
-
-              <h3 className="mt-2 text-2xl font-black text-white">
-                Simulated Match Found
-              </h3>
-
-              <p className="mt-3 text-sm leading-6 text-zinc-400">
-                {displayScan.aiSuggestedMatch || "No suggested match available."}
+              <p
+                className={`mt-1 text-lg font-black ${
+                  roi >= 0 ? "text-profitGreen" : "text-red-400"
+                }`}
+              >
+                {roi.toFixed(1)}%
               </p>
+            </div>
 
-              <div className="mt-4 rounded-xl border border-cyan-400/30 bg-cyan-400/10 p-4">
-                <p className="text-xs font-black uppercase tracking-widest text-cyan-300">
-                  Confidence
-                </p>
-                <p className="mt-1 text-2xl font-black text-white">
-                  {displayScan.aiConfidence || "Pending"}
-                </p>
-              </div>
-            </Panel>
-          )}
-
-          {isEditing && (
-            <Panel>
-              <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
-                Scan Status
+            <div className="rounded-2xl border border-vaultGold/20 bg-black/45 p-3 text-center backdrop-blur-xl">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-zinc-500">
+                Status
               </p>
+              <p className="mt-1 text-sm font-black text-white">
+                {displayScan.scanStatus}
+              </p>
+            </div>
+          </div>
+        </section>
 
-              <div className="mt-4 grid gap-3">
-                <label className="text-xs font-black uppercase tracking-widest text-zinc-500">
-                  Review Status
-                </label>
+        {saveMessage && (
+          <div className="rounded-2xl border border-profitGreen/30 bg-profitGreen/10 px-5 py-4 text-sm font-bold text-profitGreen">
+            {saveMessage}
+          </div>
+        )}
 
-                <select
-                  value={editScan.scanStatus}
-                  onChange={(event) =>
-                    updateEditField(
-                      "scanStatus",
-                      event.target.value as TemporaryScanRecord["scanStatus"]
-                    )
-                  }
-                  className="rounded-xl border border-steelBorder bg-black/60 px-4 py-3 text-sm font-bold text-white outline-none focus:border-vaultGold"
-                >
-                  <option value="Needs Review">Needs Review</option>
-                  <option value="Ready to Keep">Ready to Keep</option>
-                  <option value="Ready to Sell">Ready to Sell</option>
-                </select>
-              </div>
-            </Panel>
-          )}
-        </div>
-
-        <div className="col-span-4 space-y-5">
-          <Panel>
-            <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
-              Temporary Scan Intelligence
-            </p>
-
-            <h2 className="mt-2 text-2xl font-black text-white">
-              {isEditing ? "Edit Scan Data" : "Backend AI Pending"}
-            </h2>
-
-            <p className="mt-3 text-sm leading-6 text-zinc-400">
-              This temporary card is not part of your main collection yet.
-              Confirm the details, save the scan, then choose Keep, Sell, or
-              Delete.
-            </p>
-
-            <div className="mt-5 grid grid-cols-2 gap-3">
-              <div className="rounded-xl border border-steelBorder bg-black/50 p-4">
-                <p className="text-xs font-black uppercase text-zinc-500">
-                  Market Value
-                </p>
-                {isEditing ? (
-                  <input
-                    type="number"
-                    value={editScan.estimatedValue}
-                    onChange={(event) =>
-                      updateEditNumberField(
-                        "estimatedValue",
-                        event.target.value
-                      )
-                    }
-                    className="mt-2 w-full rounded-lg border border-steelBorder bg-black/70 px-3 py-2 text-lg font-black text-white outline-none focus:border-vaultGold"
+        {/* Image Area + Temporary Action Sidebar */}
+        <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-4 shadow-vault backdrop-blur-xl">
+          <div className="grid grid-cols-[minmax(0,1fr)_90px] gap-3">
+            <div className="min-w-0">
+              <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3">
+                <div className="min-w-full snap-center">
+                  <CardImageFrame
+                    label="Front"
+                    image={displayScan.frontImage}
                   />
-                ) : (
-                  <p className="mt-2 text-2xl font-black text-white">
-                    ${marketValue.toLocaleString()}
-                  </p>
-                )}
+                </div>
+
+                <div className="min-w-full snap-center">
+                  <CardImageFrame label="Back" image={displayScan.backImage} />
+                </div>
               </div>
 
-              <div className="rounded-xl border border-steelBorder bg-black/50 p-4">
-                <p className="text-xs font-black uppercase text-zinc-500">
-                  Cost Basis
-                </p>
-                <p className="mt-2 text-2xl font-black text-white">
-                  ${costBasis.toLocaleString()}
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-steelBorder bg-black/50 p-4">
-                <p className="text-xs font-black uppercase text-zinc-500">
-                  Gain / Loss
-                </p>
-                <p className="mt-2 text-2xl font-black text-white">
-                  ${profitLoss.toLocaleString()}
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-steelBorder bg-black/50 p-4">
-                <p className="text-xs font-black uppercase text-zinc-500">
-                  ROI
-                </p>
-                <p className="mt-2 text-2xl font-black text-white">
-                  {roi.toFixed(1)}%
-                </p>
+              <div className="mt-2 flex items-center justify-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-vaultGold" />
+                <span className="h-2 w-2 rounded-full bg-zinc-600" />
               </div>
             </div>
-          </Panel>
 
-          <Panel>
-            <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
-              Purchase / Market Data
-            </p>
+            <div className="flex flex-col gap-2 pt-10">
+              {!isEditing && (
+                <TemporaryDecisionButton
+                  label="AI"
+                  sublabel="Review"
+                  onClick={runSimulatedAiReview}
+                  cyan
+                />
+              )}
 
-            <div className="mt-5 grid grid-cols-2 gap-4">
-              <TemporaryEditField
-                label="Purchase Price"
-                value={editScan.purchasePrice}
-                displayValue={`$${displayScan.purchasePrice.toLocaleString()}`}
-                isEditing={isEditing}
-                type="number"
-                onChange={(value) =>
-                  updateEditNumberField("purchasePrice", value)
-                }
+              <TemporaryDecisionButton
+                label="Keep"
+                sublabel="Vault"
+                onClick={() => setPendingScanAction("keep")}
               />
 
-              <TemporaryEditField
-                label="Taxes / Fees"
-                value={editScan.taxesFees}
-                displayValue={`$${displayScan.taxesFees.toLocaleString()}`}
-                isEditing={isEditing}
-                type="number"
-                onChange={(value) => updateEditNumberField("taxesFees", value)}
-              />
-
-              <TemporaryEditField
-                label="Shipping"
-                value={editScan.shippingCost}
-                displayValue={`$${displayScan.shippingCost.toLocaleString()}`}
-                isEditing={isEditing}
-                type="number"
-                onChange={(value) =>
-                  updateEditNumberField("shippingCost", value)
-                }
-              />
-
-              <TemporaryEditField
-                label="Total Cost Basis"
-                value={editScan.totalCostBasis}
-                displayValue={`$${displayScan.totalCostBasis.toLocaleString()}`}
-                isEditing={isEditing}
-                type="number"
-                onChange={(value) =>
-                  updateEditNumberField("totalCostBasis", value)
-                }
-              />
-
-              <TemporaryEditField
-                label="Source"
-                value={editScan.source}
-                displayValue={displayScan.source}
-                isEditing={isEditing}
-                onChange={(value) => updateEditField("source", value)}
-              />
-
-              <TemporaryEditField
-                label="Seller"
-                value={editScan.seller}
-                displayValue={displayScan.seller}
-                isEditing={isEditing}
-                onChange={(value) => updateEditField("seller", value)}
+              <TemporaryDecisionButton
+                label="Sell"
+                sublabel="Queue"
+                onClick={() => setPendingScanAction("sell")}
               />
             </div>
-          </Panel>
+          </div>
+        </section>
 
-          <Panel>
-            <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
-              Dallas Card Show Beta Notes
+        {displayScan.aiReviewStatus === "Simulated Review Complete" && (
+          <section className="rounded-[2rem] border border-cyan-400/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
+            <p className="text-xs font-black uppercase tracking-[0.35em] text-cyan-300">
+              Simulated AI Result
             </p>
 
-            <h2 className="mt-2 text-2xl font-black text-white">
-              Booth-Side Decision Tracker
-            </h2>
+            <h3 className="mt-2 text-2xl font-black text-white">
+              Simulated Match Found
+            </h3>
 
             <p className="mt-3 text-sm leading-6 text-zinc-400">
-              Use this section during the Dallas Card Show to track the dealer,
-              booth, asking price, recent comp, target offer, max buy price, and
-              final decision.
+              {displayScan.aiSuggestedMatch || "No suggested match available."}
             </p>
 
-            <div className="mt-5 grid grid-cols-2 gap-4">
-              <TemporaryEditField
-                label="Booth / Table #"
-                value={editScan.boothNumber}
-                displayValue={displayScan.boothNumber || "Not entered"}
-                isEditing={isEditing}
-                onChange={(value) => updateEditField("boothNumber", value)}
-              />
-
-              <TemporaryEditField
-                label="Dealer Name"
-                value={editScan.dealerName}
-                displayValue={displayScan.dealerName || "Not entered"}
-                isEditing={isEditing}
-                onChange={(value) => updateEditField("dealerName", value)}
-              />
-
-              <TemporaryEditField
-                label="Asking Price"
-                value={editScan.askingPrice}
-                displayValue={`$${displayScan.askingPrice.toLocaleString()}`}
-                isEditing={isEditing}
-                type="number"
-                onChange={(value) => updateEditNumberField("askingPrice", value)}
-              />
-
-              <TemporaryEditField
-                label="Recent Comp"
-                value={editScan.recentComp}
-                displayValue={`$${displayScan.recentComp.toLocaleString()}`}
-                isEditing={isEditing}
-                type="number"
-                onChange={(value) => updateEditNumberField("recentComp", value)}
-              />
-
-              <TemporaryEditField
-                label="Offer Target"
-                value={editScan.offerTarget}
-                displayValue={`$${displayScan.offerTarget.toLocaleString()}`}
-                isEditing={isEditing}
-                type="number"
-                onChange={(value) => updateEditNumberField("offerTarget", value)}
-              />
-
-              <TemporaryEditField
-                label="Max Buy Price"
-                value={editScan.maxBuyPrice}
-                displayValue={`$${displayScan.maxBuyPrice.toLocaleString()}`}
-                isEditing={isEditing}
-                type="number"
-                onChange={(value) => updateEditNumberField("maxBuyPrice", value)}
-              />
+            <div className="mt-4 rounded-xl border border-cyan-400/30 bg-cyan-400/10 p-4">
+              <p className="text-xs font-black uppercase tracking-widest text-cyan-300">
+                Confidence
+              </p>
+              <p className="mt-1 text-2xl font-black text-white">
+                {displayScan.aiConfidence || "Pending"}
+              </p>
             </div>
+          </section>
+        )}
 
-            <div className="mt-5 rounded-xl border border-steelBorder bg-black/50 p-4">
-              <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
+        {/* Temporary Scan Intelligence */}
+        <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
+          <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+            Temporary Scan Intelligence
+          </p>
+
+          <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
+            {[
+              ["Market Value", `$${marketValue.toLocaleString()}`],
+              ["Cost Basis", `$${costBasis.toLocaleString()}`],
+              [
+                "Gain / Loss",
+                `${profitLoss >= 0 ? "+" : ""}$${profitLoss.toLocaleString()}`,
+              ],
+              ["ROI", `${roi.toFixed(1)}%`],
+              ["AI Confidence", displayScan.aiConfidence || "Pending"],
+              ["AI Status", displayScan.aiReviewStatus || "Backend Pending"],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                className="flex items-center justify-between gap-4 px-4 py-3"
+              >
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">
+                  {label}
+                </p>
+                <p className="text-right text-sm font-black text-white">
+                  {value}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Temporary Card Info */}
+        <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
+          <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+            Card Info
+          </p>
+
+          <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
+            {temporaryInfoRows.map((row) => renderTemporaryMobileRow(row))}
+          </div>
+        </section>
+
+        {/* Purchase / Market Data */}
+        <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
+          <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+            Purchase / Market Data
+          </p>
+
+          <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
+            {temporaryMarketRows.map((row) => renderTemporaryMobileRow(row))}
+          </div>
+        </section>
+
+        {/* Dallas Beta Decision Tracker */}
+        <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+              Dallas Beta Notes
+            </p>
+
+            <button
+              type="button"
+              title="Use this during the Dallas Card Show to track booth, dealer, asking price, recent comp, target offer, max buy price, and final decision."
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-vaultGold/20 bg-black/40 text-vaultGold"
+            >
+              <Info size={16} />
+            </button>
+          </div>
+
+          <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
+            {dallasBetaRows.map((row) => renderTemporaryMobileRow(row))}
+
+            <div className="flex items-start justify-between gap-4 px-4 py-3">
+              <p className="shrink-0 text-xs font-black uppercase tracking-[0.2em] text-zinc-500">
                 Beta Decision
               </p>
 
@@ -12801,7 +13039,7 @@ CardVault Pro identified a likely match and filled in suggested card details. Th
                       event.target.value as TemporaryScanRecord["betaDecision"]
                     )
                   }
-                  className="mt-3 w-full rounded-xl border border-steelBorder bg-black/70 px-4 py-3 text-sm font-bold text-white outline-none focus:border-vaultGold"
+                  className="w-full rounded-xl border border-vaultGold/20 bg-black/70 px-3 py-2 text-right text-sm font-black text-white outline-none focus:border-vaultGold"
                 >
                   <option value="Buy">Buy</option>
                   <option value="Watch">Watch</option>
@@ -12810,168 +13048,716 @@ CardVault Pro identified a likely match and filled in suggested card details. Th
                   <option value="Sell">Sell</option>
                 </select>
               ) : (
-                <p className="mt-2 text-2xl font-black text-white">
+                <p className="text-right text-sm font-black leading-6 text-white">
                   {displayScan.betaDecision}
                 </p>
               )}
             </div>
+          </div>
+        </section>
 
-            <div className="mt-5 rounded-xl border border-steelBorder bg-black/50 p-4">
-              <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
-                Negotiation Notes
+        {/* Notes */}
+        <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
+          <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+            Notes
+          </p>
+
+          {isEditing ? (
+            <textarea
+              defaultValue={String(editScan.notes || "")}
+              onBlur={(event) =>
+                updateEditField("notes", event.target.value)
+              }
+              className="mt-4 min-h-32 w-full rounded-2xl border border-vaultGold/20 bg-black/70 px-4 py-3 text-sm font-bold leading-7 text-white outline-none focus:border-vaultGold"
+              placeholder="Add notes for this temporary scan..."
+            />
+          ) : (
+            <p className="mt-4 text-sm font-bold leading-7 text-zinc-300">
+              {displayScan.notes || "No notes have been added yet."}
+            </p>
+          )}
+        </section>
+
+        {/* Fixed Mobile Temporary Scan Action Panel */}
+        <div className="fixed inset-x-0 bottom-[84px] z-40 border-t border-vaultGold/20 bg-black/95 px-4 py-3 backdrop-blur-xl xl:hidden">
+          <div className="mx-auto grid max-w-md grid-cols-2 gap-3">
+            {isEditing ? (
+              <>
+                <button
+                  type="button"
+                  onClick={saveTemporaryScanChanges}
+                  className="flex items-center justify-center gap-2 rounded-2xl border border-profitGreen bg-profitGreen px-4 py-4 text-sm font-black text-black"
+                >
+                  ✓ Save
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditScan(scan);
+                    setIsEditing(false);
+                  }}
+                  className="flex items-center justify-center gap-2 rounded-2xl border border-steelBorder bg-black/70 px-4 py-4 text-sm font-black text-zinc-300 backdrop-blur-xl"
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(true)}
+                  className="flex items-center justify-center gap-2 rounded-2xl border border-vaultGold bg-vaultGold px-4 py-4 text-sm font-black text-black"
+                >
+                  ✎ Edit Scan
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPendingDeleteScanId(displayScan.id)}
+                  className="flex items-center justify-center gap-2 rounded-2xl border border-red-700 bg-red-950/50 px-4 py-4 text-sm font-black text-red-300 backdrop-blur-xl"
+                >
+                  🗑 Delete
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop Temporary Card Detail Layout */}
+      <div className="relative isolate hidden overflow-hidden xl:block">
+        <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center opacity-[0.045]">
+          <img
+            src="/safe-door-emblem.png"
+            alt=""
+            className="h-[760px] w-[760px] object-contain grayscale"
+          />
+        </div>
+
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-6">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+              Temporary Card Detail
+            </p>
+
+            <h1 className="mt-2 text-5xl font-black tracking-wide text-white">
+              Scan Review
+            </h1>
+
+            <p className="mt-3 text-lg text-zinc-300">
+              {displayScan.player} — {displayScan.year} {displayScan.brand}{" "}
+              {displayScan.parallel}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => setActiveScreen("Scan Review Queue")}
+              className="rounded-lg border border-vaultGold/40 bg-black/40 px-6 py-3 text-sm font-bold text-white transition hover:border-vaultGold hover:text-vaultGold"
+            >
+              ← Back to Scan Queue
+            </button>
+
+            {!isEditing && (
+              <button
+                type="button"
+                onClick={runSimulatedAiReview}
+                className="rounded-lg border border-cyan-400/50 bg-cyan-400/10 px-6 py-3 text-sm font-black text-cyan-300 transition hover:bg-cyan-400 hover:text-black"
+              >
+                Simulate AI Review
+              </button>
+            )}
+
+            {isEditing ? (
+              <>
+                <button
+                  type="button"
+                  onClick={saveTemporaryScanChanges}
+                  className="rounded-lg border border-profitGreen bg-profitGreen px-6 py-3 text-sm font-black text-black transition hover:brightness-110"
+                >
+                  Save Temporary Scan
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditScan(scan);
+                    setIsEditing(false);
+                  }}
+                  className="rounded-lg border border-steelBorder bg-black/40 px-6 py-3 text-sm font-bold text-zinc-300 transition hover:text-white"
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsEditing(true)}
+                className="rounded-lg border border-vaultGold bg-vaultGold px-6 py-3 text-sm font-black text-black transition hover:bg-goldHover"
+              >
+                ✎ Edit Scan
+              </button>
+            )}
+
+            {!isEditing && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setPendingScanAction("keep")}
+                  className="rounded-lg border border-profitGreen bg-profitGreen px-6 py-3 text-sm font-black text-black transition hover:brightness-110"
+                >
+                  Keep / Add to Collection
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPendingScanAction("sell")}
+                  className="rounded-lg border border-vaultGold bg-vaultGold px-6 py-3 text-sm font-black text-black transition hover:bg-goldHover"
+                >
+                  Move to Sell Queue
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPendingDeleteScanId(displayScan.id)}
+                  className="rounded-lg border border-red-700 bg-red-950/40 px-6 py-3 text-sm font-black text-red-400 transition hover:bg-red-900/40"
+                >
+                  Delete Scan
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {saveMessage && (
+          <div className="mb-6 rounded-2xl border border-profitGreen/30 bg-profitGreen/10 px-5 py-4 text-sm font-bold text-profitGreen">
+            {saveMessage}
+          </div>
+        )}
+
+        <div className="grid grid-cols-12 items-start gap-6">
+          <div className="col-span-5 space-y-5">
+            <Panel className="bg-black/70 backdrop-blur-sm">
+              <div className="grid grid-cols-[minmax(0,1fr)_150px] gap-5">
+                <div className="grid grid-cols-2 gap-5">
+                  <CardImageFrame
+                    label="Front"
+                    image={displayScan.frontImage}
+                  />
+
+                  <CardImageFrame label="Back" image={displayScan.backImage} />
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <TemporaryDecisionButton
+                    label="AI"
+                    sublabel="Simulated Review"
+                    onClick={runSimulatedAiReview}
+                    cyan
+                  />
+
+                  <TemporaryDecisionButton
+                    label="Keep"
+                    sublabel="Add to Collection"
+                    onClick={() => setPendingScanAction("keep")}
+                  />
+
+                  <TemporaryDecisionButton
+                    label="Sell"
+                    sublabel="Move to Sell Queue"
+                    onClick={() => setPendingScanAction("sell")}
+                  />
+                </div>
+              </div>
+
+              <div className="mt-5 grid grid-cols-3 overflow-hidden rounded-xl border border-vaultGold/30">
+                <CardBadge
+                  icon="📷"
+                  label={displayScan.scanStatus}
+                  sublabel="Scan Status"
+                  accent="text-vaultGold"
+                />
+
+                <CardBadge
+                  icon="AI"
+                  label={displayScan.aiConfidence || "Pending"}
+                  sublabel={
+                    displayScan.aiReviewStatus === "Simulated Review Complete"
+                      ? "Simulated Match"
+                      : "AI Backend Pending"
+                  }
+                  accent="text-cyan-300"
+                />
+
+                <CardBadge
+                  icon="$"
+                  label={displayScan.status || "Review"}
+                  sublabel="Next Action"
+                  accent="text-vaultGold"
+                />
+              </div>
+            </Panel>
+
+            {displayScan.aiReviewStatus === "Simulated Review Complete" && (
+              <Panel>
+                <p className="text-xs font-black uppercase tracking-[0.3em] text-cyan-300">
+                  Simulated AI Result
+                </p>
+
+                <h3 className="mt-2 text-2xl font-black text-white">
+                  Simulated Match Found
+                </h3>
+
+                <p className="mt-3 text-sm leading-6 text-zinc-400">
+                  {displayScan.aiSuggestedMatch ||
+                    "No suggested match available."}
+                </p>
+
+                <div className="mt-4 rounded-xl border border-cyan-400/30 bg-cyan-400/10 p-4">
+                  <p className="text-xs font-black uppercase tracking-widest text-cyan-300">
+                    Confidence
+                  </p>
+                  <p className="mt-1 text-2xl font-black text-white">
+                    {displayScan.aiConfidence || "Pending"}
+                  </p>
+                </div>
+              </Panel>
+            )}
+
+            {isEditing && (
+              <Panel>
+                <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+                  Scan Status
+                </p>
+
+                <div className="mt-4 grid gap-3">
+                  <label className="text-xs font-black uppercase tracking-widest text-zinc-500">
+                    Review Status
+                  </label>
+
+                  <select
+                    value={editScan.scanStatus}
+                    onChange={(event) =>
+                      updateEditField(
+                        "scanStatus",
+                        event.target.value as TemporaryScanRecord["scanStatus"]
+                      )
+                    }
+                    className="rounded-xl border border-steelBorder bg-black/60 px-4 py-3 text-sm font-bold text-white outline-none focus:border-vaultGold"
+                  >
+                    <option value="Needs Review">Needs Review</option>
+                    <option value="Ready to Keep">Ready to Keep</option>
+                    <option value="Ready to Sell">Ready to Sell</option>
+                  </select>
+                </div>
+              </Panel>
+            )}
+          </div>
+
+          <div className="col-span-4 space-y-5">
+            <Panel>
+              <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+                Temporary Scan Intelligence
+              </p>
+
+              <h2 className="mt-2 text-2xl font-black text-white">
+                {isEditing ? "Edit Scan Data" : "Backend AI Pending"}
+              </h2>
+
+              <p className="mt-3 text-sm leading-6 text-zinc-400">
+                This temporary card is not part of your main collection yet.
+                Confirm the details, save the scan, then choose Keep, Sell, or
+                Delete.
+              </p>
+
+              <div className="mt-5 grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-steelBorder bg-black/50 p-4">
+                  <p className="text-xs font-black uppercase text-zinc-500">
+                    Market Value
+                  </p>
+                  {isEditing ? (
+                    <input
+                      type="number"
+                      value={editScan.estimatedValue}
+                      onChange={(event) =>
+                        updateEditNumberField(
+                          "estimatedValue",
+                          event.target.value
+                        )
+                      }
+                      className="mt-2 w-full rounded-lg border border-steelBorder bg-black/70 px-3 py-2 text-lg font-black text-white outline-none focus:border-vaultGold"
+                    />
+                  ) : (
+                    <p className="mt-2 text-2xl font-black text-white">
+                      ${marketValue.toLocaleString()}
+                    </p>
+                  )}
+                </div>
+
+                <div className="rounded-xl border border-steelBorder bg-black/50 p-4">
+                  <p className="text-xs font-black uppercase text-zinc-500">
+                    Cost Basis
+                  </p>
+                  <p className="mt-2 text-2xl font-black text-white">
+                    ${costBasis.toLocaleString()}
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-steelBorder bg-black/50 p-4">
+                  <p className="text-xs font-black uppercase text-zinc-500">
+                    Gain / Loss
+                  </p>
+                  <p className="mt-2 text-2xl font-black text-white">
+                    ${profitLoss.toLocaleString()}
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-steelBorder bg-black/50 p-4">
+                  <p className="text-xs font-black uppercase text-zinc-500">
+                    ROI
+                  </p>
+                  <p className="mt-2 text-2xl font-black text-white">
+                    {roi.toFixed(1)}%
+                  </p>
+                </div>
+              </div>
+            </Panel>
+
+            <Panel>
+              <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+                Purchase / Market Data
+              </p>
+
+              <div className="mt-5 grid grid-cols-2 gap-4">
+                <TemporaryEditField
+                  label="Purchase Price"
+                  value={editScan.purchasePrice}
+                  displayValue={`$${displayScan.purchasePrice.toLocaleString()}`}
+                  isEditing={isEditing}
+                  type="number"
+                  onChange={(value) =>
+                    updateEditNumberField("purchasePrice", value)
+                  }
+                />
+
+                <TemporaryEditField
+                  label="Taxes / Fees"
+                  value={editScan.taxesFees}
+                  displayValue={`$${displayScan.taxesFees.toLocaleString()}`}
+                  isEditing={isEditing}
+                  type="number"
+                  onChange={(value) =>
+                    updateEditNumberField("taxesFees", value)
+                  }
+                />
+
+                <TemporaryEditField
+                  label="Shipping"
+                  value={editScan.shippingCost}
+                  displayValue={`$${displayScan.shippingCost.toLocaleString()}`}
+                  isEditing={isEditing}
+                  type="number"
+                  onChange={(value) =>
+                    updateEditNumberField("shippingCost", value)
+                  }
+                />
+
+                <TemporaryEditField
+                  label="Total Cost Basis"
+                  value={editScan.totalCostBasis}
+                  displayValue={`$${displayScan.totalCostBasis.toLocaleString()}`}
+                  isEditing={isEditing}
+                  type="number"
+                  onChange={(value) =>
+                    updateEditNumberField("totalCostBasis", value)
+                  }
+                />
+
+                <TemporaryEditField
+                  label="Source"
+                  value={editScan.source}
+                  displayValue={displayScan.source}
+                  isEditing={isEditing}
+                  onChange={(value) => updateEditField("source", value)}
+                />
+
+                <TemporaryEditField
+                  label="Seller"
+                  value={editScan.seller}
+                  displayValue={displayScan.seller}
+                  isEditing={isEditing}
+                  onChange={(value) => updateEditField("seller", value)}
+                />
+              </div>
+            </Panel>
+
+            <Panel>
+              <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+                Dallas Card Show Beta Notes
+              </p>
+
+              <h2 className="mt-2 text-2xl font-black text-white">
+                Booth-Side Decision Tracker
+              </h2>
+
+              <p className="mt-3 text-sm leading-6 text-zinc-400">
+                Use this section during the Dallas Card Show to track the dealer,
+                booth, asking price, recent comp, target offer, max buy price,
+                and final decision.
+              </p>
+
+              <div className="mt-5 grid grid-cols-2 gap-4">
+                <TemporaryEditField
+                  label="Booth / Table #"
+                  value={editScan.boothNumber}
+                  displayValue={displayScan.boothNumber || "Not entered"}
+                  isEditing={isEditing}
+                  onChange={(value) => updateEditField("boothNumber", value)}
+                />
+
+                <TemporaryEditField
+                  label="Dealer Name"
+                  value={editScan.dealerName}
+                  displayValue={displayScan.dealerName || "Not entered"}
+                  isEditing={isEditing}
+                  onChange={(value) => updateEditField("dealerName", value)}
+                />
+
+                <TemporaryEditField
+                  label="Asking Price"
+                  value={editScan.askingPrice}
+                  displayValue={`$${displayScan.askingPrice.toLocaleString()}`}
+                  isEditing={isEditing}
+                  type="number"
+                  onChange={(value) =>
+                    updateEditNumberField("askingPrice", value)
+                  }
+                />
+
+                <TemporaryEditField
+                  label="Recent Comp"
+                  value={editScan.recentComp}
+                  displayValue={`$${displayScan.recentComp.toLocaleString()}`}
+                  isEditing={isEditing}
+                  type="number"
+                  onChange={(value) =>
+                    updateEditNumberField("recentComp", value)
+                  }
+                />
+
+                <TemporaryEditField
+                  label="Offer Target"
+                  value={editScan.offerTarget}
+                  displayValue={`$${displayScan.offerTarget.toLocaleString()}`}
+                  isEditing={isEditing}
+                  type="number"
+                  onChange={(value) =>
+                    updateEditNumberField("offerTarget", value)
+                  }
+                />
+
+                <TemporaryEditField
+                  label="Max Buy Price"
+                  value={editScan.maxBuyPrice}
+                  displayValue={`$${displayScan.maxBuyPrice.toLocaleString()}`}
+                  isEditing={isEditing}
+                  type="number"
+                  onChange={(value) =>
+                    updateEditNumberField("maxBuyPrice", value)
+                  }
+                />
+              </div>
+
+              <div className="mt-5 rounded-xl border border-steelBorder bg-black/50 p-4">
+                <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
+                  Beta Decision
+                </p>
+
+                {isEditing ? (
+                  <select
+                    value={editScan.betaDecision}
+                    onChange={(event) =>
+                      updateEditField(
+                        "betaDecision",
+                        event.target.value as TemporaryScanRecord["betaDecision"]
+                      )
+                    }
+                    className="mt-3 w-full rounded-xl border border-steelBorder bg-black/70 px-4 py-3 text-sm font-bold text-white outline-none focus:border-vaultGold"
+                  >
+                    <option value="Buy">Buy</option>
+                    <option value="Watch">Watch</option>
+                    <option value="Pass">Pass</option>
+                    <option value="Keep">Keep</option>
+                    <option value="Sell">Sell</option>
+                  </select>
+                ) : (
+                  <p className="mt-2 text-2xl font-black text-white">
+                    {displayScan.betaDecision}
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-5 rounded-xl border border-steelBorder bg-black/50 p-4">
+                <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
+                  Negotiation Notes
+                </p>
+
+                {isEditing ? (
+                  <textarea
+                    value={editScan.negotiationNotes}
+                    onChange={(event) =>
+                      updateEditField("negotiationNotes", event.target.value)
+                    }
+                    className="mt-3 min-h-[120px] w-full rounded-xl border border-steelBorder bg-black/70 p-3 text-sm text-white outline-none focus:border-vaultGold"
+                    placeholder="Example: Dealer asking $125. Recent comp around $105. Offer target $90. Max buy $100. Dealer may bundle with another card."
+                  />
+                ) : (
+                  <p className="mt-3 text-sm leading-6 text-zinc-400">
+                    {displayScan.negotiationNotes ||
+                      "No negotiation notes entered yet."}
+                  </p>
+                )}
+              </div>
+            </Panel>
+          </div>
+
+          <div className="col-span-3 space-y-5">
+            <Panel>
+              <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+                Card Info
+              </p>
+
+              <div className="mt-5 space-y-4">
+                <TemporaryEditField
+                  label="Player"
+                  value={editScan.player}
+                  displayValue={displayScan.player}
+                  isEditing={isEditing}
+                  onChange={(value) => updateEditField("player", value)}
+                />
+
+                <TemporaryEditField
+                  label="Card"
+                  value={editScan.card}
+                  displayValue={displayScan.card}
+                  isEditing={isEditing}
+                  onChange={(value) => updateEditField("card", value)}
+                />
+
+                <TemporaryEditField
+                  label="Team"
+                  value={editScan.team}
+                  displayValue={displayScan.team}
+                  isEditing={isEditing}
+                  onChange={(value) => updateEditField("team", value)}
+                />
+
+                <TemporaryEditField
+                  label="Sport"
+                  value={editScan.sport}
+                  displayValue={displayScan.sport}
+                  isEditing={isEditing}
+                  onChange={(value) => updateEditField("sport", value)}
+                />
+
+                <TemporaryEditField
+                  label="Year"
+                  value={editScan.year}
+                  displayValue={displayScan.year}
+                  isEditing={isEditing}
+                  onChange={(value) => updateEditField("year", value)}
+                />
+
+                <TemporaryEditField
+                  label="Brand"
+                  value={editScan.brand}
+                  displayValue={displayScan.brand}
+                  isEditing={isEditing}
+                  onChange={(value) => updateEditField("brand", value)}
+                />
+
+                <TemporaryEditField
+                  label="Set"
+                  value={editScan.set}
+                  displayValue={displayScan.set}
+                  isEditing={isEditing}
+                  onChange={(value) => updateEditField("set", value)}
+                />
+
+                <TemporaryEditField
+                  label="Card Number"
+                  value={editScan.cardNumber}
+                  displayValue={displayScan.cardNumber}
+                  isEditing={isEditing}
+                  onChange={(value) => updateEditField("cardNumber", value)}
+                />
+
+                <TemporaryEditField
+                  label="Parallel"
+                  value={editScan.parallel}
+                  displayValue={displayScan.parallel}
+                  isEditing={isEditing}
+                  onChange={(value) => updateEditField("parallel", value)}
+                />
+
+                <TemporaryEditField
+                  label="Grade"
+                  value={editScan.grade}
+                  displayValue={displayScan.grade}
+                  isEditing={isEditing}
+                  onChange={(value) => updateEditField("grade", value)}
+                />
+
+                <TemporaryEditField
+                  label="Grader"
+                  value={editScan.grader}
+                  displayValue={displayScan.grader}
+                  isEditing={isEditing}
+                  onChange={(value) => updateEditField("grader", value)}
+                />
+
+                <TemporaryEditField
+                  label="Serial Number"
+                  value={editScan.serialNumber}
+                  displayValue={displayScan.serialNumber}
+                  isEditing={isEditing}
+                  onChange={(value) => updateEditField("serialNumber", value)}
+                />
+
+                <TemporaryEditField
+                  label="Storage"
+                  value={editScan.storageLocation}
+                  displayValue={displayScan.storageLocation}
+                  isEditing={isEditing}
+                  onChange={(value) =>
+                    updateEditField("storageLocation", value)
+                  }
+                />
+              </div>
+            </Panel>
+
+            <Panel>
+              <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
+                Notes
               </p>
 
               {isEditing ? (
                 <textarea
-                  value={editScan.negotiationNotes}
+                  value={editScan.notes}
                   onChange={(event) =>
-                    updateEditField("negotiationNotes", event.target.value)
+                    updateEditField("notes", event.target.value)
                   }
-                  className="mt-3 min-h-[120px] w-full rounded-xl border border-steelBorder bg-black/70 p-3 text-sm text-white outline-none focus:border-vaultGold"
-                  placeholder="Example: Dealer asking $125. Recent comp around $105. Offer target $90. Max buy $100. Dealer may bundle with another card."
+                  className="mt-4 min-h-[130px] w-full rounded-xl border border-steelBorder bg-black/60 p-3 text-sm text-white outline-none focus:border-vaultGold"
                 />
               ) : (
-                <p className="mt-3 text-sm leading-6 text-zinc-400">
-                  {displayScan.negotiationNotes ||
-                    "No negotiation notes entered yet."}
+                <p className="mt-4 text-sm leading-6 text-zinc-400">
+                  {displayScan.notes}
                 </p>
               )}
-            </div>
-          </Panel>
-        </div>
-
-        <div className="col-span-3 space-y-5">
-          <Panel>
-            <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
-              Card Info
-            </p>
-
-            <div className="mt-5 space-y-4">
-              <TemporaryEditField
-                label="Player"
-                value={editScan.player}
-                displayValue={displayScan.player}
-                isEditing={isEditing}
-                onChange={(value) => updateEditField("player", value)}
-              />
-
-              <TemporaryEditField
-                label="Card"
-                value={editScan.card}
-                displayValue={displayScan.card}
-                isEditing={isEditing}
-                onChange={(value) => updateEditField("card", value)}
-              />
-
-              <TemporaryEditField
-                label="Team"
-                value={editScan.team}
-                displayValue={displayScan.team}
-                isEditing={isEditing}
-                onChange={(value) => updateEditField("team", value)}
-              />
-
-              <TemporaryEditField
-                label="Sport"
-                value={editScan.sport}
-                displayValue={displayScan.sport}
-                isEditing={isEditing}
-                onChange={(value) => updateEditField("sport", value)}
-              />
-
-              <TemporaryEditField
-                label="Year"
-                value={editScan.year}
-                displayValue={displayScan.year}
-                isEditing={isEditing}
-                onChange={(value) => updateEditField("year", value)}
-              />
-
-              <TemporaryEditField
-                label="Brand"
-                value={editScan.brand}
-                displayValue={displayScan.brand}
-                isEditing={isEditing}
-                onChange={(value) => updateEditField("brand", value)}
-              />
-
-              <TemporaryEditField
-                label="Set"
-                value={editScan.set}
-                displayValue={displayScan.set}
-                isEditing={isEditing}
-                onChange={(value) => updateEditField("set", value)}
-              />
-
-              <TemporaryEditField
-                label="Card Number"
-                value={editScan.cardNumber}
-                displayValue={displayScan.cardNumber}
-                isEditing={isEditing}
-                onChange={(value) => updateEditField("cardNumber", value)}
-              />
-
-              <TemporaryEditField
-                label="Parallel"
-                value={editScan.parallel}
-                displayValue={displayScan.parallel}
-                isEditing={isEditing}
-                onChange={(value) => updateEditField("parallel", value)}
-              />
-
-              <TemporaryEditField
-                label="Grade"
-                value={editScan.grade}
-                displayValue={displayScan.grade}
-                isEditing={isEditing}
-                onChange={(value) => updateEditField("grade", value)}
-              />
-
-              <TemporaryEditField
-                label="Grader"
-                value={editScan.grader}
-                displayValue={displayScan.grader}
-                isEditing={isEditing}
-                onChange={(value) => updateEditField("grader", value)}
-              />
-
-              <TemporaryEditField
-                label="Serial Number"
-                value={editScan.serialNumber}
-                displayValue={displayScan.serialNumber}
-                isEditing={isEditing}
-                onChange={(value) => updateEditField("serialNumber", value)}
-              />
-
-              <TemporaryEditField
-                label="Storage"
-                value={editScan.storageLocation}
-                displayValue={displayScan.storageLocation}
-                isEditing={isEditing}
-                onChange={(value) => updateEditField("storageLocation", value)}
-              />
-            </div>
-          </Panel>
-
-          <Panel>
-            <p className="text-xs font-black uppercase tracking-[0.3em] text-vaultGold">
-              Notes
-            </p>
-
-            {isEditing ? (
-              <textarea
-                value={editScan.notes}
-                onChange={(event) =>
-                  updateEditField("notes", event.target.value)
-                }
-                className="mt-4 min-h-[130px] w-full rounded-xl border border-steelBorder bg-black/60 p-3 text-sm text-white outline-none focus:border-vaultGold"
-              />
-            ) : (
-              <p className="mt-4 text-sm leading-6 text-zinc-400">
-                {displayScan.notes}
-              </p>
-            )}
-          </Panel>
+            </Panel>
+          </div>
         </div>
       </div>
 
