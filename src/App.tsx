@@ -7326,6 +7326,16 @@ function CardDetail({
   const displayCard = isEditing ? editCard : card;
   const cardData = displayCard as any;
 
+  type EditableDetailRow = {
+    label: string;
+    value: React.ReactNode;
+    field?: string;
+    rawValue?: string | number;
+    type?: "text" | "number" | "textarea" | "select";
+    options?: string[];
+    calculated?: boolean;
+  };
+
   function updateEditField<K extends keyof CardRecord>(
     field: K,
     value: CardRecord[K]
@@ -7334,6 +7344,21 @@ function CardDetail({
       ...currentCard,
       [field]: value,
     }));
+  }
+
+  function updateCardDataField(field: string, value: string | number | boolean) {
+    setEditCard(
+      (currentCard) =>
+        ({
+          ...currentCard,
+          [field]: value,
+        } as CardRecord)
+    );
+  }
+
+  function updateNumberField(field: string, value: string) {
+    const cleanedValue = value === "" ? 0 : Number(value);
+    updateCardDataField(field, Number.isNaN(cleanedValue) ? 0 : cleanedValue);
   }
 
   function handleCardImageUpload(
@@ -7375,7 +7400,7 @@ function CardDetail({
     });
 
     setIsEditing(false);
-    setSaveMessage("Card images updated successfully.");
+    setSaveMessage("Card detail updated successfully.");
 
     window.setTimeout(() => {
       setSaveMessage("");
@@ -7391,12 +7416,101 @@ function CardDetail({
   const profitLoss = marketValue - costBasis;
   const roi = costBasis > 0 ? (profitLoss / costBasis) * 100 : 0;
 
-  const rookieDisplay =
-    displayCard.card.toLowerCase().includes("rookie") ||
-    displayCard.year === "2023" ||
-    displayCard.year === "2017"
+  const playerDisplay =
+    displayCard.player ||
+    cardData.players ||
+    cardData.playerNames ||
+    "Unknown Player";
+
+  const setDisplay = cardData.set || cardData.cardSet || "";
+  const cardNumberDisplay =
+    cardData.cardNumber || cardData.number || cardData.cardNo || "";
+
+  const cardTypeDisplay =
+    cardData.cardType ||
+    cardData.type ||
+    (displayCard.card.toLowerCase().includes("patch")
+      ? "Patch / Memorabilia"
+      : displayCard.card);
+
+  const serialNumberDisplay =
+    cardData.serialNumber ||
+    cardData.serial ||
+    cardData.printRunNumber ||
+    cardData.numbered ||
+    "";
+
+  const autographDisplay =
+    cardData.autograph === true ||
+    cardData.isAutograph === true ||
+    cardData.auto === true ||
+    `${cardData.autograph || ""}`.toLowerCase() === "yes"
       ? "Yes"
       : "No";
+
+  const patchDisplay =
+    cardData.patch === true ||
+    cardData.isPatch === true ||
+    cardData.memorabilia === true ||
+    `${cardData.patch || ""}`.toLowerCase() === "yes" ||
+    displayCard.card.toLowerCase().includes("patch") ||
+    displayCard.card.toLowerCase().includes("memorabilia") ||
+    cardTypeDisplay.toLowerCase().includes("patch") ||
+    cardTypeDisplay.toLowerCase().includes("memorabilia")
+      ? "Yes"
+      : "No";
+
+  const rookieDisplay =
+    cardData.rookieCard === true ||
+    cardData.isRookie === true ||
+    `${cardData.rookieCard || ""}`.toLowerCase() === "yes" ||
+    displayCard.card.toLowerCase().includes("rookie") ||
+    displayCard.card.toLowerCase().includes("rc")
+      ? "Yes"
+      : "No";
+
+  const rookieFeatureDisplay =
+    cardData.rookieFeature ||
+    cardData.rookiePlayer ||
+    (rookieDisplay === "Yes" ? "Rookie card selected" : "None");
+
+  const featuresDisplay = Array.isArray(cardData.features)
+    ? cardData.features.join(", ")
+    : cardData.features ||
+      [
+        displayCard.parallel && displayCard.parallel !== "Base"
+          ? displayCard.parallel
+          : "",
+        patchDisplay === "Yes" ? "Patch / Memorabilia" : "",
+        autographDisplay === "Yes" ? "Autograph" : "",
+        serialNumberDisplay ? "Low Serial Number" : "",
+      ]
+        .filter(Boolean)
+        .join(", ");
+
+  const cardNameParts = [
+    displayCard.year,
+    displayCard.brand,
+    setDisplay,
+    cardTypeDisplay,
+    cardNumberDisplay ? `#${cardNumberDisplay}` : "",
+    displayCard.parallel && displayCard.parallel !== "Base"
+      ? displayCard.parallel
+      : "",
+  ].filter(Boolean);
+
+  const cardNameDisplay = cardNameParts.join(" ");
+
+  const cardIdentityBadges = [
+    rookieDisplay === "Yes" ? "RC" : "",
+    autographDisplay === "Yes" ? "AUTO" : "",
+    patchDisplay === "Yes" ? "PATCH" : "",
+    serialNumberDisplay?.includes("/")
+      ? `/${serialNumberDisplay.split("/").pop()}`
+      : displayCard.parallel?.match(/\/\d+/)?.[0] || "",
+    cardData.team ? cardData.team : "",
+    displayCard.parallel && displayCard.parallel !== "Base" ? "PREMIUM" : "",
+  ].filter(Boolean);
 
   const suggestedAction =
     marketValue > costBasis && roi >= 25
@@ -7408,25 +7522,403 @@ function CardDetail({
   const marketRangeLow = Math.max(0, Math.round(marketValue * 0.92));
   const marketRangeHigh = Math.round(marketValue * 1.08);
 
-  const mobileInfoRows = [
-    ["Player", displayCard.player],
-    ["Team", cardData.team || "Not listed"],
-    ["Year", displayCard.year],
-    ["Brand", displayCard.brand],
-    ["Set", cardData.set || cardData.cardSet || displayCard.card],
-    ["Card #", cardData.cardNumber || "Not listed"],
-    ["Parallel", displayCard.parallel || "Base"],
-    ["Rookie", rookieDisplay],
+  const mobileInfoRows: EditableDetailRow[] = [
+    {
+      label: "Player(s)",
+      value: playerDisplay,
+      field: "player",
+      rawValue: displayCard.player || playerDisplay,
+    },
+    {
+      label: "Year",
+      value: displayCard.year,
+      field: "year",
+      rawValue: displayCard.year,
+    },
+    {
+      label: "Brand",
+      value: displayCard.brand,
+      field: "brand",
+      rawValue: displayCard.brand,
+    },
+    {
+      label: "Set",
+      value: setDisplay || "Not listed",
+      field: "set",
+      rawValue: setDisplay,
+    },
+    {
+      label: "Card Name / Description",
+      value: displayCard.card,
+      field: "card",
+      rawValue: displayCard.card,
+      type: "textarea",
+    },
+    {
+      label: "Card Number",
+      value: cardNumberDisplay || "Not listed",
+      field: "cardNumber",
+      rawValue: cardNumberDisplay,
+    },
+    {
+      label: "Card Type",
+      value: cardTypeDisplay || "Not listed",
+      field: "cardType",
+      rawValue: cardTypeDisplay,
+    },
+    {
+      label: "Parallel",
+      value: displayCard.parallel || "Base",
+      field: "parallel",
+      rawValue: displayCard.parallel || "Base",
+    },
+    {
+      label: "Serial Number",
+      value: serialNumberDisplay || "Not listed",
+      field: "serialNumber",
+      rawValue: serialNumberDisplay,
+    },
+    {
+      label: "Team",
+      value: cardData.team || "Not listed",
+      field: "team",
+      rawValue: cardData.team || "",
+    },
+    {
+      label: "Rookie Card",
+      value: rookieDisplay,
+      field: "rookieCard",
+      rawValue: rookieDisplay,
+      type: "select",
+      options: ["No", "Yes"],
+    },
+    {
+      label: "Rookie Feature",
+      value: rookieFeatureDisplay,
+      field: "rookieFeature",
+      rawValue: rookieFeatureDisplay === "None" ? "" : rookieFeatureDisplay,
+    },
+    {
+      label: "Autograph",
+      value: autographDisplay,
+      field: "autograph",
+      rawValue: autographDisplay,
+      type: "select",
+      options: ["No", "Yes"],
+    },
+    {
+      label: "Patch / Memorabilia",
+      value: patchDisplay,
+      field: "patch",
+      rawValue: patchDisplay,
+      type: "select",
+      options: ["No", "Yes"],
+    },
+    {
+      label: "Features",
+      value: featuresDisplay || "Not listed",
+      field: "features",
+      rawValue: featuresDisplay,
+      type: "textarea",
+    },
   ];
 
-  const mobileCollectionRows = [
-    ["Status", displayCard.status || "Personal Collection"],
-    ["Cost Basis", `$${costBasis.toLocaleString()}`],
-    ["Purchase Price", `$${(displayCard.purchasePrice || 0).toLocaleString()}`],
-    ["Market Value", `$${marketValue.toLocaleString()}`],
-    ["Profit / Loss", `${profitLoss >= 0 ? "+" : ""}$${profitLoss.toLocaleString()}`],
-    ["ROI", `${roi.toFixed(1)}%`],
+  const mobileLocationRows: EditableDetailRow[] = [
+    {
+      label: "Vault Location",
+      value: cardData.vaultLocation || cardData.location || "Not listed",
+      field: "vaultLocation",
+      rawValue: cardData.vaultLocation || cardData.location || "",
+    },
+    {
+      label: "Box",
+      value: cardData.box || cardData.vaultBox || "Not listed",
+      field: "box",
+      rawValue: cardData.box || cardData.vaultBox || "",
+    },
+    {
+      label: "Row",
+      value: cardData.row || cardData.vaultRow || "Not listed",
+      field: "row",
+      rawValue: cardData.row || cardData.vaultRow || "",
+    },
+    {
+      label: "Slot",
+      value: cardData.slot || cardData.vaultSlot || "Not listed",
+      field: "slot",
+      rawValue: cardData.slot || cardData.vaultSlot || "",
+    },
+    {
+      label: "Show / Booth",
+      value: cardData.booth || cardData.boothNumber || "Not listed",
+      field: "booth",
+      rawValue: cardData.booth || cardData.boothNumber || "",
+    },
+    {
+      label: "Dealer",
+      value: cardData.dealer || cardData.dealerName || "Not listed",
+      field: "dealerName",
+      rawValue: cardData.dealer || cardData.dealerName || "",
+    },
   ];
+
+  const mobileGradingRows: EditableDetailRow[] = [
+    {
+      label: "Status",
+      value:
+        cardData.gradeStatus || cardData.gradingStatus || displayCard.status || "Raw",
+      field: "gradeStatus",
+      rawValue:
+        cardData.gradeStatus || cardData.gradingStatus || displayCard.status || "Raw",
+    },
+    {
+      label: "Current Grade",
+      value: cardData.currentGrade || cardData.grade || "Not graded",
+      field: "currentGrade",
+      rawValue: cardData.currentGrade || cardData.grade || "",
+    },
+    {
+      label: "Target Grade",
+      value: cardData.targetGrade || "Not listed",
+      field: "targetGrade",
+      rawValue: cardData.targetGrade || "",
+    },
+    {
+      label: "Company",
+      value: cardData.gradeCompany || cardData.gradingCompany || "Not listed",
+      field: "gradeCompany",
+      rawValue: cardData.gradeCompany || cardData.gradingCompany || "",
+    },
+    {
+      label: "Condition Notes",
+      value: cardData.conditionNotes || "Not listed",
+      field: "conditionNotes",
+      rawValue: cardData.conditionNotes || "",
+      type: "textarea",
+    },
+    {
+      label: "Recommendation",
+      value: cardData.gradingRecommendation || "Hold for review",
+      field: "gradingRecommendation",
+      rawValue: cardData.gradingRecommendation || "Hold for review",
+      type: "textarea",
+    },
+  ];
+
+  const marketRows: EditableDetailRow[] = [
+    {
+      label: "Estimated Value",
+      value: `$${marketValue.toLocaleString()}`,
+      field: "estimatedValue",
+      rawValue: marketValue,
+      type: "number",
+    },
+    {
+      label: "Market Range",
+      value: `$${marketRangeLow.toLocaleString()} - $${marketRangeHigh.toLocaleString()}`,
+      calculated: true,
+    },
+    {
+      label: "Profit / Loss",
+      value: `${profitLoss >= 0 ? "+" : ""}$${profitLoss.toLocaleString()}`,
+      calculated: true,
+    },
+    {
+      label: "ROI",
+      value: `${roi.toFixed(1)}%`,
+      calculated: true,
+    },
+    {
+      label: "Suggested Action",
+      value: suggestedAction,
+      calculated: true,
+    },
+    {
+      label: "Cost Basis",
+      value: `$${costBasis.toLocaleString()}`,
+      field: "totalCostBasis",
+      rawValue: costBasis,
+      type: "number",
+    },
+  ];
+
+  const mobilePurchaseRows: EditableDetailRow[] = [
+    {
+      label: "Purchase Date",
+      value: cardData.purchaseDate || "Not listed",
+      field: "purchaseDate",
+      rawValue: cardData.purchaseDate || "",
+    },
+    {
+      label: "Purchase Price",
+      value: `$${(displayCard.purchasePrice || 0).toLocaleString()}`,
+      field: "purchasePrice",
+      rawValue: displayCard.purchasePrice || 0,
+      type: "number",
+    },
+    {
+      label: "Source / Platform",
+      value: cardData.source || cardData.platform || "Not listed",
+      field: "source",
+      rawValue: cardData.source || cardData.platform || "",
+    },
+    {
+      label: "Seller",
+      value: cardData.seller || cardData.sellerName || "Not listed",
+      field: "sellerName",
+      rawValue: cardData.seller || cardData.sellerName || "",
+    },
+    {
+      label: "Taxes / Fees",
+      value: `$${(cardData.taxesFees || cardData.fees || 0).toLocaleString()}`,
+      field: "taxesFees",
+      rawValue: cardData.taxesFees || cardData.fees || 0,
+      type: "number",
+    },
+    {
+      label: "Shipping",
+      value: `$${(cardData.shippingCost || cardData.shipping || 0).toLocaleString()}`,
+      field: "shippingCost",
+      rawValue: cardData.shippingCost || cardData.shipping || 0,
+      type: "number",
+    },
+    {
+      label: "Total Cost Basis",
+      value: `$${costBasis.toLocaleString()}`,
+      field: "totalCostBasis",
+      rawValue: costBasis,
+      type: "number",
+    },
+  ];
+
+  const mobileCollectionRows: EditableDetailRow[] = [
+    {
+      label: "Status",
+      value: displayCard.status || "Personal Collection",
+      field: "status",
+      rawValue: displayCard.status || "Personal Collection",
+      type: "select",
+      options: ["Personal Collection", "For Sale", "Sold", "Hold", "Watch", "Review"],
+    },
+    {
+      label: "Cost Basis",
+      value: `$${costBasis.toLocaleString()}`,
+      field: "totalCostBasis",
+      rawValue: costBasis,
+      type: "number",
+    },
+    {
+      label: "Purchase Price",
+      value: `$${(displayCard.purchasePrice || 0).toLocaleString()}`,
+      field: "purchasePrice",
+      rawValue: displayCard.purchasePrice || 0,
+      type: "number",
+    },
+    {
+      label: "Market Value",
+      value: `$${marketValue.toLocaleString()}`,
+      field: "estimatedValue",
+      rawValue: marketValue,
+      type: "number",
+    },
+    {
+      label: "Profit / Loss",
+      value: `${profitLoss >= 0 ? "+" : ""}$${profitLoss.toLocaleString()}`,
+      calculated: true,
+    },
+    {
+      label: "ROI",
+      value: `${roi.toFixed(1)}%`,
+      calculated: true,
+    },
+  ];
+
+  function renderDisplayValue(value: React.ReactNode) {
+    if (value === null || value === undefined || value === "") {
+      return "Not listed";
+    }
+
+    return value;
+  }
+
+  function renderEditableRow(row: EditableDetailRow) {
+    const canEdit = isEditing && row.field && !row.calculated;
+    const inputBaseClass =
+      "w-full rounded-xl border border-vaultGold/20 bg-black/55 px-3 py-2 text-right text-sm font-black text-white outline-none transition placeholder:text-zinc-600 focus:border-vaultGold";
+
+    return (
+      <div
+        key={row.label}
+        className="flex items-start justify-between gap-4 px-4 py-3"
+      >
+        <p className="shrink-0 pt-2 text-xs font-black uppercase tracking-[0.2em] text-zinc-500">
+          {row.label}
+        </p>
+
+        {canEdit ? (
+          <div className="min-w-0 flex-1">
+            {row.type === "textarea" ? (
+              <textarea
+                value={String(row.rawValue ?? "")}
+                rows={3}
+                onChange={(event) =>
+                  updateCardDataField(row.field!, event.target.value)
+                }
+                className={`${inputBaseClass} resize-none leading-6`}
+              />
+            ) : row.type === "select" ? (
+              <select
+                value={String(row.rawValue ?? "")}
+                onChange={(event) => {
+                  const nextValue = event.target.value;
+
+                  if (
+                    row.field === "rookieCard" ||
+                    row.field === "autograph" ||
+                    row.field === "patch"
+                  ) {
+                    updateCardDataField(row.field, nextValue === "Yes");
+                    return;
+                  }
+
+                  updateCardDataField(row.field!, nextValue);
+                }}
+                className={inputBaseClass}
+              >
+                {(row.options || []).map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type={row.type === "number" ? "number" : "text"}
+                value={String(row.rawValue ?? "")}
+                onChange={(event) => {
+                  if (row.type === "number") {
+                    updateNumberField(row.field!, event.target.value);
+                    return;
+                  }
+
+                  updateCardDataField(row.field!, event.target.value);
+                }}
+                className={inputBaseClass}
+              />
+            )}
+          </div>
+        ) : (
+          <p className="text-right text-sm font-black leading-6 text-white">
+            {renderDisplayValue(row.value)}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  function renderEditableRows(rows: EditableDetailRow[]) {
+    return rows.map((row) => renderEditableRow(row));
+  }
 
   return (
     <div className="relative isolate w-full max-w-full overflow-hidden">
@@ -7443,7 +7935,7 @@ function CardDetail({
 
         <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_50%_0%,rgba(212,175,55,0.14),transparent_34%),linear-gradient(180deg,rgba(0,0,0,0.2),rgba(0,0,0,0.95))]" />
 
-        {/* Mobile Header */}
+        {/* CARD DETAIL PART 1 — Header, Value Summary, Field-Triggered Badges */}
         <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
           <button
             type="button"
@@ -7453,18 +7945,38 @@ function CardDetail({
             ← Collection
           </button>
 
-          <p className="text-xs font-black uppercase tracking-[0.42em] text-vaultGold">
-            Card Detail
-          </p>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+              Card Detail
+            </p>
 
-          <h1 className="mt-3 text-3xl font-black uppercase leading-none text-white">
-            {displayCard.player}
+            {isEditing && (
+              <span className="rounded-full border border-vaultGold/30 bg-vaultGold/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-vaultGold">
+                Editing
+              </span>
+            )}
+          </div>
+
+          <h1 className="mt-4 text-3xl font-black uppercase leading-none text-white">
+            {playerDisplay}
           </h1>
 
-          <p className="mt-2 text-sm font-bold uppercase leading-6 text-zinc-400">
-            {displayCard.year} {displayCard.brand} {displayCard.card}
-            {displayCard.parallel ? ` • ${displayCard.parallel}` : ""}
+          <p className="mt-3 text-sm font-bold uppercase leading-6 tracking-[0.08em] text-zinc-400">
+            {cardNameDisplay || displayCard.card}
           </p>
+
+          {cardIdentityBadges.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {cardIdentityBadges.map((badge) => (
+                <span
+                  key={badge}
+                  className="rounded-full border border-vaultGold/30 bg-vaultGold/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-vaultGold"
+                >
+                  {badge}
+                </span>
+              ))}
+            </div>
+          )}
 
           <div className="mt-5 grid grid-cols-3 gap-2">
             <div className="rounded-2xl border border-vaultGold/20 bg-black/45 p-3 text-center backdrop-blur-xl">
@@ -7506,7 +8018,7 @@ function CardDetail({
           </div>
         )}
 
-        {/* Swipe Image Carousel */}
+        {/* CARD DETAIL PART 2 — Premium Mobile Image Area */}
         <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-4 shadow-vault backdrop-blur-xl">
           <div className="mb-3 flex items-center justify-between">
             <div>
@@ -7566,7 +8078,7 @@ function CardDetail({
                 onClick={saveEditedCard}
                 className="rounded-2xl border border-vaultGold bg-vaultGold px-4 py-3 text-sm font-black text-black shadow-vault"
               >
-                ✓ Save
+                ✓ Save All Fields
               </button>
 
               <button
@@ -7606,9 +8118,7 @@ function CardDetail({
           </p>
 
           <p className="mt-4 text-sm font-bold leading-7 text-zinc-300">
-            {displayCard.year} {displayCard.player} {displayCard.brand}{" "}
-            {displayCard.card}
-            {displayCard.parallel ? ` ${displayCard.parallel}` : ""}. Current
+            {playerDisplay} — {cardNameDisplay || displayCard.card}. Current
             estimated value is{" "}
             <span className="font-black text-vaultGold">
               ${marketValue.toLocaleString()}
@@ -7625,55 +8135,74 @@ function CardDetail({
           </p>
 
           <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
-            {[
-              ["Estimated Value", `$${marketValue.toLocaleString()}`],
-              [
-                "Market Range",
-                `$${marketRangeLow.toLocaleString()} - $${marketRangeHigh.toLocaleString()}`,
-              ],
-              [
-                "Profit / Loss",
-                `${profitLoss >= 0 ? "+" : ""}$${profitLoss.toLocaleString()}`,
-              ],
-              ["ROI", `${roi.toFixed(1)}%`],
-              ["Suggested Action", suggestedAction],
-              ["Cost Basis", `$${costBasis.toLocaleString()}`],
-            ].map(([label, value]) => (
-              <div
-                key={label}
-                className="flex items-center justify-between gap-4 px-4 py-3"
-              >
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">
-                  {label}
-                </p>
-                <p className="text-right text-sm font-black text-white">
-                  {value}
-                </p>
-              </div>
-            ))}
+            {renderEditableRows(marketRows)}
           </div>
         </section>
 
-        {/* Card Info */}
+        {/* CARD DETAIL PART 3 — Card Info, Location, Grading Strategy */}
         <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
           <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
             Card Info
           </p>
 
           <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
-            {mobileInfoRows.map(([label, value]) => (
-              <div
-                key={label}
-                className="flex items-center justify-between gap-4 px-4 py-3"
-              >
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">
-                  {label}
-                </p>
-                <p className="text-right text-sm font-black text-white">
-                  {value || "Not listed"}
-                </p>
-              </div>
-            ))}
+            {renderEditableRows(mobileInfoRows)}
+          </div>
+        </section>
+
+        <section className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          <div className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
+            <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+              Location
+            </p>
+
+            <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
+              {renderEditableRows(mobileLocationRows)}
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
+            <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+              Grading Strategy
+            </p>
+
+            <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
+              {renderEditableRows(mobileGradingRows)}
+            </div>
+          </div>
+        </section>
+
+        {/* Notes */}
+        <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
+          <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+            Notes
+          </p>
+
+          {isEditing ? (
+            <textarea
+              value={String(cardData.notes || "")}
+              rows={5}
+              onChange={(event) => updateCardDataField("notes", event.target.value)}
+              className="mt-4 w-full resize-none rounded-2xl border border-vaultGold/20 bg-black/55 px-4 py-3 text-sm font-bold leading-7 text-white outline-none transition placeholder:text-zinc-600 focus:border-vaultGold"
+              placeholder="Add collector notes, beta notes, or negotiation notes..."
+            />
+          ) : (
+            <p className="mt-4 text-sm font-bold leading-7 text-zinc-300">
+              {cardData.notes ||
+                cardData.purchaseNotes ||
+                "No notes have been added for this card yet."}
+            </p>
+          )}
+        </section>
+
+        {/* Purchase Information */}
+        <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
+          <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+            Purchase Information
+          </p>
+
+          <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
+            {renderEditableRows(mobilePurchaseRows)}
           </div>
         </section>
 
@@ -7684,33 +8213,8 @@ function CardDetail({
           </p>
 
           <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
-            {mobileCollectionRows.map(([label, value]) => (
-              <div
-                key={label}
-                className="flex items-center justify-between gap-4 px-4 py-3"
-              >
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">
-                  {label}
-                </p>
-                <p className="text-right text-sm font-black text-white">
-                  {value}
-                </p>
-              </div>
-            ))}
+            {renderEditableRows(mobileCollectionRows)}
           </div>
-        </section>
-
-        {/* Notes */}
-        <section className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
-          <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
-            Notes
-          </p>
-
-          <p className="mt-4 text-sm font-bold leading-7 text-zinc-300">
-            {cardData.notes ||
-              cardData.purchaseNotes ||
-              "No notes have been added for this card yet."}
-          </p>
         </section>
       </div>
 
@@ -7906,15 +8410,15 @@ function CardImageFrame({
         {label}
       </p>
 
-      <div className="flex min-h-[420px] items-center justify-center rounded-2xl border border-vaultGold/30 bg-black/50 p-4">
+      <div className="flex min-h-[340px] items-center justify-center rounded-2xl border border-vaultGold/30 bg-black/50 p-3 sm:min-h-[420px] sm:p-4">
         {image ? (
           <img
             src={image}
             alt={`${label} card image`}
-            className="max-h-[380px] w-full rounded-xl object-contain"
+            className="max-h-[315px] w-full rounded-xl object-contain sm:max-h-[380px]"
           />
         ) : (
-          <div className="flex h-[380px] w-full items-center justify-center rounded-xl border border-dashed border-steelBorder bg-graphite900/70">
+          <div className="flex h-[315px] w-full items-center justify-center rounded-xl border border-dashed border-steelBorder bg-graphite900/70 sm:h-[380px]">
             <p className="text-sm font-bold uppercase tracking-widest text-zinc-500">
               No {label} Image
             </p>
