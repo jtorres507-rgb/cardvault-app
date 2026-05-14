@@ -7475,6 +7475,7 @@ function CardDetail({
     "Unknown Player";
 
   const setDisplay = cardData.set || cardData.cardSet || "";
+
   const cardNumberDisplay =
     cardData.cardNumber || cardData.number || cardData.cardNo || "";
 
@@ -7578,34 +7579,62 @@ function CardDetail({
     label: string;
     value: string | number;
     field?: string;
-    inputType?: "text" | "number" | "textarea";
+    secondaryField?: string;
+    inputType?: "text" | "number" | "textarea" | "brandSet";
   };
 
-  function MobileEditableRow({
-    label,
-    value,
-    field,
-    inputType = "text",
-  }: MobileEditableRowConfig) {
+  function renderMobileEditableRow(row: MobileEditableRowConfig) {
+    const { label, value, field, secondaryField, inputType = "text" } = row;
     const fieldName = field || "";
+    const isEditable = isEditing && Boolean(fieldName);
+
     const editableValue =
       fieldName && (editCard as any)[fieldName] !== undefined
         ? (editCard as any)[fieldName]
         : value || "";
 
-    const isEditable = isEditing && Boolean(fieldName);
+    const secondaryValue =
+      secondaryField && (editCard as any)[secondaryField] !== undefined
+        ? (editCard as any)[secondaryField]
+        : "";
 
     return (
-      <div className="flex items-start justify-between gap-4 px-4 py-3">
+      <div
+        key={label}
+        className="flex items-start justify-between gap-4 px-4 py-3"
+      >
         <p className="shrink-0 text-xs font-black uppercase tracking-[0.2em] text-zinc-500">
           {label}
         </p>
 
         {isEditable ? (
-          inputType === "textarea" ? (
+          inputType === "brandSet" ? (
+            <div className="w-full space-y-2">
+              <input
+                type="text"
+                defaultValue={String(editableValue)}
+                onBlur={(event) =>
+                  updateAnyEditField(fieldName, event.target.value)
+                }
+                className="w-full rounded-xl border border-vaultGold/20 bg-black/70 px-3 py-2 text-right text-sm font-black text-white outline-none focus:border-vaultGold"
+                placeholder="Brand"
+              />
+
+              <input
+                type="text"
+                defaultValue={String(secondaryValue)}
+                onBlur={(event) =>
+                  secondaryField &&
+                  updateAnyEditField(secondaryField, event.target.value)
+                }
+                className="w-full rounded-xl border border-vaultGold/20 bg-black/70 px-3 py-2 text-right text-sm font-black text-white outline-none focus:border-vaultGold"
+                placeholder="Set"
+              />
+            </div>
+          ) : inputType === "textarea" ? (
             <textarea
-              value={String(editableValue)}
-              onChange={(event) =>
+              defaultValue={String(editableValue)}
+              onBlur={(event) =>
                 updateAnyEditField(fieldName, event.target.value)
               }
               className="min-h-24 w-full rounded-xl border border-vaultGold/20 bg-black/70 px-3 py-2 text-right text-sm font-black leading-6 text-white outline-none focus:border-vaultGold"
@@ -7613,12 +7642,14 @@ function CardDetail({
           ) : (
             <input
               type={inputType}
-              value={String(editableValue)}
-              onChange={(event) =>
+              defaultValue={String(editableValue)}
+              onBlur={(event) =>
                 updateAnyEditField(
                   fieldName,
                   inputType === "number"
-                    ? Number(event.target.value)
+                    ? event.target.value === ""
+                      ? 0
+                      : Number(event.target.value)
                     : event.target.value
                 )
               }
@@ -7635,55 +7666,212 @@ function CardDetail({
   }
 
   const mobileInfoRows: MobileEditableRowConfig[] = [
-    { label: "Year", value: displayCard.year, field: "year", inputType: "number" },
-    { label: "Brand", value: displayCard.brand, field: "brand" },
-    { label: "Set", value: setDisplay || "Not listed", field: "set" },
-    { label: "Card Number", value: cardNumberDisplay || "Not listed", field: "cardNumber" },
-    { label: "Card Type", value: cardTypeDisplay || "Not listed", field: "cardType" },
-    { label: "Parallel", value: displayCard.parallel || "Base", field: "parallel" },
-    { label: "Serial Number", value: serialNumberDisplay || "Not listed", field: "serialNumber" },
-    { label: "Player(s)", value: playerDisplay, field: "player" },
-    { label: "Team", value: cardData.team || "Not listed", field: "team" },
-    { label: "Rookie Card", value: rookieDisplay, field: "rookieCard" },
-    { label: "Rookie Feature", value: rookieFeatureDisplay, field: "rookieFeature" },
-    { label: "Autograph", value: autographDisplay, field: "autograph" },
-    { label: "Patch / Memorabilia", value: patchDisplay, field: "patch" },
-    { label: "Features", value: featuresDisplay || "Not listed", field: "features", inputType: "textarea" },
+    {
+      label: "Player(s)",
+      value: playerDisplay,
+      field: "player",
+    },
+    {
+      label: "Team",
+      value: cardData.team || "Not listed",
+      field: "team",
+    },
+    {
+      label: "Year",
+      value: displayCard.year,
+      field: "year",
+      inputType: "number",
+    },
+    {
+      label: "Brand / Set",
+      value:
+        [displayCard.brand, setDisplay].filter(Boolean).join(" • ") ||
+        "Not listed",
+      field: "brand",
+      secondaryField: "set",
+      inputType: "brandSet",
+    },
+    {
+      label: "Card Type",
+      value: cardTypeDisplay || "Not listed",
+      field: "cardType",
+    },
+    {
+      label: "Parallel",
+      value: displayCard.parallel || "Base",
+      field: "parallel",
+    },
+    {
+      label: "Serial Number",
+      value: serialNumberDisplay || "Not listed",
+      field: "serialNumber",
+    },
+    {
+      label: "Rookie Card",
+      value: rookieDisplay,
+      field: "rookieCard",
+    },
+    {
+      label: "Rookie Feature",
+      value: rookieFeatureDisplay,
+      field: "rookieFeature",
+    },
+    {
+      label: "Autograph",
+      value: autographDisplay,
+      field: "autograph",
+    },
+    {
+      label: "Patch / Memorabilia",
+      value: patchDisplay,
+      field: "patch",
+    },
+    {
+      label: "Features",
+      value: featuresDisplay || "Not listed",
+      field: "features",
+      inputType: "textarea",
+    },
   ];
 
   const mobileLocationRows: MobileEditableRowConfig[] = [
-    { label: "Vault Location", value: cardData.vaultLocation || cardData.location || "Not listed", field: "vaultLocation" },
-    { label: "Box", value: cardData.box || cardData.vaultBox || "Not listed", field: "box" },
-    { label: "Row", value: cardData.row || cardData.vaultRow || "Not listed", field: "row" },
-    { label: "Slot", value: cardData.slot || cardData.vaultSlot || "Not listed", field: "slot" },
-    { label: "Show / Booth", value: cardData.booth || cardData.boothNumber || "Not listed", field: "booth" },
-    { label: "Dealer", value: cardData.dealer || cardData.dealerName || "Not listed", field: "dealer" },
+    {
+      label: "Vault Location",
+      value: cardData.vaultLocation || cardData.location || "Not listed",
+      field: "vaultLocation",
+    },
+    {
+      label: "Box",
+      value: cardData.box || cardData.vaultBox || "Not listed",
+      field: "box",
+    },
+    {
+      label: "Row",
+      value: cardData.row || cardData.vaultRow || "Not listed",
+      field: "row",
+    },
+    {
+      label: "Slot",
+      value: cardData.slot || cardData.vaultSlot || "Not listed",
+      field: "slot",
+    },
+    {
+      label: "Show / Booth",
+      value: cardData.booth || cardData.boothNumber || "Not listed",
+      field: "booth",
+    },
+    {
+      label: "Dealer",
+      value: cardData.dealer || cardData.dealerName || "Not listed",
+      field: "dealer",
+    },
   ];
 
   const mobileGradingRows: MobileEditableRowConfig[] = [
-    { label: "Status", value: cardData.gradeStatus || cardData.gradingStatus || displayCard.status || "Raw", field: "gradeStatus" },
-    { label: "Current Grade", value: cardData.currentGrade || cardData.grade || "Not graded", field: "currentGrade" },
-    { label: "Target Grade", value: cardData.targetGrade || "Not listed", field: "targetGrade" },
-    { label: "Company", value: cardData.gradeCompany || cardData.gradingCompany || "Not listed", field: "gradeCompany" },
-    { label: "Condition Notes", value: cardData.conditionNotes || "Not listed", field: "conditionNotes", inputType: "textarea" },
-    { label: "Recommendation", value: cardData.gradingRecommendation || "Hold for review", field: "gradingRecommendation", inputType: "textarea" },
+    {
+      label: "Status",
+      value:
+        cardData.gradeStatus ||
+        cardData.gradingStatus ||
+        displayCard.status ||
+        "Raw",
+      field: "gradeStatus",
+    },
+    {
+      label: "Current Grade",
+      value: cardData.currentGrade || cardData.grade || "Not graded",
+      field: "currentGrade",
+    },
+    {
+      label: "Target Grade",
+      value: cardData.targetGrade || "Not listed",
+      field: "targetGrade",
+    },
+    {
+      label: "Company",
+      value: cardData.gradeCompany || cardData.gradingCompany || "Not listed",
+      field: "gradeCompany",
+    },
+    {
+      label: "Condition Notes",
+      value: cardData.conditionNotes || "Not listed",
+      field: "conditionNotes",
+      inputType: "textarea",
+    },
+    {
+      label: "Recommendation",
+      value: cardData.gradingRecommendation || "Hold for review",
+      field: "gradingRecommendation",
+      inputType: "textarea",
+    },
   ];
 
   const mobilePurchaseRows: MobileEditableRowConfig[] = [
-    { label: "Purchase Date", value: cardData.purchaseDate || "Not listed", field: "purchaseDate" },
-    { label: "Purchase Price", value: displayCard.purchasePrice || 0, field: "purchasePrice", inputType: "number" },
-    { label: "Source / Platform", value: cardData.source || cardData.platform || "Not listed", field: "source" },
-    { label: "Seller", value: cardData.seller || cardData.sellerName || "Not listed", field: "seller" },
-    { label: "Taxes / Fees", value: cardData.taxesFees || cardData.fees || 0, field: "taxesFees", inputType: "number" },
-    { label: "Shipping", value: cardData.shippingCost || cardData.shipping || 0, field: "shippingCost", inputType: "number" },
-    { label: "Total Cost Basis", value: costBasis, field: "totalCostBasis", inputType: "number" },
+    {
+      label: "Purchase Date",
+      value: cardData.purchaseDate || "Not listed",
+      field: "purchaseDate",
+    },
+    {
+      label: "Purchase Price",
+      value: displayCard.purchasePrice || 0,
+      field: "purchasePrice",
+      inputType: "number",
+    },
+    {
+      label: "Source / Platform",
+      value: cardData.source || cardData.platform || "Not listed",
+      field: "source",
+    },
+    {
+      label: "Seller",
+      value: cardData.seller || cardData.sellerName || "Not listed",
+      field: "seller",
+    },
+    {
+      label: "Taxes / Fees",
+      value: cardData.taxesFees || cardData.fees || 0,
+      field: "taxesFees",
+      inputType: "number",
+    },
+    {
+      label: "Shipping",
+      value: cardData.shippingCost || cardData.shipping || 0,
+      field: "shippingCost",
+      inputType: "number",
+    },
+    {
+      label: "Total Cost Basis",
+      value: costBasis,
+      field: "totalCostBasis",
+      inputType: "number",
+    },
   ];
 
   const mobileCollectionRows: MobileEditableRowConfig[] = [
-    { label: "Status", value: displayCard.status || "Personal Collection", field: "status" },
-    { label: "Purchase Price", value: displayCard.purchasePrice || 0, field: "purchasePrice", inputType: "number" },
-    { label: "Market Value", value: marketValue, field: "estimatedValue", inputType: "number" },
-    { label: "Cost Basis", value: costBasis, field: "totalCostBasis", inputType: "number" },
+    {
+      label: "Status",
+      value: displayCard.status || "Personal Collection",
+      field: "status",
+    },
+    {
+      label: "Purchase Price",
+      value: displayCard.purchasePrice || 0,
+      field: "purchasePrice",
+      inputType: "number",
+    },
+    {
+      label: "Market Value",
+      value: marketValue,
+      field: "estimatedValue",
+      inputType: "number",
+    },
+    {
+      label: "Cost Basis",
+      value: costBasis,
+      field: "totalCostBasis",
+      inputType: "number",
+    },
   ];
 
   return (
@@ -7849,9 +8037,7 @@ function CardDetail({
           </p>
 
           <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
-            {mobileInfoRows.map((row) => (
-              <MobileEditableRow key={row.label} {...row} />
-            ))}
+            {mobileInfoRows.map((row) => renderMobileEditableRow(row))}
           </div>
         </section>
 
@@ -7862,9 +8048,7 @@ function CardDetail({
             </p>
 
             <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
-              {mobileLocationRows.map((row) => (
-                <MobileEditableRow key={row.label} {...row} />
-              ))}
+              {mobileLocationRows.map((row) => renderMobileEditableRow(row))}
             </div>
           </div>
 
@@ -7874,9 +8058,7 @@ function CardDetail({
             </p>
 
             <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
-              {mobileGradingRows.map((row) => (
-                <MobileEditableRow key={row.label} {...row} />
-              ))}
+              {mobileGradingRows.map((row) => renderMobileEditableRow(row))}
             </div>
           </div>
         </section>
@@ -7889,14 +8071,10 @@ function CardDetail({
 
           {isEditing ? (
             <textarea
-              value={
-                String(
-                  (editCard as any).notes ||
-                    (editCard as any).purchaseNotes ||
-                    ""
-                )
-              }
-              onChange={(event) =>
+              defaultValue={String(
+                (editCard as any).notes || (editCard as any).purchaseNotes || ""
+              )}
+              onBlur={(event) =>
                 updateAnyEditField("notes", event.target.value)
               }
               className="mt-4 min-h-32 w-full rounded-2xl border border-vaultGold/20 bg-black/70 px-4 py-3 text-sm font-bold leading-7 text-white outline-none focus:border-vaultGold"
@@ -7918,9 +8096,7 @@ function CardDetail({
           </p>
 
           <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
-            {mobilePurchaseRows.map((row) => (
-              <MobileEditableRow key={row.label} {...row} />
-            ))}
+            {mobilePurchaseRows.map((row) => renderMobileEditableRow(row))}
           </div>
         </section>
 
@@ -7931,9 +8107,7 @@ function CardDetail({
           </p>
 
           <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
-            {mobileCollectionRows.map((row) => (
-              <MobileEditableRow key={row.label} {...row} />
-            ))}
+            {mobileCollectionRows.map((row) => renderMobileEditableRow(row))}
 
             <div className="flex items-center justify-between gap-4 px-4 py-3">
               <p className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">
