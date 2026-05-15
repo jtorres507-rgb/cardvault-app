@@ -6711,7 +6711,10 @@ function PlayerCollectionReportPreview({
       case "card":
         return (
           <div className="print-card-cell">
-            <div className="print-card-title">{card.card || "Untitled Card"}</div>
+            <div className="print-card-title">
+              {card.card || "Untitled Card"}
+            </div>
+
             {card.year || card.brand ? (
               <div className="print-card-subtitle">
                 {[card.year, card.brand].filter(Boolean).join(" ")}
@@ -6744,8 +6747,13 @@ function PlayerCollectionReportPreview({
 
       case "gainLoss": {
         const gain = (card.estimatedValue || 0) - (card.purchasePrice || 0);
+
         return (
-          <span className={gain >= 0 ? "print-value-positive" : "print-value-negative"}>
+          <span
+            className={
+              gain >= 0 ? "print-value-positive" : "print-value-negative"
+            }
+          >
             {formatCurrency(gain)}
           </span>
         );
@@ -6772,7 +6780,13 @@ function PlayerCollectionReportPreview({
   };
 
   return (
-    <div className="collection-print-report">
+    <div
+      className="collection-print-report force-collection-report-light"
+      style={{
+        backgroundColor: "#ffffff",
+        color: "#111827",
+      }}
+    >
       {/* Repeating header on every printed page */}
       <div className="print-page-header">
         <div className="print-page-header-inner">
@@ -6782,6 +6796,7 @@ function PlayerCollectionReportPreview({
               alt="CARDGEMZ Vault Pro Logo"
               className="print-brand-logo"
             />
+
             <div className="print-brand-text">
               <div className="print-brand-title">CARDGEMZ VAULT PRO</div>
             </div>
@@ -6792,7 +6807,13 @@ function PlayerCollectionReportPreview({
       </div>
 
       {/* This block should appear only once */}
-      <div className="print-report-first-page">
+      <div
+        className="print-report-first-page"
+        style={{
+          backgroundColor: "#ffffff",
+          color: "#111827",
+        }}
+      >
         <div className="print-report-title-block">
           <h1>{reportTitle}</h1>
           <p>Printable Inventory List | {reportDate}</p>
@@ -6806,12 +6827,16 @@ function PlayerCollectionReportPreview({
 
           <div className="print-summary-card">
             <div className="print-summary-label">COLLECTION VALUE</div>
-            <div className="print-summary-value">{formatCurrency(totalValue)}</div>
+            <div className="print-summary-value">
+              {formatCurrency(totalValue)}
+            </div>
           </div>
 
           <div className="print-summary-card">
             <div className="print-summary-label">TOTAL PAID</div>
-            <div className="print-summary-value">{formatCurrency(totalPaid)}</div>
+            <div className="print-summary-value">
+              {formatCurrency(totalPaid)}
+            </div>
           </div>
 
           <div className="print-summary-card">
@@ -6823,7 +6848,9 @@ function PlayerCollectionReportPreview({
 
           <div className="print-summary-card">
             <div className="print-summary-label">AVERAGE VALUE</div>
-            <div className="print-summary-value">{formatCurrency(averageValue)}</div>
+            <div className="print-summary-value">
+              {formatCurrency(averageValue)}
+            </div>
           </div>
         </div>
       </div>
@@ -6844,8 +6871,12 @@ function PlayerCollectionReportPreview({
           {cards.map((card, index) => (
             <tr key={card.id}>
               <td className="print-col-index">{index + 1}</td>
+
               {activeColumns.map((column) => (
-                <td key={`${card.id}-${column}`} className={`print-col-${column}`}>
+                <td
+                  key={`${card.id}-${column}`}
+                  className={`print-col-${column}`}
+                >
                   {renderCell(card, column)}
                 </td>
               ))}

@@ -4002,170 +4002,96 @@ body,
   color: #0f8a3b !important;
 }
 /* =========================================================
-   FINAL PRINT REPORT WHITE OVERRIDE — MUST BE LAST
-   Forces printable report body white on Android/iPhone print preview.
+   FINAL COLLECTION REPORT WHITE FIX — MUST BE LAST
 ========================================================= */
 
+.force-collection-report-light,
+.force-collection-report-light * {
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+.force-collection-report-light,
+.force-collection-report-light .print-report-first-page,
+.force-collection-report-light .print-summary-grid,
+.force-collection-report-light .print-summary-card,
+.force-collection-report-light .print-report-table,
+.force-collection-report-light .print-report-table tbody,
+.force-collection-report-light .print-report-table tr,
+.force-collection-report-light .print-report-table td,
+.force-collection-report-light .print-card-cell,
+.force-collection-report-light .print-report-notes {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #111827 !important;
+}
+
+.force-collection-report-light h1,
+.force-collection-report-light h2,
+.force-collection-report-light h3,
+.force-collection-report-light h4,
+.force-collection-report-light p,
+.force-collection-report-light span,
+.force-collection-report-light strong,
+.force-collection-report-light div,
+.force-collection-report-light td {
+  color: #111827 !important;
+}
+
+.force-collection-report-light .print-page-header-inner,
+.force-collection-report-light .print-report-table th {
+  background: #000000 !important;
+  background-color: #000000 !important;
+  color: #f4c44f !important;
+}
+
+.force-collection-report-light .print-page-header-inner *,
+.force-collection-report-light .print-brand-right {
+  color: #ffffff !important;
+}
+
+.force-collection-report-light .print-brand-title,
+.force-collection-report-light .print-report-table th {
+  color: #f4c44f !important;
+}
+
+.force-collection-report-light .print-summary-label,
+.force-collection-report-light .print-card-subtitle {
+  color: #64748b !important;
+}
+
+.force-collection-report-light .print-value-positive {
+  color: #0f8a3b !important;
+}
+
+.force-collection-report-light .print-value-negative {
+  color: #c62828 !important;
+}
+
 @media print {
-  html,
-  body,
-  #root {
-    background: #ffffff !important;
-    background-color: #ffffff !important;
-    color: #111827 !important;
-  }
-
-  .screen-only,
-  .reports-screen-controls,
-  nav,
-  aside,
-  button {
-    display: none !important;
-    visibility: hidden !important;
-  }
-
-  .print-only,
-  .clean-print-report-output,
-  .clean-print-report-output * {
-    display: revert !important;
-    visibility: visible !important;
-  }
-
-  .clean-print-report-output {
-    position: absolute !important;
-    inset: 0 auto auto 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-height: 100vh !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: #ffffff !important;
-    background-color: #ffffff !important;
-    color: #111827 !important;
-    box-shadow: none !important;
-    border: none !important;
-    overflow: visible !important;
-    z-index: 999999 !important;
-  }
-
-  .clean-print-report-output,
-  .clean-print-report-output section,
-  .clean-print-report-output article,
-  .clean-print-report-output main,
-  .clean-print-report-output div,
-  .clean-print-report-output table,
-  .clean-print-report-output tbody,
-  .clean-print-report-output tr,
-  .clean-print-report-output td,
-  .collection-print-report,
-  .collection-print-report section,
-  .collection-print-report article,
-  .collection-print-report main,
-  .collection-print-report div,
-  .collection-print-report table,
-  .collection-print-report tbody,
-  .collection-print-report tr,
-  .collection-print-report td,
-  .card-analysis-print-report,
-  .card-analysis-print-report section,
-  .card-analysis-print-report article,
-  .card-analysis-print-report main,
-  .card-analysis-print-report div,
-  .card-analysis-print-report table,
-  .card-analysis-print-report tbody,
-  .card-analysis-print-report tr,
-  .card-analysis-print-report td {
+  .force-collection-report-light,
+  .force-collection-report-light .print-report-first-page,
+  .force-collection-report-light .print-summary-grid,
+  .force-collection-report-light .print-summary-card,
+  .force-collection-report-light .print-report-table,
+  .force-collection-report-light .print-report-table tbody,
+  .force-collection-report-light .print-report-table tr,
+  .force-collection-report-light .print-report-table td,
+  .force-collection-report-light .print-card-cell,
+  .force-collection-report-light .print-report-notes {
     background: #ffffff !important;
     background-color: #ffffff !important;
     background-image: none !important;
     color: #111827 !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
   }
 
-  .clean-print-report-output h1,
-  .clean-print-report-output h2,
-  .clean-print-report-output h3,
-  .clean-print-report-output h4,
-  .clean-print-report-output p,
-  .clean-print-report-output span,
-  .clean-print-report-output strong,
-  .clean-print-report-output li,
-  .clean-print-report-output td,
-  .collection-print-report h1,
-  .collection-print-report h2,
-  .collection-print-report h3,
-  .collection-print-report h4,
-  .collection-print-report p,
-  .collection-print-report span,
-  .collection-print-report strong,
-  .collection-print-report li,
-  .collection-print-report td,
-  .card-analysis-print-report h1,
-  .card-analysis-print-report h2,
-  .card-analysis-print-report h3,
-  .card-analysis-print-report h4,
-  .card-analysis-print-report p,
-  .card-analysis-print-report span,
-  .card-analysis-print-report strong,
-  .card-analysis-print-report li,
-  .card-analysis-print-report td {
-    color: #111827 !important;
-  }
-
-  /* Keep only report headers/table headers black and gold */
-  .print-page-header-inner,
-  .analysis-print-header,
-  .memorabilia-report-header,
-  .grading-form-header,
-  .print-report-table th,
-  .analysis-print-panel h2,
-  .analysis-print-metric-row p,
-  .memorabilia-report-card-title,
-  .grading-form-card-title {
+  .force-collection-report-light .print-page-header-inner,
+  .force-collection-report-light .print-report-table th {
     background: #000000 !important;
     background-color: #000000 !important;
-    background-image: none !important;
     color: #f4c44f !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-
-  .print-page-header-inner *,
-  .analysis-print-header *,
-  .memorabilia-report-header *,
-  .grading-form-header * {
-    color: #ffffff !important;
-  }
-
-  .analysis-print-brand-text strong,
-  .memorabilia-report-brand-name span,
-  .grading-form-brand-name span,
-  .print-brand-title {
-    color: #f4c44f !important;
-  }
-
-  .print-value-positive,
-  .analysis-profit {
-    color: #0f8a3b !important;
-  }
-
-  .print-value-negative {
-    color: #c62828 !important;
-  }
-  img {
-    background: transparent !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  @page {
-    size: letter;
-    margin: 0.35in;
-  }
 }
-  img {
-    background: transparent !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
