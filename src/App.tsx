@@ -65,12 +65,15 @@ type CardStatus =
   | "Watchlist"
   | "Watch"
   | "Grade Candidate"
+  | "Protect"
   | "Sold";
 
 type CardRecord = {
   id: number;
   player: string;
   card: string;
+  cardName?: string;
+  cardType?: string;
   team: string;
   sport: string;
   year: string;
@@ -84,8 +87,10 @@ type CardRecord = {
   league?: string;
   rookieCard?: string;
   feature?: string;
+  features?: string[];
   grade: string;
   grader: string;
+  slabbed?: boolean;
   serialNumber: string;
   sku: string;
   status: CardStatus;
@@ -111,6 +116,8 @@ type CardRecord = {
   backImage?: string;
   slabImage?: string;
   receiptImage?: string;
+
+  collectionIntelligence?: CollectionIntelligence;
 };
 
 type NotificationCategory =
@@ -193,6 +200,8 @@ type TemporaryScanRecord = {
 const MAX_TEMPORARY_SCANS = 30;
 const TEMPORARY_SCAN_WARNING_LIMIT = 25;
 
+const initialMemorabilia: MemorabiliaRecord[] = [];
+
 type BetaFeedbackRecord = {
   id: number;
   category:
@@ -231,6 +240,8 @@ type SaleRecord = {
 type AddCardForm = {
   player: string;
   card: string;
+  cardName: string;
+  cardType: string;
   team: string;
   sport: string;
   year: string;
@@ -241,6 +252,13 @@ type AddCardForm = {
   rookie: string;
   autograph: string;
   patch: string;
+  league: string;
+  rookieCard: string;
+  feature: string;
+  features: string[];
+  grade: string;
+  grader: string;
+  slabbed: boolean;
   serialNumber: string;
   sku: string;
   status: CardStatus;
@@ -251,21 +269,25 @@ type AddCardForm = {
   totalCostBasis: string;
   source: string;
   seller: string;
-  invoice: string;
   paymentMethod: string;
-  grade: string;
-  grader: string;
-  gradingStatus: string;
+  storageLocation: string;
   estimatedValue: string;
+  lastSale: string;
   averageComp: string;
+  highComp: string;
+  lowComp: string;
+  compConfidence: string;
+  gainLoss: string;
+  roi: string;
   notes: string;
   privateNotes: string;
-  printableReportNotes: string;
-  storageLocation: string;
+  invoice: string;
+  gradingStatus: string;
   frontImage?: string;
   backImage?: string;
   slabImage?: string;
   receiptImage?: string;
+  printableReportNotes: string;
 };
 
 const cardgemzLogo = "/cardgemz-main-logo.png";
@@ -320,277 +342,587 @@ type CollectionReportColumn =
   | "serialNumber"
   | "notes";
 
+  type CollectionIntelligence = {
+  estimatedPSA: string;
+  estimatedBGS: string;
+  estimatedSGC: string;
+  estimatedCGC: string;
+
+  centeringEstimate: string;
+  cornersEstimate: string;
+  edgesEstimate: string;
+  surfaceEstimate: string;
+  autoEstimate?: string;
+
+  bestGradingCompany:
+    | "PSA"
+    | "BGS"
+    | "SGC"
+    | "CGC"
+    | "Raw Hold"
+    | "Do Not Grade";
+
+  gradingRecommendation: string;
+  gradingConfidence: "Low" | "Medium" | "High";
+
+  rawCompLow: number;
+  rawCompHigh: number;
+  gradedCompLow: number;
+  gradedCompHigh: number;
+  cardVaultValueLow: number;
+  cardVaultValueHigh: number;
+  compConfidence: "Low" | "Medium" | "High";
+
+  marketAction: "Keep" | "Sell" | "Watch" | "Grade" | "Review" | "Protect";
+  movementStatus: "Gainer" | "Loser" | "Stable" | "Volatile" | "Not Tracked";
+  valueChangePercent: number;
+
+  riskFactors: string[];
+  intelligenceNotes: string;
+  lastReviewedDate: string;
+};
+
 const initialCards: CardRecord[] = [
   {
     id: 1,
+    player: "Anfernee Penny Hardaway",
+    card: "Magic Man",
+    cardName: "Anfernee Penny Hardaway Magic Man",
+    cardType: "Insert / Magic Man",
+    team: "Orlando Magic",
+    sport: "Basketball",
+    year: "1994",
+    brand: "SkyBox E-Motion",
+    set: "E-Motion Magic Man",
+    cardNumber: "8 of 9",
+    parallel: "Base",
+    rookie: "No",
+    autograph: "No",
+    patch: "No",
+    league: "NBA",
+    rookieCard: "No",
+    feature: "Magic Man insert",
+    features: ["Magic Man", "1990s Insert", "Orlando Magic", "Penny Hardaway"],
+    grade: "Raw",
+    grader: "Raw",
+    slabbed: false,
+    serialNumber: "N/A",
+    sku: "CVP-HARDAWAY-1994-MAGICMAN-8OF9",
+    status: "Watch",
+    purchaseDate: "",
+    purchasePrice: 0,
+    taxesFees: 0,
+    shippingCost: 0,
+    totalCostBasis: 0,
+    source: "Personal Collection",
+    seller: "",
+    paymentMethod: "",
+    storageLocation: "Raw Collection",
+    estimatedValue: 5,
+    lastSale: 5,
+    averageComp: 5,
+    highComp: 7,
+    lowComp: 3,
+    compConfidence: "Medium",
+    gainLoss: 0,
+    roi: 0,
+    notes:
+      "Estimated BGS 7.5–8.5. Likely raw hold unless closer inspection shows much cleaner corners and surface.",
+
+    collectionIntelligence: {
+      estimatedPSA: "7–8",
+      estimatedBGS: "7.5–8.5",
+      estimatedSGC: "7.5–8.5",
+      estimatedCGC: "7.5–8.5",
+      centeringEstimate: "8.5–9.0",
+      cornersEstimate: "7.5–8.0",
+      edgesEstimate: "7.5–8.0",
+      surfaceEstimate: "7.0–8.0",
+      bestGradingCompany: "Raw Hold",
+      gradingRecommendation:
+        "Hold raw unless close-up inspection shows gem-level corners and surface.",
+      gradingConfidence: "Medium",
+      rawCompLow: 3,
+      rawCompHigh: 7,
+      gradedCompLow: 0,
+      gradedCompHigh: 0,
+      cardVaultValueLow: 3,
+      cardVaultValueHigh: 10,
+      compConfidence: "Medium",
+      marketAction: "Review",
+      movementStatus: "Not Tracked",
+      valueChangePercent: 0,
+      riskFactors: ["Black-border edge wear", "Surface scratches", "Corner whitening"],
+      intelligenceNotes:
+        "Nostalgia/raw hold card. Grading only makes sense if condition is much cleaner outside the holder.",
+      lastReviewedDate: "2026-05-14",
+    },
+  },
+
+  {
+    id: 2,
+    player: "Tim Duncan",
+    card: "Artistry in Motion Gold /10",
+    cardName: "Tim Duncan Court Kings Artistry in Motion Gold /10",
+    cardType: "Insert",
+    team: "San Antonio Spurs",
+    sport: "Basketball",
+    year: "2024-25",
+    brand: "Panini Court Kings",
+    set: "Court Kings Artistry in Motion",
+    cardNumber: "No. 27",
+    parallel: "Gold /10",
+    rookie: "No",
+    autograph: "No",
+    patch: "No",
+    league: "NBA",
+    rookieCard: "No",
+    feature: "Low-numbered Spurs legend insert",
+    features: ["Low Serial Number", "Gold Parallel", "Spurs Legend", "Court Kings"],
+    grade: "Raw",
+    grader: "Raw",
+    slabbed: false,
+    serialNumber: "06/10",
+    sku: "CVP-DUNCAN-2024-COURTKINGS-AIM-GOLD-06OF10",
+    status: "Grade Candidate",
+    purchaseDate: "",
+    purchasePrice: 0,
+    taxesFees: 0,
+    shippingCost: 0,
+    totalCostBasis: 0,
+    source: "Personal Collection",
+    seller: "",
+    paymentMethod: "",
+    storageLocation: "Raw Collection",
+    estimatedValue: 40,
+    lastSale: 40,
+    averageComp: 40,
+    highComp: 60,
+    lowComp: 25,
+    compConfidence: "Low",
+    gainLoss: 0,
+    roi: 0,
+    notes:
+      "Low-number Tim Duncan /10. Estimated BGS 8.5–9.0. Grade review candidate because of Spurs legend appeal and rarity.",
+
+    collectionIntelligence: {
+      estimatedPSA: "8–9",
+      estimatedBGS: "8.5–9.0",
+      estimatedSGC: "8.5–9.0",
+      estimatedCGC: "8.5–9.0",
+      centeringEstimate: "8.5–9.0",
+      cornersEstimate: "8.0–8.5",
+      edgesEstimate: "8.0–8.5",
+      surfaceEstimate: "8.0–9.0",
+      bestGradingCompany: "BGS",
+      gradingRecommendation:
+        "Grade review candidate because it is a low-numbered Tim Duncan /10.",
+      gradingConfidence: "Medium",
+      rawCompLow: 25,
+      rawCompHigh: 60,
+      gradedCompLow: 0,
+      gradedCompHigh: 0,
+      cardVaultValueLow: 25,
+      cardVaultValueHigh: 60,
+      compConfidence: "Low",
+      marketAction: "Grade",
+      movementStatus: "Not Tracked",
+      valueChangePercent: 0,
+      riskFactors: ["Foil surface", "Dark edge chipping", "Limited exact comps"],
+      intelligenceNotes:
+        "Limited exact comps. Low-number Spurs legend card gives stronger collector value than base inserts.",
+      lastReviewedDate: "2026-05-14",
+    },
+  },
+
+  {
+    id: 3,
     player: "Michael Jordan",
-    card: "1986 Fleer #57",
+    card: "NBA Superstars",
+    cardName: "Michael Jordan NBA Superstars",
+    cardType: "Insert / Subset",
     team: "Chicago Bulls",
     sport: "Basketball",
-    year: "1986",
+    year: "1994",
     brand: "Fleer",
-    set: "Fleer Basketball",
-    cardNumber: "57",
+    set: "NBA Superstars",
+    cardNumber: "1 of 20",
     parallel: "Base",
-    grade: "PSA 8",
-    grader: "PSA",
+    rookie: "No",
+    autograph: "No",
+    patch: "No",
+    league: "NBA",
+    rookieCard: "No",
+    feature: "NBA Superstars subset",
+    features: ["Michael Jordan", "1990s Insert", "Chicago Bulls", "NBA Superstars"],
+    grade: "Raw",
+    grader: "Raw",
+    slabbed: false,
     serialNumber: "N/A",
-    sku: "CVP-JORDAN-1986-FLEER-57",
+    sku: "CVP-JORDAN-1994-FLEER-NBASUPERSTARS-1OF20",
     status: "Personal Collection",
-    purchaseDate: "June 1, 2025",
-    purchasePrice: 12500,
+    purchaseDate: "",
+    purchasePrice: 0,
     taxesFees: 0,
     shippingCost: 0,
-    totalCostBasis: 12500,
-    source: "Private Sale",
-    seller: "Private",
-    paymentMethod: "Wire",
-    storageLocation: "Vault Elite-01",
-    estimatedValue: 45200,
-    lastSale: 45200,
-    averageComp: 45200,
-    highComp: 48000,
-    lowComp: 43000,
-    compConfidence: "Manual",
-    gainLoss: 32700,
-    roi: 261.6,
-    notes: "High-value flagship card. Insurance report candidate.",
+    totalCostBasis: 0,
+    source: "Personal Collection",
+    seller: "",
+    paymentMethod: "",
+    storageLocation: "Raw Collection",
+    estimatedValue: 15,
+    lastSale: 15,
+    averageComp: 15,
+    highComp: 20,
+    lowComp: 8,
+    compConfidence: "Medium",
+    gainLoss: 0,
+    roi: 0,
+    notes:
+      "Cool Michael Jordan raw hold. Estimated BGS/PSA range around 7–8 based on visible corner, edge, and surface risk.",
+
+    collectionIntelligence: {
+      estimatedPSA: "7–8",
+      estimatedBGS: "7.0–8.0",
+      estimatedSGC: "7.0–8.0",
+      estimatedCGC: "7.0–8.0",
+      centeringEstimate: "8.0–8.5",
+      cornersEstimate: "7.0–7.5",
+      edgesEstimate: "7.0–7.5",
+      surfaceEstimate: "7.0–8.0",
+      bestGradingCompany: "Raw Hold",
+      gradingRecommendation:
+        "Better as a raw Michael Jordan collector card unless condition improves on closer inspection.",
+      gradingConfidence: "Medium",
+      rawCompLow: 8,
+      rawCompHigh: 20,
+      gradedCompLow: 0,
+      gradedCompHigh: 0,
+      cardVaultValueLow: 10,
+      cardVaultValueHigh: 20,
+      compConfidence: "Medium",
+      marketAction: "Keep",
+      movementStatus: "Not Tracked",
+      valueChangePercent: 0,
+      riskFactors: ["Corner wear", "Surface age wear", "Edge whitening"],
+      intelligenceNotes:
+        "Cool Jordan raw hold. Grading upside is limited unless the card is cleaner than photos show.",
+      lastReviewedDate: "2026-05-14",
+    },
   },
-  {
-    id: 2,
-    player: "Victor Wembanyama",
-    card: "2023 Prizm Black Gold /10",
-    team: "San Antonio Spurs",
-    sport: "Basketball",
-    year: "2023",
-    brand: "Panini Prizm",
-    set: "Prizm",
-    cardNumber: "BG-10",
-    parallel: "Black Gold /10",
-    grade: "PSA 10",
-    grader: "PSA",
-    serialNumber: "/10",
-    sku: "CVP-WEMBY-PRIZM-BG-010",
-    status: "Personal Collection",
-    purchaseDate: "May 24, 2025",
-    purchasePrice: 1850,
-    taxesFees: 0,
-    shippingCost: 0,
-    totalCostBasis: 1850,
-    source: "eBay",
-    seller: "eBay Seller",
-    paymentMethod: "Card",
-    storageLocation: "Vault A-01",
-    estimatedValue: 6200,
-    lastSale: 6100,
-    averageComp: 6200,
-    highComp: 6800,
-    lowComp: 5700,
-    compConfidence: "Manual",
-    gainLoss: 4350,
-    roi: 235.1,
-    notes: "Top Wemby hold; premium parallel with strong long-term collection value.",
-  },
-  {
-    id: 3,
-    player: "Victor Wembanyama",
-    card: "2023 Prizm Silver",
-    team: "San Antonio Spurs",
-    sport: "Basketball",
-    year: "2023",
-    brand: "Panini Prizm",
-    set: "Prizm",
-    cardNumber: "Silver",
-    parallel: "Silver",
-    grade: "PSA 10",
-    grader: "PSA",
-    serialNumber: "N/A",
-    sku: "VM01001",
-    status: "Personal Collection",
-    purchaseDate: "May 24, 2025",
-    purchasePrice: 900,
-    taxesFees: 0,
-    shippingCost: 0,
-    totalCostBasis: 900,
-    source: "Card Show",
-    seller: "Dealer",
-    paymentMethod: "Cash",
-    storageLocation: "Vault A-02",
-    estimatedValue: 2350,
-    lastSale: 2300,
-    averageComp: 2350,
-    highComp: 2500,
-    lowComp: 2200,
-    compConfidence: "Manual",
-    gainLoss: 1450,
-    roi: 161.1,
-    notes: "Core rookie-year Prizm position.",
-  },
+
   {
     id: 4,
-    player: "Quinyon Mitchell",
-    card: "2023-2024 Topps Signature Class Chrome Variation Auto 5/5",
-    team: "Philadelphia Eagles",
-    sport: "Football",
+    player: "Victor Wembanyama",
+    card: "Rookie of the Year Topps Now RC",
+    cardName: "Victor Wembanyama Rookie of the Year Topps Now RC",
+    cardType: "Rookie Card",
+    team: "San Antonio Spurs",
+    sport: "Basketball",
     year: "2023-24",
-    brand: "Topps",
-    set: "Signature Class Chrome",
-    cardNumber: "SC-QM",
-    parallel: "Auto 5/5",
+    brand: "Topps Now",
+    set: "Rookie of the Year",
+    cardNumber: "VW-6",
+    parallel: "Base",
+    rookie: "Yes",
+    autograph: "No",
+    patch: "No",
+    league: "NBA",
+    rookieCard: "Yes",
+    feature: "Rookie of the Year Topps Now RC",
+    features: ["Rookie Card", "Rookie of the Year", "Topps Now", "Wembanyama"],
     grade: "Raw",
-    grader: "Beckett",
-    serialNumber: "5/5",
-    sku: "CVP-QUINYON-SIG-005",
+    grader: "Raw",
+    slabbed: false,
+    serialNumber: "N/A",
+    sku: "CVP-WEMBY-2023-TOPPSNOW-ROY-VW6",
     status: "Grade Candidate",
-    purchaseDate: "June 11, 2025",
-    purchasePrice: 193.92,
+    purchaseDate: "",
+    purchasePrice: 0,
     taxesFees: 0,
     shippingCost: 0,
-    totalCostBasis: 193.92,
-    source: "Sales Counter",
-    seller: "Sales Counter",
-    paymentMethod: "Card",
-    storageLocation: "Sales Counter",
-    estimatedValue: 700,
-    lastSale: 644,
-    averageComp: 623,
-    highComp: 826,
-    lowComp: 434,
-    compConfidence: "Manual",
-    gainLoss: 506.08,
-    roi: 261.0,
+    totalCostBasis: 0,
+    source: "Personal Collection",
+    seller: "",
+    paymentMethod: "",
+    storageLocation: "Raw Collection",
+    estimatedValue: 25,
+    lastSale: 25,
+    averageComp: 25,
+    highComp: 25,
+    lowComp: 20,
+    compConfidence: "Medium",
+    gainLoss: 0,
+    roi: 0,
     notes:
-      "Fingerprints cleaned. Looks very good with no obvious whitening. Estimated 9.5-10 potential with possible Black Label upside.",
+      "Strong modern rookie grading candidate. PSA 9–10 estimate, with PSA 10 upside if surface and corners are clean.",
+
+    collectionIntelligence: {
+      estimatedPSA: "9–10",
+      estimatedBGS: "8.5–9.5",
+      estimatedSGC: "9–10",
+      estimatedCGC: "9–9.5",
+      centeringEstimate: "9.0–9.5",
+      cornersEstimate: "8.5–9.0",
+      edgesEstimate: "8.5–9.0",
+      surfaceEstimate: "8.5–9.5",
+      bestGradingCompany: "PSA",
+      gradingRecommendation:
+        "Submit to PSA only if surface and corners pass close inspection.",
+      gradingConfidence: "Medium",
+      rawCompLow: 20,
+      rawCompHigh: 25,
+      gradedCompLow: 35,
+      gradedCompHigh: 200,
+      cardVaultValueLow: 25,
+      cardVaultValueHigh: 150,
+      compConfidence: "Medium",
+      marketAction: "Grade",
+      movementStatus: "Not Tracked",
+      valueChangePercent: 0,
+      riskFactors: ["Dark edges", "Surface scratches", "Case glare", "High print run"],
+      intelligenceNotes:
+        "Strong modern rookie grading candidate. PSA 10 upside exists, but PSA 9 may not justify submission cost if comps are weak.",
+      lastReviewedDate: "2026-05-14",
+    },
   },
+
   {
     id: 5,
-    player: "Patrick Mahomes II",
-    card: "2017 Prizm #269",
-    team: "Kansas City Chiefs",
-    sport: "Football",
-    year: "2017",
-    brand: "Panini Prizm",
-    set: "Prizm",
-    cardNumber: "269",
-    parallel: "Base",
-    grade: "PSA 10",
-    grader: "PSA",
-    serialNumber: "N/A",
-    sku: "CVP-MAHOMES-2017-PRIZM-269",
-    status: "For Sale",
-    purchaseDate: "April 20, 2025",
-    purchasePrice: 325,
+    player: "David Robinson",
+    card: "Flawless Loyal Greats Patch Auto /5",
+    cardName: "David Robinson Flawless Loyal Greats Patch Auto /5",
+    cardType: "Patch Autograph",
+    team: "San Antonio Spurs",
+    sport: "Basketball",
+    year: "2023-24",
+    brand: "Panini Flawless",
+    set: "Flawless Loyal Greats",
+    cardNumber: "",
+    parallel: "Emerald /5",
+    rookie: "No",
+    autograph: "Yes",
+    patch: "Yes",
+    league: "NBA",
+    rookieCard: "No",
+    feature: "Premium Flawless patch autograph",
+    features: ["Patch Auto", "Flawless", "Low Serial Number", "Spurs Legend", "Premium Thick Stock"],
+    grade: "Raw",
+    grader: "Raw",
+    slabbed: false,
+    serialNumber: "5/5",
+    sku: "CVP-ROBINSON-2023-FLAWLESS-LOYALGREATS-5OF5",
+    status: "Protect",
+    purchaseDate: "",
+    purchasePrice: 0,
     taxesFees: 0,
     shippingCost: 0,
-    totalCostBasis: 325,
-    source: "Card Show",
-    seller: "Dealer",
-    paymentMethod: "Cash",
-    storageLocation: "Vault B-01",
-    estimatedValue: 525,
-    lastSale: 520,
-    averageComp: 525,
-    highComp: 575,
-    lowComp: 475,
-    compConfidence: "Manual",
-    gainLoss: 200,
-    roi: 61.5,
-    notes: "For sale candidate.",
+    totalCostBasis: 0,
+    source: "Personal Collection",
+    seller: "",
+    paymentMethod: "",
+    storageLocation: "Premium Raw Collection",
+    estimatedValue: 250,
+    lastSale: 250,
+    averageComp: 250,
+    highComp: 350,
+    lowComp: 175,
+    compConfidence: "Low",
+    gainLoss: 0,
+    roi: 0,
+    notes:
+      "Premium David Robinson Flawless patch auto /5. Best grading purpose is protection, authentication, and showcase value.",
+
+    collectionIntelligence: {
+      estimatedPSA: "8–9",
+      estimatedBGS: "8.0–9.0",
+      estimatedSGC: "8.5–9.0",
+      estimatedCGC: "8.5–9.0",
+      centeringEstimate: "8.5–9.0",
+      cornersEstimate: "8.0–8.5",
+      edgesEstimate: "8.0–8.5",
+      surfaceEstimate: "8.0–9.0",
+      autoEstimate: "9–10",
+      bestGradingCompany: "BGS",
+      gradingRecommendation:
+        "Grade or authenticate for protection and premium presentation, not purely to chase gem.",
+      gradingConfidence: "Medium",
+      rawCompLow: 175,
+      rawCompHigh: 350,
+      gradedCompLow: 175,
+      gradedCompHigh: 400,
+      cardVaultValueLow: 175,
+      cardVaultValueHigh: 350,
+      compConfidence: "Low",
+      marketAction: "Protect",
+      movementStatus: "Not Tracked",
+      valueChangePercent: 0,
+      riskFactors: ["Thick-stock corners", "Patch-card edges", "Limited exact comps"],
+      intelligenceNotes:
+        "Premium Spurs legend Flawless patch auto /5. Best reason to grade is protection, authenticity, and showcase value.",
+      lastReviewedDate: "2026-05-14",
+    },
   },
+
   {
     id: 6,
-    player: "Shohei Ohtani",
-    card: "2023 Topps Chrome",
-    team: "Los Angeles Dodgers",
-    sport: "Baseball",
-    year: "2023",
-    brand: "Topps Chrome",
-    set: "Topps Chrome",
-    cardNumber: "N/A",
-    parallel: "Base",
+    player: "David Robinson",
+    card: "Flawless Loyal Greats Patch Auto /10",
+    cardName: "David Robinson Flawless Loyal Greats Patch Auto /10",
+    cardType: "Patch Autograph",
+    team: "San Antonio Spurs",
+    sport: "Basketball",
+    year: "2023-24",
+    brand: "Panini Flawless",
+    set: "Flawless Loyal Greats",
+    cardNumber: "",
+    parallel: "/10",
+    rookie: "No",
+    autograph: "Yes",
+    patch: "Yes",
+    league: "NBA",
+    rookieCard: "No",
+    feature: "Premium Flawless patch autograph",
+    features: ["Patch Auto", "Flawless", "Low Serial Number", "Spurs Legend", "Premium Thick Stock"],
     grade: "Raw",
-    grader: "Review",
-    serialNumber: "N/A",
-    sku: "CVP-OHTANI-2023-TOPPS-CHROME",
-    status: "Watchlist",
-    purchaseDate: "May 1, 2025",
-    purchasePrice: 75,
+    grader: "Raw",
+    slabbed: false,
+    serialNumber: "08/10",
+    sku: "CVP-ROBINSON-2023-FLAWLESS-LOYALGREATS-08OF10",
+    status: "Protect",
+    purchaseDate: "",
+    purchasePrice: 0,
     taxesFees: 0,
     shippingCost: 0,
-    totalCostBasis: 75,
-    source: "LCS",
-    seller: "Local Card Shop",
-    paymentMethod: "Card",
-    storageLocation: "Vault C-01",
-    estimatedValue: 185,
+    totalCostBasis: 0,
+    source: "Personal Collection",
+    seller: "",
+    paymentMethod: "",
+    storageLocation: "Premium Raw Collection",
+    estimatedValue: 180,
     lastSale: 180,
-    averageComp: 185,
-    highComp: 210,
-    lowComp: 160,
-    compConfidence: "Manual",
-    gainLoss: 110,
-    roi: 146.6,
-    notes: "Watchlist card.",
-  },
-];
+    averageComp: 180,
+    highComp: 250,
+    lowComp: 125,
+    compConfidence: "Low",
+    gainLoss: 0,
+    roi: 0,
+    notes:
+      "Premium David Robinson Flawless patch auto /10. Strong protection/showcase candidate.",
 
-const initialMemorabilia: MemorabiliaRecord[] = [
-  {
-    id: 1,
-    itemName: "Autographed Cowboys Jersey",
-    athlete: "Micah Parsons",
-    category: "Football",
-    itemType: "Jersey",
-    authentication: "Beckett",
-    coaNumber: "BAS-REVIEW-001",
-    purchaseDate: "June 12, 2025",
-    purchasePrice: 350,
-    estimatedValue: 750,
-    storageLocation: "Display Case A",
-    condition: "Excellent",
-    insuranceCandidate: true,
-    saleStatus: "Hold",
-    notes: "High-display item. Good candidate for insurance documentation.",
+    collectionIntelligence: {
+      estimatedPSA: "8–9",
+      estimatedBGS: "8.5–9.0",
+      estimatedSGC: "8.5–9.0",
+      estimatedCGC: "8.5–9.0",
+      centeringEstimate: "8.5–9.0",
+      cornersEstimate: "8.0–8.5",
+      edgesEstimate: "8.0–8.5",
+      surfaceEstimate: "8.5–9.0",
+      autoEstimate: "9.5–10",
+      bestGradingCompany: "BGS",
+      gradingRecommendation:
+        "Grade or authenticate for protection and showcase value.",
+      gradingConfidence: "Medium",
+      rawCompLow: 125,
+      rawCompHigh: 250,
+      gradedCompLow: 125,
+      gradedCompHigh: 300,
+      cardVaultValueLow: 125,
+      cardVaultValueHigh: 250,
+      compConfidence: "Low",
+      marketAction: "Protect",
+      movementStatus: "Not Tracked",
+      valueChangePercent: 0,
+      riskFactors: ["Thick-stock corners", "Patch-card edges", "Limited exact comps"],
+      intelligenceNotes:
+        "Strong premium Spurs legend card. Slightly below the /5 in rarity, but still a showcase/protection candidate.",
+      lastReviewedDate: "2026-05-14",
+    },
   },
+
   {
-    id: 2,
-    itemName: "Signed Game-Style Shoes",
-    athlete: "Victor Wembanyama",
-    category: "Basketball",
-    itemType: "Shoes",
-    authentication: "PSA/DNA",
-    coaNumber: "PSA-REVIEW-002",
-    purchaseDate: "July 4, 2025",
-    purchasePrice: 900,
-    estimatedValue: 1850,
-    storageLocation: "Vault Memorabilia Shelf",
-    condition: "Near Mint",
-    insuranceCandidate: true,
-    saleStatus: "Review",
-    notes: "Premium upside item. Needs photo documentation and COA upload.",
-  },
-  {
-    id: 3,
-    itemName: "Autographed Display Helmet",
-    athlete: "Patrick Mahomes",
-    category: "Football",
-    itemType: "Helmet",
-    authentication: "JSA",
-    coaNumber: "JSA-REVIEW-003",
-    purchaseDate: "August 18, 2025",
-    purchasePrice: 525,
-    estimatedValue: 1100,
-    storageLocation: "Vault B",
-    condition: "Excellent",
-    insuranceCandidate: true,
-    saleStatus: "Hold",
-    notes: "Strong long-term hold. Add detailed photos before final insurance report.",
+    id: 7,
+    player: "Victor Wembanyama",
+    card: "State of the Art",
+    cardName: "Victor Wembanyama Court Kings State of the Art",
+    cardType: "Case Hit / SSP Style Insert",
+    team: "San Antonio Spurs",
+    sport: "Basketball",
+    year: "2024",
+    brand: "Panini Court Kings",
+    set: "State of the Art",
+    cardNumber: "7",
+    parallel: "Base",
+    rookie: "Yes",
+    autograph: "No",
+    patch: "No",
+    league: "NBA",
+    rookieCard: "Yes",
+    feature: "State of the Art rookie-year insert",
+    features: ["Wembanyama", "State of the Art", "Court Kings", "BGS Slab", "High-End Rookie-Year Insert"],
+    grade: "BGS 9",
+    grader: "BGS",
+    slabbed: true,
+    serialNumber: "N/A",
+    sku: "CVP-WEMBY-2024-COURTKINGS-STATEOFTHEART-BGS9",
+    status: "Personal Collection",
+    purchaseDate: "",
+    purchasePrice: 0,
+    taxesFees: 0,
+    shippingCost: 0,
+    totalCostBasis: 0,
+    source: "Personal Collection",
+    seller: "",
+    paymentMethod: "",
+    storageLocation: "Graded Collection",
+    estimatedValue: 375,
+    lastSale: 350,
+    averageComp: 375,
+    highComp: 450,
+    lowComp: 300,
+    compConfidence: "Medium",
+    gainLoss: 0,
+    roi: 0,
+    notes:
+      "Already BGS 9. Estimated PSA crossover likely PSA 9, possible PSA 10 only if surface and subgrades support it.",
+
+    collectionIntelligence: {
+      estimatedPSA: "9, possible 10 crossover",
+      estimatedBGS: "Current BGS 9",
+      estimatedSGC: "9–10",
+      estimatedCGC: "9–9.5",
+      centeringEstimate: "9–10",
+      cornersEstimate: "9",
+      edgesEstimate: "8.5–9.5",
+      surfaceEstimate: "8.5–9.5",
+      bestGradingCompany: "PSA",
+      gradingRecommendation:
+        "Keep BGS slab unless PSA 10 crossover comps justify the risk.",
+      gradingConfidence: "Medium",
+      rawCompLow: 197,
+      rawCompHigh: 350,
+      gradedCompLow: 300,
+      gradedCompHigh: 450,
+      cardVaultValueLow: 300,
+      cardVaultValueHigh: 450,
+      compConfidence: "Medium",
+      marketAction: "Keep",
+      movementStatus: "Not Tracked",
+      valueChangePercent: 0,
+      riskFactors: ["Surface glare", "Unknown BGS subgrades", "Crossover risk"],
+      intelligenceNotes:
+        "One of the strongest cards reviewed. Already graded BGS 9. PSA 10 crossover should only be considered if comps are significantly higher.",
+      lastReviewedDate: "2026-05-14",
+    },
   },
 ];
 
 const emptyForm: AddCardForm = {
   player: "",
   card: "",
+  cardName: "",
+  cardType: "",
   team: "",
   sport: "Basketball",
   year: "",
@@ -601,8 +933,15 @@ const emptyForm: AddCardForm = {
   rookie: "No",
   autograph: "No",
   patch: "No",
+  league: "NBA",
+  rookieCard: "No",
+  feature: "",
+  features: [],
+  grade: "Raw",
+  grader: "Raw",
+  slabbed: false,
   serialNumber: "",
-  sku: "CVP-WEMBY-PRIZM-001",
+  sku: "",
   status: "Personal Collection",
   purchaseDate: "",
   purchasePrice: "",
@@ -611,17 +950,25 @@ const emptyForm: AddCardForm = {
   totalCostBasis: "",
   source: "",
   seller: "",
-  invoice: "",
   paymentMethod: "",
-  grade: "Raw",
-  grader: "PSA",
-  gradingStatus: "Planning",
+  storageLocation: "",
   estimatedValue: "",
+  lastSale: "",
   averageComp: "",
+  highComp: "",
+  lowComp: "",
+  compConfidence: "Low",
+  gainLoss: "",
+  roi: "",
   notes: "",
   privateNotes: "",
   printableReportNotes: "",
-  storageLocation: "Vault A-01",
+  invoice: "",
+  gradingStatus: "",
+  frontImage: "",
+  backImage: "",
+  slabImage: "",
+  receiptImage: "",
 };
 
 const starterNotifications: CardVaultNotification[] = [
@@ -3923,6 +4270,178 @@ function AllCards({
     );
   }
 
+  function getFeatureIconBadges(card: CardRecord) {
+    const cardData = card as any;
+
+    const serialNumber = String(
+      card.serialNumber ||
+        cardData.serial ||
+        cardData.printRunNumber ||
+        cardData.numbered ||
+        ""
+    );
+
+    const cardText = [
+      card.card,
+      card.parallel,
+      card.feature,
+      Array.isArray(cardData.features)
+        ? cardData.features.join(" ")
+        : cardData.features,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+    const isRookie =
+      cardData.rookieCard === true ||
+      cardData.isRookie === true ||
+      `${card.rookieCard || cardData.rookieCard || ""}`.toLowerCase() ===
+        "yes" ||
+      `${card.rookie || ""}`.toLowerCase() === "yes" ||
+      card.card.toLowerCase().includes("rookie") ||
+      card.card.toLowerCase().includes("rc");
+
+    const isAutograph =
+      cardData.autograph === true ||
+      cardData.isAutograph === true ||
+      cardData.auto === true ||
+      `${card.autograph || ""}`.toLowerCase() === "yes";
+
+    const isPatch =
+      cardData.patch === true ||
+      cardData.isPatch === true ||
+      cardData.memorabilia === true ||
+      `${card.patch || ""}`.toLowerCase() === "yes" ||
+      card.card.toLowerCase().includes("patch") ||
+      card.card.toLowerCase().includes("memorabilia") ||
+      cardText.includes("patch") ||
+      cardText.includes("memorabilia");
+
+    return [
+      isRookie
+        ? {
+            key: "rookie",
+            label: "RC",
+            title: "Rookie Card",
+            shape: "shield",
+            className: "border-vaultGold/50 bg-black/85 text-vaultGold",
+          }
+        : null,
+
+      isAutograph
+        ? {
+            key: "autograph",
+            label: "✒",
+            title: "Autograph",
+            shape: "circle",
+            className: "border-vaultGold/50 bg-black/85 text-vaultGold",
+          }
+        : null,
+
+      isPatch
+        ? {
+            key: "patch",
+            label: "23",
+            title: "Patch / Memorabilia",
+            shape: "jersey",
+            className: "border-vaultGold/50 bg-black/85 text-vaultGold",
+          }
+        : null,
+
+      serialNumber === "1/1"
+        ? {
+            key: "one-of-one",
+            label: "1/1",
+            title: "One of One",
+            shape: "diamond",
+            className: "border-blue-400/60 bg-blue-950/85 text-blue-200",
+          }
+        : null,
+
+      serialNumber.endsWith("/25")
+        ? {
+            key: "out-of-25",
+            label: "/25",
+            title: "Numbered /25",
+            shape: "diamond",
+            className: "border-vaultGold/70 bg-vaultGold/15 text-vaultGold",
+          }
+        : null,
+
+      serialNumber.endsWith("/50")
+        ? {
+            key: "out-of-50",
+            label: "/50",
+            title: "Numbered /50",
+            shape: "diamond",
+            className: "border-zinc-300/70 bg-zinc-700/60 text-zinc-100",
+          }
+        : null,
+
+      serialNumber.endsWith("/100")
+        ? {
+            key: "out-of-100",
+            label: "/100",
+            title: "Numbered /100",
+            shape: "diamond",
+            className: "border-amber-700/70 bg-amber-950/70 text-amber-300",
+          }
+        : null,
+
+      cardText.includes("ssp") || cardText.includes("super short print")
+        ? {
+            key: "ssp",
+            label: "SSP",
+            title: "Super Short Print",
+            shape: "circle",
+            className: "border-vaultGold/60 bg-black/85 text-vaultGold",
+          }
+        : null,
+    ].filter(Boolean) as {
+      key: string;
+      label: string;
+      title: string;
+      shape: "shield" | "circle" | "jersey" | "diamond";
+      className: string;
+    }[];
+  }
+
+  function MiniFeatureIconBadge({
+    badge,
+  }: {
+    badge: {
+      key: string;
+      label: string;
+      title: string;
+      shape: "shield" | "circle" | "jersey" | "diamond";
+      className: string;
+    };
+  }) {
+    const baseClass =
+      "flex h-7 w-7 items-center justify-center border text-[8px] font-black shadow-lg backdrop-blur-xl";
+
+    const shapeClass =
+      badge.shape === "shield"
+        ? "rounded-t-lg rounded-b-[1rem]"
+        : badge.shape === "circle"
+        ? "rounded-full"
+        : badge.shape === "jersey"
+        ? "rounded-lg"
+        : "rotate-45 rounded-md";
+
+    const labelClass = badge.shape === "diamond" ? "-rotate-45" : "";
+
+    return (
+      <span
+        title={badge.title}
+        className={`${baseClass} ${shapeClass} ${badge.className}`}
+      >
+        <span className={labelClass}>{badge.label}</span>
+      </span>
+    );
+  }
+
   return (
     <div className="w-full max-w-full space-y-5 overflow-x-hidden">
       {/* Mobile / Tablet Vault Manager Header */}
@@ -4123,13 +4642,14 @@ function AllCards({
             const cardDescription = getCardDescription(card);
             const cardStatus = getCardStatus(card);
             const cardGrade = getCardGrade(card);
+            const featureIconBadges = getFeatureIconBadges(card);
 
             return (
               <button
                 key={card.id}
                 type="button"
                 onClick={() => openCardDetail(card.id)}
-                className="flex w-full gap-4 overflow-hidden rounded-[1.5rem] border border-vaultGold/12 bg-black/55 p-3 text-left shadow-vault"
+                className="relative flex w-full gap-4 overflow-hidden rounded-[1.5rem] border border-vaultGold/12 bg-black/55 p-3 text-left shadow-vault"
               >
                 <div className="relative flex h-28 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-zinc-900 via-black to-zinc-950">
                   <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(212,175,55,0.14),transparent_45%)]" />
@@ -4145,7 +4665,7 @@ function AllCards({
                   )}
                 </div>
 
-                <div className="min-w-0 flex-1 py-1">
+                <div className="min-w-0 flex-1 py-1 pr-24">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="line-clamp-1 text-base font-black uppercase leading-5 text-white">
@@ -4175,6 +4695,14 @@ function AllCards({
                   <p className="mt-3 text-lg font-black text-profitGreen">
                     ${card.estimatedValue.toLocaleString()}
                   </p>
+
+                  {featureIconBadges.length > 0 && (
+                    <div className="absolute bottom-3 right-3 flex items-center gap-1.5">
+                      {featureIconBadges.map((badge) => (
+                        <MiniFeatureIconBadge key={badge.key} badge={badge} />
+                      ))}
+                    </div>
+                  )}
                 </div>
               </button>
             );
@@ -8047,12 +8575,13 @@ function CardDetail({
       ? "Patch / Memorabilia"
       : displayCard.card);
 
-  const serialNumberDisplay =
+  const serialNumberDisplay = String(
     cardData.serialNumber ||
-    cardData.serial ||
-    cardData.printRunNumber ||
-    cardData.numbered ||
-    "";
+      cardData.serial ||
+      cardData.printRunNumber ||
+      cardData.numbered ||
+      ""
+  );
 
   const autographDisplay =
     cardData.autograph === true ||
@@ -8115,17 +8644,6 @@ function CardDetail({
 
   const cardNameDisplay = cardNameParts.join(" ");
 
-  const cardIdentityBadges = [
-    rookieDisplay === "Yes" ? "RC" : "",
-    autographDisplay === "Yes" ? "AUTO" : "",
-    patchDisplay === "Yes" ? "PATCH" : "",
-    serialNumberDisplay?.includes("/")
-      ? `/${serialNumberDisplay.split("/").pop()}`
-      : displayCard.parallel?.match(/\/\d+/)?.[0] || "",
-    cardData.team ? cardData.team : "",
-    displayCard.parallel && displayCard.parallel !== "Base" ? "PREMIUM" : "",
-  ].filter(Boolean);
-
   const suggestedAction =
     marketValue > costBasis && roi >= 25
       ? "HOLD"
@@ -8135,6 +8653,188 @@ function CardDetail({
 
   const marketRangeLow = Math.max(0, Math.round(marketValue * 0.92));
   const marketRangeHigh = Math.round(marketValue * 1.08);
+  const collectionIntelligence = displayCard.collectionIntelligence;
+
+  const gradeText = `${displayCard.grade || ""} ${
+    collectionIntelligence?.estimatedPSA || ""
+  } ${collectionIntelligence?.estimatedBGS || ""}`.toUpperCase();
+
+  const cardIdentityBadges = [
+    displayCard.status === "Grade Candidate" ? "GRADE CANDIDATE" : "",
+    displayCard.status === "Protect" ? "PROTECT" : "",
+    displayCard.status === "Watch" || displayCard.status === "Watchlist"
+      ? "WATCH"
+      : "",
+
+    collectionIntelligence?.bestGradingCompany === "PSA" ? "PSA" : "",
+    collectionIntelligence?.bestGradingCompany === "BGS" ? "BGS" : "",
+    collectionIntelligence?.bestGradingCompany === "Raw Hold" ? "RAW HOLD" : "",
+
+    gradeText.includes("BLACK LABEL 10") ? "BLACK LABEL 10" : "",
+    gradeText.includes("PSA 10") ? "PSA 10" : "",
+    !gradeText.includes("PSA 10") && gradeText.includes("PSA 9") ? "PSA 9" : "",
+    !gradeText.includes("PSA 10") &&
+    !gradeText.includes("PSA 9") &&
+    gradeText.includes("PSA 8")
+      ? "PSA 8"
+      : "",
+
+    gradeText.includes("BGS 10") ? "BGS 10" : "",
+    gradeText.includes("BGS 9.5") ? "BGS 9.5" : "",
+    !gradeText.includes("BGS 9.5") && gradeText.includes("BGS 9")
+      ? "BGS 9"
+      : "",
+    gradeText.includes("BGS 8.5") ? "BGS 8.5" : "",
+    !gradeText.includes("BGS 8.5") && gradeText.includes("BGS 8")
+      ? "BGS 8"
+      : "",
+
+    serialNumberDisplay?.includes("/")
+      ? `/${serialNumberDisplay.split("/").pop()}`
+      : displayCard.parallel?.match(/\/\d+/)?.[0] || "",
+
+    rookieDisplay === "Yes" ? "RC" : "",
+  ].filter(Boolean);
+
+  const cardFeatureIconBadges = [
+    rookieDisplay === "Yes"
+      ? {
+          key: "rookie",
+          label: "RC",
+          title: "Rookie Card",
+          shape: "shield",
+          className: "border-vaultGold/50 bg-black/80 text-vaultGold",
+        }
+      : null,
+
+    autographDisplay === "Yes"
+      ? {
+          key: "autograph",
+          label: "✒",
+          title: "Autograph",
+          shape: "circle",
+          className: "border-vaultGold/50 bg-black/80 text-vaultGold",
+        }
+      : null,
+
+    patchDisplay === "Yes"
+      ? {
+          key: "patch",
+          label: "23",
+          title: "Patch / Memorabilia",
+          shape: "jersey",
+          className: "border-vaultGold/50 bg-black/80 text-vaultGold",
+        }
+      : null,
+
+    serialNumberDisplay === "1/1"
+      ? {
+          key: "one-of-one",
+          label: "1/1",
+          title: "One of One",
+          shape: "diamond",
+          className: "border-blue-400/60 bg-blue-950/80 text-blue-200",
+        }
+      : null,
+
+    serialNumberDisplay.endsWith("/25")
+      ? {
+          key: "out-of-25",
+          label: "/25",
+          title: "Numbered /25",
+          shape: "diamond",
+          className: "border-vaultGold/70 bg-vaultGold/15 text-vaultGold",
+        }
+      : null,
+
+    serialNumberDisplay.endsWith("/50")
+      ? {
+          key: "out-of-50",
+          label: "/50",
+          title: "Numbered /50",
+          shape: "diamond",
+          className: "border-zinc-300/70 bg-zinc-700/50 text-zinc-100",
+        }
+      : null,
+
+    serialNumberDisplay.endsWith("/100")
+      ? {
+          key: "out-of-100",
+          label: "/100",
+          title: "Numbered /100",
+          shape: "diamond",
+          className: "border-amber-700/70 bg-amber-950/60 text-amber-300",
+        }
+      : null,
+
+    featuresDisplay.toLowerCase().includes("ssp") ||
+    featuresDisplay.toLowerCase().includes("super short print")
+      ? {
+          key: "ssp",
+          label: "SSP",
+          title: "Super Short Print",
+          shape: "circle",
+          className: "border-vaultGold/60 bg-black/80 text-vaultGold",
+        }
+      : null,
+  ].filter(Boolean) as {
+    key: string;
+    label: string;
+    title: string;
+    shape: "shield" | "circle" | "jersey" | "diamond";
+    className: string;
+  }[];
+
+  const collectionIntelligenceRows = collectionIntelligence
+    ? [
+        ["Estimated PSA", collectionIntelligence.estimatedPSA],
+        ["Estimated BGS", collectionIntelligence.estimatedBGS],
+        ["Estimated SGC", collectionIntelligence.estimatedSGC],
+        ["Estimated CGC", collectionIntelligence.estimatedCGC],
+        ["Centering", collectionIntelligence.centeringEstimate],
+        ["Corners", collectionIntelligence.cornersEstimate],
+        ["Edges", collectionIntelligence.edgesEstimate],
+        ["Surface", collectionIntelligence.surfaceEstimate],
+        ["Auto", collectionIntelligence.autoEstimate || "Not applicable"],
+        ["Best Company", collectionIntelligence.bestGradingCompany],
+        ["Grade Decision", collectionIntelligence.gradingRecommendation],
+        [
+          "Raw Comp Range",
+          `$${collectionIntelligence.rawCompLow.toLocaleString()} - $${collectionIntelligence.rawCompHigh.toLocaleString()}`,
+        ],
+        [
+          "Graded Comp Range",
+          `$${collectionIntelligence.gradedCompLow.toLocaleString()} - $${collectionIntelligence.gradedCompHigh.toLocaleString()}`,
+        ],
+        [
+          "CardVault Value",
+          `$${collectionIntelligence.cardVaultValueLow.toLocaleString()} - $${collectionIntelligence.cardVaultValueHigh.toLocaleString()}`,
+        ],
+        ["Market Action", collectionIntelligence.marketAction],
+        ["Movement", collectionIntelligence.movementStatus],
+        ["Risk Factors", collectionIntelligence.riskFactors.join(", ")],
+        ["Intelligence Notes", collectionIntelligence.intelligenceNotes],
+      ]
+    : [
+        ["Estimated PSA", "Not reviewed"],
+        ["Estimated BGS", "Not reviewed"],
+        ["Estimated SGC", "Not reviewed"],
+        ["Estimated CGC", "Not reviewed"],
+        ["Best Company", "Review needed"],
+        ["Grade Decision", "Review this card before grading."],
+        ["Market Action", displayCard.status || "Review"],
+      ];
+
+  const collectionIntelligenceBadges = collectionIntelligence
+    ? [
+        collectionIntelligence.marketAction,
+        collectionIntelligence.bestGradingCompany,
+        collectionIntelligence.gradingConfidence,
+        collectionIntelligence.movementStatus !== "Not Tracked"
+          ? collectionIntelligence.movementStatus
+          : "",
+      ].filter(Boolean)
+    : ["Review Needed"];
 
   type MobileEditableRowConfig = {
     label: string;
@@ -8267,6 +8967,41 @@ function CardDetail({
     );
   }
 
+  function FeatureIconBadge({
+    badge,
+  }: {
+    badge: {
+      key: string;
+      label: string;
+      title: string;
+      shape: "shield" | "circle" | "jersey" | "diamond";
+      className: string;
+    };
+  }) {
+    const baseClass =
+      "flex h-9 w-9 items-center justify-center border text-[10px] font-black shadow-lg backdrop-blur-xl";
+
+    const shapeClass =
+      badge.shape === "shield"
+        ? "rounded-t-xl rounded-b-[1.25rem]"
+        : badge.shape === "circle"
+        ? "rounded-full"
+        : badge.shape === "jersey"
+        ? "rounded-xl"
+        : "rotate-45 rounded-md";
+
+    const labelClass = badge.shape === "diamond" ? "-rotate-45" : "";
+
+    return (
+      <span
+        title={badge.title}
+        className={`${baseClass} ${shapeClass} ${badge.className}`}
+      >
+        <span className={labelClass}>{badge.label}</span>
+      </span>
+    );
+  }
+
   const mobileInfoRows: MobileEditableRowConfig[] = [
     {
       label: "Player(s)",
@@ -8371,40 +9106,23 @@ function CardDetail({
 
   const mobileGradingRows: MobileEditableRowConfig[] = [
     {
-      label: "Status",
+      label: "Current Grade",
+      value: cardData.currentGrade || cardData.grade || "Not graded",
+      field: "currentGrade",
+    },
+    {
+      label: "Grader",
+      value: cardData.grader || cardData.gradeCompany || "Not listed",
+      field: "grader",
+    },
+    {
+      label: "Grade Status",
       value:
         cardData.gradeStatus ||
         cardData.gradingStatus ||
         displayCard.status ||
         "Raw",
       field: "gradeStatus",
-    },
-    {
-      label: "Current Grade",
-      value: cardData.currentGrade || cardData.grade || "Not graded",
-      field: "currentGrade",
-    },
-    {
-      label: "Target Grade",
-      value: cardData.targetGrade || "Not listed",
-      field: "targetGrade",
-    },
-    {
-      label: "Company",
-      value: cardData.gradeCompany || cardData.gradingCompany || "Not listed",
-      field: "gradeCompany",
-    },
-    {
-      label: "Condition Notes",
-      value: cardData.conditionNotes || "Not listed",
-      field: "conditionNotes",
-      inputType: "textarea",
-    },
-    {
-      label: "Recommendation",
-      value: cardData.gradingRecommendation || "Hold for review",
-      field: "gradingRecommendation",
-      inputType: "textarea",
     },
   ];
 
@@ -8567,7 +9285,7 @@ function CardDetail({
           <div className="grid grid-cols-[minmax(0,1fr)_90px] gap-3">
             <div className="min-w-0">
               <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3">
-                <div className="min-w-full snap-center">
+                <div className="relative min-w-full snap-center">
                   <CardImageFrame
                     label="Front"
                     image={displayCard.frontImage}
@@ -8578,6 +9296,14 @@ function CardDetail({
                     }
                     onRemove={() => removeCardImage("frontImage")}
                   />
+
+                  {cardFeatureIconBadges.length > 0 && (
+                    <div className="absolute bottom-6 right-4 flex items-center gap-2">
+                      {cardFeatureIconBadges.map((badge) => (
+                        <FeatureIconBadge key={badge.key} badge={badge} />
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="min-w-full snap-center">
@@ -8682,9 +9408,48 @@ function CardDetail({
           </div>
 
           <div className="rounded-[2rem] border border-vaultGold/20 bg-black/60 p-5 shadow-vault backdrop-blur-xl">
-            <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
-              Grading Strategy
-            </p>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+                  Collection Intelligence
+                </p>
+                <p className="mt-2 text-xs font-bold leading-5 text-zinc-500">
+                  Grade estimates, comp range, market action, and CardVault
+                  recommendation.
+                </p>
+              </div>
+
+              <span className="rounded-full border border-vaultGold/30 bg-vaultGold/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-vaultGold">
+                {collectionIntelligence?.marketAction || "Review"}
+              </span>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {collectionIntelligenceBadges.map((badge) => (
+                <span
+                  key={String(badge)}
+                  className="rounded-full border border-vaultGold/20 bg-black/50 px-3 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-zinc-300"
+                >
+                  {badge}
+                </span>
+              ))}
+            </div>
+
+            <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
+              {collectionIntelligenceRows.map(([label, value]) => (
+                <div
+                  key={label}
+                  className="flex items-start justify-between gap-4 px-4 py-3"
+                >
+                  <p className="shrink-0 text-xs font-black uppercase tracking-[0.2em] text-zinc-500">
+                    {label}
+                  </p>
+                  <p className="text-right text-sm font-black leading-6 text-white">
+                    {value || "Not listed"}
+                  </p>
+                </div>
+              ))}
+            </div>
 
             <div className="mt-4 divide-y divide-vaultGold/10 overflow-hidden rounded-2xl border border-vaultGold/15 bg-black/35">
               {mobileGradingRows.map((row) => renderMobileEditableRow(row))}
@@ -8701,7 +9466,9 @@ function CardDetail({
           {isEditing ? (
             <textarea
               defaultValue={String(
-                (editCard as any).notes || (editCard as any).purchaseNotes || ""
+                (editCard as any).notes ||
+                  (editCard as any).purchaseNotes ||
+                  ""
               )}
               onBlur={(event) =>
                 updateAnyEditField("notes", event.target.value)
@@ -8904,16 +9671,26 @@ function CardDetail({
             <Panel className="bg-black/70 backdrop-blur-sm">
               <div className="grid grid-cols-[minmax(0,1fr)_150px] gap-5">
                 <div className="grid grid-cols-2 gap-5">
-                  <CardImageFrame
-                    label="Front"
-                    image={displayCard.frontImage}
-                    isEditing={isEditing}
-                    inputId={`front-image-${displayCard.id}`}
-                    onUpload={(event) =>
-                      handleCardImageUpload("frontImage", event)
-                    }
-                    onRemove={() => removeCardImage("frontImage")}
-                  />
+                  <div className="relative">
+                    <CardImageFrame
+                      label="Front"
+                      image={displayCard.frontImage}
+                      isEditing={isEditing}
+                      inputId={`front-image-${displayCard.id}`}
+                      onUpload={(event) =>
+                        handleCardImageUpload("frontImage", event)
+                      }
+                      onRemove={() => removeCardImage("frontImage")}
+                    />
+
+                    {cardFeatureIconBadges.length > 0 && (
+                      <div className="absolute bottom-4 right-4 flex items-center gap-2">
+                        {cardFeatureIconBadges.map((badge) => (
+                          <FeatureIconBadge key={badge.key} badge={badge} />
+                        ))}
+                      </div>
+                    )}
+                  </div>
 
                   <CardImageFrame
                     label="Back"
@@ -8992,7 +9769,188 @@ function CardDetail({
 
           {/* Bottom row */}
           <VaultLocationCard card={displayCard} />
-          <GradingStrategyCard card={displayCard} />
+
+          <section className="col-span-12 rounded-[2rem] border border-vaultGold/20 bg-black/70 p-6 shadow-vault backdrop-blur-sm">
+            <div className="flex items-start justify-between gap-6">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.35em] text-vaultGold">
+                  Collection Intelligence
+                </p>
+
+                <h2 className="mt-3 text-3xl font-black uppercase text-white">
+                  {collectionIntelligence?.marketAction || "Review"} Strategy
+                </h2>
+
+                <p className="mt-2 max-w-3xl text-sm font-bold leading-6 text-zinc-400">
+                  Grade estimates, market comps, grading-company fit, risk
+                  factors, and CardVault recommendation for this card.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap justify-end gap-2">
+                {collectionIntelligenceBadges.map((badge) => (
+                  <span
+                    key={String(badge)}
+                    className="rounded-full border border-vaultGold/30 bg-vaultGold/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-vaultGold"
+                  >
+                    {badge}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-4 gap-4">
+              <div className="rounded-2xl border border-vaultGold/15 bg-black/45 p-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500">
+                  PSA Estimate
+                </p>
+                <p className="mt-2 text-2xl font-black text-white">
+                  {collectionIntelligence?.estimatedPSA || "N/A"}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-vaultGold/15 bg-black/45 p-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500">
+                  BGS Estimate
+                </p>
+                <p className="mt-2 text-2xl font-black text-white">
+                  {collectionIntelligence?.estimatedBGS || "N/A"}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-vaultGold/15 bg-black/45 p-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500">
+                  CardVault Value
+                </p>
+                <p className="mt-2 text-2xl font-black text-vaultGold">
+                  {collectionIntelligence
+                    ? `$${collectionIntelligence.cardVaultValueLow.toLocaleString()} - $${collectionIntelligence.cardVaultValueHigh.toLocaleString()}`
+                    : "N/A"}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-vaultGold/15 bg-black/45 p-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500">
+                  Best Company
+                </p>
+                <p className="mt-2 text-2xl font-black text-white">
+                  {collectionIntelligence?.bestGradingCompany || "Review"}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-2 gap-5">
+              <div className="rounded-2xl border border-vaultGold/15 bg-black/45 p-5">
+                <p className="text-xs font-black uppercase tracking-[0.25em] text-vaultGold">
+                  Grade Intelligence
+                </p>
+
+                <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                  {[
+                    ["Centering", collectionIntelligence?.centeringEstimate],
+                    ["Corners", collectionIntelligence?.cornersEstimate],
+                    ["Edges", collectionIntelligence?.edgesEstimate],
+                    ["Surface", collectionIntelligence?.surfaceEstimate],
+                    ["Auto", collectionIntelligence?.autoEstimate || "N/A"],
+                    ["Confidence", collectionIntelligence?.gradingConfidence],
+                  ].map(([label, value]) => (
+                    <div
+                      key={label}
+                      className="rounded-xl border border-vaultGold/10 bg-black/40 p-3"
+                    >
+                      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">
+                        {label}
+                      </p>
+                      <p className="mt-1 font-black text-white">
+                        {value || "Not listed"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-vaultGold/15 bg-black/45 p-5">
+                <p className="text-xs font-black uppercase tracking-[0.25em] text-vaultGold">
+                  Market Intelligence
+                </p>
+
+                <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                  {[
+                    [
+                      "Raw Comps",
+                      collectionIntelligence
+                        ? `$${collectionIntelligence.rawCompLow.toLocaleString()} - $${collectionIntelligence.rawCompHigh.toLocaleString()}`
+                        : "N/A",
+                    ],
+                    [
+                      "Graded Comps",
+                      collectionIntelligence
+                        ? `$${collectionIntelligence.gradedCompLow.toLocaleString()} - $${collectionIntelligence.gradedCompHigh.toLocaleString()}`
+                        : "N/A",
+                    ],
+                    ["Market Action", collectionIntelligence?.marketAction],
+                    ["Movement", collectionIntelligence?.movementStatus],
+                    ["Comp Confidence", collectionIntelligence?.compConfidence],
+                    [
+                      "Value Change",
+                      collectionIntelligence
+                        ? `${collectionIntelligence.valueChangePercent.toFixed(1)}%`
+                        : "0.0%",
+                    ],
+                  ].map(([label, value]) => (
+                    <div
+                      key={label}
+                      className="rounded-xl border border-vaultGold/10 bg-black/40 p-3"
+                    >
+                      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">
+                        {label}
+                      </p>
+                      <p className="mt-1 font-black text-white">
+                        {value || "Not listed"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-2 gap-5">
+              <div className="rounded-2xl border border-vaultGold/15 bg-black/45 p-5">
+                <p className="text-xs font-black uppercase tracking-[0.25em] text-vaultGold">
+                  Risk Factors
+                </p>
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {(collectionIntelligence?.riskFactors || [
+                    "Review needed",
+                  ]).map((risk) => (
+                    <span
+                      key={risk}
+                      className="rounded-full border border-red-500/25 bg-red-950/20 px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-red-300"
+                    >
+                      {risk}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-vaultGold/15 bg-black/45 p-5">
+                <p className="text-xs font-black uppercase tracking-[0.25em] text-vaultGold">
+                  CardVault Recommendation
+                </p>
+
+                <p className="mt-4 text-sm font-bold leading-7 text-zinc-300">
+                  {collectionIntelligence?.gradingRecommendation ||
+                    "Review this card before making a grading, selling, or watch-list decision."}
+                </p>
+
+                <p className="mt-4 text-sm font-bold leading-7 text-zinc-400">
+                  {collectionIntelligence?.intelligenceNotes ||
+                    "No Collection Intelligence notes have been added yet."}
+                </p>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
     </div>
