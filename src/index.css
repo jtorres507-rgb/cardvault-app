@@ -3782,3 +3782,222 @@ body,
 .clean-print-report-output img {
   background: transparent !important;
 }
+
+/* =========================================================
+   FINAL REPORT LIGHT MODE FORCE
+   Use for report previews inside the dark app theme.
+========================================================= */
+
+.force-report-light,
+.force-report-light * {
+  color: #111827 !important;
+  text-shadow: none !important;
+}
+
+.force-report-light {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+}
+
+.force-report-light section,
+.force-report-light article,
+.force-report-light main,
+.force-report-light div,
+.force-report-light table,
+.force-report-light tbody,
+.force-report-light tr,
+.force-report-light td {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+/* Keep report brand/header bars black where intended */
+.force-report-light header,
+.force-report-light thead,
+.force-report-light th,
+.force-report-light .analysis-print-header,
+.force-report-light .print-page-header-inner,
+.force-report-light .memorabilia-report-header,
+.force-report-light .grading-form-header,
+.force-report-light .analysis-print-metric-row p,
+.force-report-light .analysis-print-panel h2,
+.force-report-light .memorabilia-report-card-title,
+.force-report-light .grading-form-card-title {
+  background: #000000 !important;
+  background-color: #000000 !important;
+  color: #f4c44f !important;
+}
+
+/* White cards/panels inside reports */
+.force-report-light .analysis-print-panel,
+.force-report-light .card-analysis-print-report,
+.force-report-light .collection-print-report,
+.force-report-light .memorabilia-report-page,
+.force-report-light .grading-form-page,
+.force-report-light .memorabilia-report-card,
+.force-report-light .grading-form-card,
+.force-report-light .grading-form-table-card {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}
+
+/* Make important report text dark */
+.force-report-light h1,
+.force-report-light h2,
+.force-report-light h3,
+.force-report-light h4,
+.force-report-light p,
+.force-report-light span,
+.force-report-light strong,
+.force-report-light li,
+.force-report-light label,
+.force-report-light td {
+  color: #111827 !important;
+}
+
+/* Restore gold labels in report headers */
+.force-report-light th,
+.force-report-light .analysis-print-brand-text strong,
+.force-report-light .analysis-print-report-name,
+.force-report-light .memorabilia-report-type,
+.force-report-light .memorabilia-report-card-title,
+.force-report-light .grading-form-card-title {
+  color: #f4c44f !important;
+}
+
+/* Restore white text only inside black brand/header bars */
+.force-report-light .analysis-print-header,
+.force-report-light .analysis-print-header *,
+.force-report-light .print-page-header-inner,
+.force-report-light .print-page-header-inner *,
+.force-report-light .memorabilia-report-header,
+.force-report-light .memorabilia-report-header *,
+.force-report-light .grading-form-header,
+.force-report-light .grading-form-header * {
+  color: #ffffff !important;
+}
+
+.force-report-light .analysis-print-brand-text strong,
+.force-report-light .memorabilia-report-brand-name span,
+.force-report-light .grading-form-brand-name span {
+  color: #f4c44f !important;
+}
+
+/* Preserve profit/loss colors */
+.force-report-light .analysis-profit,
+.force-report-light .print-value-positive {
+  color: #0f8a3b !important;
+}
+
+.force-report-light .print-value-negative {
+  color: #c62828 !important;
+}
+
+/* Image slots stay clean */
+.force-report-light img {
+  background: transparent !important;
+}
+
+@media print {
+  .force-report-light,
+  .force-report-light * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  .force-report-light {
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+}
+/* =========================================================
+   CARD ANALYSIS REPORT — LIGHT SCREEN + PRINT FIX
+========================================================= */
+
+.card-analysis-print-report,
+.card-analysis-print-report .analysis-print-body,
+.card-analysis-print-report .analysis-print-content {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}
+
+.card-analysis-print-report .analysis-print-panel {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border: 1px solid #cfd6df !important;
+}
+
+.card-analysis-print-report .analysis-print-panel h2 {
+  background: #000000 !important;
+  background-color: #000000 !important;
+  color: #f4c44f !important;
+}
+
+.card-analysis-print-report .analysis-detail-grid,
+.card-analysis-print-report .analysis-image-grid,
+.card-analysis-print-report .analysis-grade-grid,
+.card-analysis-print-report .analysis-comp-grid,
+.card-analysis-print-report .analysis-sale-table,
+.card-analysis-print-report .analysis-notes-list,
+.card-analysis-print-report .analysis-decision-text {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}
+
+.card-analysis-print-report .analysis-detail-grid span,
+.card-analysis-print-report .analysis-grade-grid span,
+.card-analysis-print-report .analysis-comp-grid span,
+.card-analysis-print-report .analysis-sale-table span {
+  color: #64748b !important;
+}
+
+.card-analysis-print-report strong,
+.card-analysis-print-report li,
+.card-analysis-print-report p {
+  color: #111827 !important;
+}
+
+.card-analysis-print-report .analysis-print-header,
+.card-analysis-print-report .analysis-print-header * {
+  background-color: transparent;
+}
+
+.card-analysis-print-report .analysis-print-header {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+.card-analysis-print-report .analysis-print-brand-text,
+.card-analysis-print-report .analysis-print-brand-text span,
+.card-analysis-print-report .analysis-print-report-name {
+  color: #ffffff !important;
+}
+
+.card-analysis-print-report .analysis-print-brand-text strong {
+  color: #f4c44f !important;
+}
+
+.card-analysis-print-report .analysis-print-metric-row {
+  background: #ffffff !important;
+  border: 1px solid #d7a92d !important;
+}
+
+.card-analysis-print-report .analysis-print-metric-row div {
+  background: #ffffff !important;
+  border-right: 1px solid #d7a92d !important;
+}
+
+.card-analysis-print-report .analysis-print-metric-row p {
+  background: #000000 !important;
+  color: #f4c44f !important;
+}
+
+.card-analysis-print-report .analysis-profit {
+  color: #0f8a3b !important;
+}

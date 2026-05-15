@@ -6874,276 +6874,305 @@ function CardAnalysisReportPreview({ card }: { card: CardRecord }) {
   const estimatedValue = card.estimatedValue || 0;
   const targetSale = estimatedValue * 1.15;
   const projectedProfit = estimatedValue - purchasePrice;
-  const roi = purchasePrice > 0 ? Math.round((projectedProfit / purchasePrice) * 100) : 0;
+  const roi =
+    purchasePrice > 0
+      ? Math.round((projectedProfit / purchasePrice) * 100)
+      : 0;
 
   const frontImage = reportCard.frontImage || reportCard.frontImageUrl || "";
   const backImage = reportCard.backImage || reportCard.backImageUrl || "";
 
-return (
-  <div className="card-analysis-print-report">
-    <div className="analysis-print-header">
-      <div className="analysis-print-brand">
+  const reportTitlePlayer = card.player || "Card";
+
+  return (
+    <div className="card-analysis-print-report bg-white text-slate-950">
+      <div className="analysis-print-header">
+        <div className="analysis-print-brand">
+          <img
+            src="/cardgemz-report-logo.png"
+            alt="CardVault Pro"
+            className="analysis-print-logo"
+          />
+
+          <div className="analysis-print-brand-text">
+            <span>CARDVAULT</span> <strong>PRO</strong>
+          </div>
+        </div>
+
+        <div className="analysis-print-report-name">Card Analysis Report</div>
+      </div>
+
+      <div className="analysis-print-body bg-white">
         <img
           src="/cardgemz-report-logo.png"
           alt=""
           className="analysis-report-watermark"
         />
-        <div className="analysis-print-brand-text">
-          <span>CARDVAULT</span> <strong>PRO</strong>
-        </div>
-      </div>
 
-      <div className="analysis-print-report-name">Card Analysis Report</div>
-    </div>
+        <div className="analysis-print-content bg-white">
+          {/* TITLE */}
+          <div className="analysis-print-title-block bg-white">
+            <h1>{reportTitlePlayer} Card Analysis</h1>
+            <p>Personal Collection Evaluation | June 11, 2025</p>
+          </div>
 
-    <div className="analysis-print-body">
-      <img
-        src="/cardgemz-report-logo.png"
-        alt=""
-        className="analysis-report-watermark"
-      />
+          <div className="analysis-print-metric-row">
+            <div>
+              <p>Purchase Price</p>
+              <strong>{money(purchasePrice)}</strong>
+            </div>
 
-      <div className="analysis-print-content">
-        {/* TITLE */}
-        <div className="analysis-print-title-block">
-          <h1>Michael Jordan Card Analysis</h1>
-          <p>Personal Collection Evaluation | June 11, 2025</p>
-        </div>
+            <div>
+              <p>Est. Value</p>
+              <strong>{money(estimatedValue)}</strong>
+            </div>
 
-      <div className="analysis-print-metric-row">
-        <div>
-          <p>Purchase Price</p>
-          <strong>{money(purchasePrice)}</strong>
-        </div>
+            <div>
+              <p>Target Sale</p>
+              <strong>{money(targetSale)}</strong>
+            </div>
 
-        <div>
-          <p>Est. Value</p>
-          <strong>{money(estimatedValue)}</strong>
-        </div>
+            <div>
+              <p>Projected Profit</p>
+              <strong className="analysis-profit">
+                {projectedProfit >= 0 ? "+" : ""}
+                {money(projectedProfit)}
+              </strong>
+            </div>
 
-        <div>
-          <p>Target Sale</p>
-          <strong>{money(targetSale)}</strong>
-        </div>
-
-        <div>
-          <p>Projected Profit</p>
-          <strong className="analysis-profit">
-            {projectedProfit >= 0 ? "+" : ""}
-            {money(projectedProfit)}
-          </strong>
-        </div>
-
-        <div>
-          <p>Decision</p>
-          <strong>Hold Pending Grade</strong>
-        </div>
-      </div>
-
-        <div className="analysis-print-grid">
-          <div className="analysis-print-panel">
-            <h2>Card Profile</h2>
-
-            <div className="analysis-detail-grid">
-              <span>Card:</span>
-              <strong>{card.card}</strong>
-
-              <span>Player:</span>
-              <strong>{card.player}</strong>
-
-              <span>Team:</span>
-              <strong>{card.team}</strong>
-
-              <span>Sport:</span>
-              <strong>{card.sport}</strong>
-
-              <span>Year:</span>
-              <strong>{card.year}</strong>
-
-              <span>Brand:</span>
-              <strong>{card.brand}</strong>
-
-              <span>SKU:</span>
-              <strong>{card.sku}</strong>
-
-              <span>Serial Number:</span>
-              <strong>{card.serialNumber}</strong>
-
-              <span>Condition:</span>
-              <strong>{reportCard.condition || "Review"}</strong>
-
-              <span>Status:</span>
-              <strong>{card.status}</strong>
-
-              <span>Location:</span>
-              <strong>{card.storageLocation}</strong>
+            <div>
+              <p>Decision</p>
+              <strong>Hold Pending Grade</strong>
             </div>
           </div>
 
-          <div className="analysis-print-panel">
-            <h2>Card Images</h2>
+          <div className="analysis-print-grid">
+            <div className="analysis-print-panel">
+              <h2>Card Profile</h2>
 
-            <div className="analysis-image-grid">
-              <div>
-                <p>Front</p>
-                {frontImage ? (
-                  <img src={frontImage} alt="Card front" />
-                ) : (
-                  <div className="analysis-image-placeholder">No Front Image</div>
-                )}
+              <div className="analysis-detail-grid">
+                <span>Card:</span>
+                <strong>{card.card}</strong>
+
+                <span>Player:</span>
+                <strong>{card.player}</strong>
+
+                <span>Team:</span>
+                <strong>{card.team}</strong>
+
+                <span>Sport:</span>
+                <strong>{card.sport}</strong>
+
+                <span>Year:</span>
+                <strong>{card.year}</strong>
+
+                <span>Brand:</span>
+                <strong>{card.brand}</strong>
+
+                <span>SKU:</span>
+                <strong>{card.sku}</strong>
+
+                <span>Serial Number:</span>
+                <strong>{card.serialNumber}</strong>
+
+                <span>Condition:</span>
+                <strong>{reportCard.condition || "Review"}</strong>
+
+                <span>Status:</span>
+                <strong>{card.status}</strong>
+
+                <span>Location:</span>
+                <strong>{card.storageLocation}</strong>
               </div>
+            </div>
 
-              <div>
-                <p>Back</p>
-                {backImage ? (
-                  <img src={backImage} alt="Card back" />
-                ) : (
-                  <div className="analysis-image-placeholder">No Back Image</div>
-                )}
+            <div className="analysis-print-panel">
+              <h2>Card Images</h2>
+
+              <div className="analysis-image-grid">
+                <div>
+                  <p>Front</p>
+                  {frontImage ? (
+                    <img src={frontImage} alt="Card front" />
+                  ) : (
+                    <div className="analysis-image-placeholder">
+                      No Front Image
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <p>Back</p>
+                  {backImage ? (
+                    <img src={backImage} alt="Card back" />
+                  ) : (
+                    <div className="analysis-image-placeholder">
+                      No Back Image
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="analysis-print-panel">
+              <h2>Card Activity & Inspection Notes</h2>
+
+              <ul className="analysis-notes-list">
+                <li>{card.notes || "No inspection notes entered."}</li>
+                <li>
+                  Card should be reviewed before grading, insurance update, or
+                  sale.
+                </li>
+                <li>
+                  Market comps should be refreshed before making a final
+                  decision.
+                </li>
+              </ul>
+            </div>
+
+            <div className="analysis-print-panel">
+              <h2>Grading Evaluation</h2>
+
+              <div className="analysis-grade-grid">
+                <div>
+                  <span>Corners</span>
+                  <strong>Review</strong>
+                </div>
+
+                <div>
+                  <span>Centering</span>
+                  <strong>Review</strong>
+                </div>
+
+                <div>
+                  <span>Edges</span>
+                  <strong>Review</strong>
+                </div>
+
+                <div>
+                  <span>Surface</span>
+                  <strong>Review</strong>
+                </div>
+
+                <div>
+                  <span>Current Grade</span>
+                  <strong>{card.grade}</strong>
+                </div>
+
+                <div>
+                  <span>Grading Status</span>
+                  <strong>{card.status}</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="analysis-print-panel">
+              <h2>Market Comp Analysis</h2>
+
+              <div className="analysis-comp-grid">
+                <div>
+                  <span>Low Comp</span>
+                  <strong>{money(card.lowComp || 0)}</strong>
+                </div>
+
+                <div>
+                  <span>Est. Value</span>
+                  <strong>{money(estimatedValue)}</strong>
+                </div>
+
+                <div>
+                  <span>High Comp</span>
+                  <strong>{money(card.highComp || 0)}</strong>
+                </div>
+
+                <div>
+                  <span>Confidence</span>
+                  <strong>Medium</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="analysis-print-panel">
+              <h2>Predicted Sale Price</h2>
+
+              <div className="analysis-sale-table">
+                <div>
+                  <span>Current Grade</span>
+                  <strong>{money(estimatedValue)}</strong>
+                </div>
+
+                <div>
+                  <span>Premium Grade Target</span>
+                  <strong className="analysis-profit">
+                    {money(targetSale)}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Projected Profit</span>
+                  <strong className="analysis-profit">
+                    {money(projectedProfit)}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>ROI</span>
+                  <strong>{roi}%</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="analysis-print-panel">
+              <h2>Personal Collection Decision</h2>
+
+              <p className="analysis-decision-text">
+                Hold / Review. Final grading outcome, market comps, and
+                collection priority should determine whether to hold long-term,
+                grade, insure, or sell.
+              </p>
+            </div>
+
+            <div className="analysis-print-panel">
+              <h2>Sale Information</h2>
+
+              <div className="analysis-detail-grid">
+                <span>Sale Date:</span>
+                <strong>TBD</strong>
+
+                <span>Platform/Show:</span>
+                <strong>TBD</strong>
+
+                <span>Sale Price:</span>
+                <strong>TBD</strong>
+
+                <span>Net Proceeds:</span>
+                <strong>TBD</strong>
               </div>
             </div>
           </div>
 
-          <div className="analysis-print-panel">
-            <h2>Card Activity & Inspection Notes</h2>
+          <div className="analysis-print-panel analysis-report-notes">
+            <h2>Report Notes</h2>
 
             <ul className="analysis-notes-list">
-              <li>{card.notes || "No inspection notes entered."}</li>
-              <li>Card should be reviewed before grading, insurance update, or sale.</li>
-              <li>Market comps should be refreshed before making a final decision.</li>
+              <li>
+                Market comps should be refreshed before any sale, trade,
+                insurance update, or grading decision.
+              </li>
+              <li>
+                Raw cards should be inspected for centering, corners, edges, and
+                surface before grading.
+              </li>
+              <li>
+                This report is generated from the card page and reflects the
+                current data on file.
+              </li>
             </ul>
           </div>
-
-          <div className="analysis-print-panel">
-            <h2>Grading Evaluation</h2>
-
-            <div className="analysis-grade-grid">
-              <div>
-                <span>Corners</span>
-                <strong>Review</strong>
-              </div>
-
-              <div>
-                <span>Centering</span>
-                <strong>Review</strong>
-              </div>
-
-              <div>
-                <span>Edges</span>
-                <strong>Review</strong>
-              </div>
-
-              <div>
-                <span>Surface</span>
-                <strong>Review</strong>
-              </div>
-
-              <div>
-                <span>Current Grade</span>
-                <strong>{card.grade}</strong>
-              </div>
-
-              <div>
-                <span>Grading Status</span>
-                <strong>{card.status}</strong>
-              </div>
-            </div>
-          </div>
-
-          <div className="analysis-print-panel">
-            <h2>Market Comp Analysis</h2>
-
-            <div className="analysis-comp-grid">
-              <div>
-                <span>Low Comp</span>
-                <strong>{money(card.lowComp || 0)}</strong>
-              </div>
-
-              <div>
-                <span>Est. Value</span>
-                <strong>{money(estimatedValue)}</strong>
-              </div>
-
-              <div>
-                <span>High Comp</span>
-                <strong>{money(card.highComp || 0)}</strong>
-              </div>
-
-              <div>
-                <span>Confidence</span>
-                <strong>Medium</strong>
-              </div>
-            </div>
-          </div>
-
-          <div className="analysis-print-panel">
-            <h2>Predicted Sale Price</h2>
-
-            <div className="analysis-sale-table">
-              <div>
-                <span>Current Grade</span>
-                <strong>{money(estimatedValue)}</strong>
-              </div>
-
-              <div>
-                <span>Premium Grade Target</span>
-                <strong className="analysis-profit">{money(targetSale)}</strong>
-              </div>
-
-              <div>
-                <span>Projected Profit</span>
-                <strong className="analysis-profit">{money(projectedProfit)}</strong>
-              </div>
-
-              <div>
-                <span>ROI</span>
-                <strong>{roi}%</strong>
-              </div>
-            </div>
-          </div>
-
-          <div className="analysis-print-panel">
-            <h2>Personal Collection Decision</h2>
-
-            <p className="analysis-decision-text">
-              Hold / Review. Final grading outcome, market comps, and collection
-              priority should determine whether to hold long-term, grade, insure,
-              or sell.
-            </p>
-          </div>
-
-          <div className="analysis-print-panel">
-            <h2>Sale Information</h2>
-
-            <div className="analysis-detail-grid">
-              <span>Sale Date:</span>
-              <strong>TBD</strong>
-
-              <span>Platform/Show:</span>
-              <strong>TBD</strong>
-
-              <span>Sale Price:</span>
-              <strong>TBD</strong>
-
-              <span>Net Proceeds:</span>
-              <strong>TBD</strong>
-            </div>
-          </div>
-        </div>
-
-        <div className="analysis-print-panel analysis-report-notes">
-          <h2>Report Notes</h2>
-
-          <ul className="analysis-notes-list">
-            <li>Market comps should be refreshed before any sale, trade, insurance update, or grading decision.</li>
-            <li>Raw cards should be inspected for centering, corners, edges, and surface before grading.</li>
-            <li>This report is generated from the card page and reflects the current data on file.</li>
-          </ul>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 }
 
 function AddCard({ onSave }: { onSave: (formData: AddCardForm) => void }) {
